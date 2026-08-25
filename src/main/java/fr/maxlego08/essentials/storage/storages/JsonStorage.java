@@ -2,25 +2,7 @@ package fr.maxlego08.essentials.storage.storages;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.discord.DiscordAction;
-import fr.maxlego08.essentials.api.dto.ChatMessageDTO;
-import fr.maxlego08.essentials.api.dto.CooldownDTO;
-import fr.maxlego08.essentials.api.dto.DiscordAccountDTO;
-import fr.maxlego08.essentials.api.dto.DiscordCodeDTO;
-import fr.maxlego08.essentials.api.dto.EconomyDTO;
-import fr.maxlego08.essentials.api.dto.EconomyTransactionDTO;
-import fr.maxlego08.essentials.api.dto.HomeDTO;
-import fr.maxlego08.essentials.api.dto.MailBoxDTO;
-import fr.maxlego08.essentials.api.dto.MailMessageDTO;
-import fr.maxlego08.essentials.api.dto.PlayerSlotDTO;
-import fr.maxlego08.essentials.api.dto.PublicHomeDTO;
-import fr.maxlego08.essentials.api.dto.SanctionDTO;
-import fr.maxlego08.essentials.api.dto.StepDTO;
-import fr.maxlego08.essentials.api.dto.UserDTO;
-import fr.maxlego08.essentials.api.dto.UserEconomyDTO;
-import fr.maxlego08.essentials.api.dto.UserEconomyRankingDTO;
-import fr.maxlego08.essentials.api.dto.UserVoteDTO;
-import fr.maxlego08.essentials.api.dto.VaultDTO;
-import fr.maxlego08.essentials.api.dto.VaultItemDTO;
+import fr.maxlego08.essentials.api.dto.*;
 import fr.maxlego08.essentials.api.economy.Economy;
 import fr.maxlego08.essentials.api.home.Home;
 import fr.maxlego08.essentials.api.mailbox.MailBoxItem;
@@ -35,22 +17,28 @@ import fr.maxlego08.essentials.api.user.UserRecord;
 import fr.maxlego08.essentials.api.vault.Vault;
 import fr.maxlego08.essentials.user.ZUser;
 import fr.maxlego08.essentials.zutils.utils.StorageHelper;
-import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import fr.maxlego08.menu.common.utils.nms.ItemStackUtils;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class JsonStorage extends StorageHelper implements IStorage {
+
+    private JsonStorageState state;
 
     public JsonStorage(EssentialsPlugin plugin) {
         super(plugin);
@@ -62,8 +50,8 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     private void createFolder() {
         File folder = getFolder();
-        if (!folder.exists()) {
-            folder.mkdir();
+        if (!folder.exists() && !folder.mkdirs()) {
+            this.plugin.getLogger().warning("Unable to create JSON storage folder: " + folder.getAbsolutePath());
         }
     }
 
@@ -73,6 +61,10 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
         File folder = getFolder();
         this.totalUser = folder == null ? 0 : Optional.ofNullable(folder.listFiles()).map(e -> e.length).orElse(0);
+        this.state = loadState();
+        this.state.sanctions.stream()
+                .filter(sanctionDTO -> sanctionDTO.sanction_type() == fr.maxlego08.essentials.api.sanction.SanctionType.BAN && sanctionDTO.expired_at() != null && sanctionDTO.expired_at().getTime() > System.currentTimeMillis())
+                .forEach(sanctionDTO -> this.banSanctions.put(sanctionDTO.player_unique_id(), Sanction.fromDTO(sanctionDTO)));
         this.plugin.getLogger().severe("Please use MYSQL storage, the JSON is only to enable the for the first installation of the plugin.");
     }
 
@@ -85,10 +77,106 @@ public class JsonStorage extends StorageHelper implements IStorage {
             Persist persist = this.plugin.getPersist();
             persist.save(user, getUserFile(uniqueId));
         });
+        saveState();
     }
 
     private File getUserFile(UUID uniqueId) {
         return new File(getFolder(), uniqueId + ".json");
+    }
+
+    private File getStateFile() {
+        return new File(this.plugin.getDataFolder(), "json-storage-state.json");
+    }
+
+    private synchronized JsonStorageState loadState() {
+        JsonStorageState loaded = this.plugin.getPersist().load(JsonStorageState.class, getStateFile());
+        return loaded == null ? new JsonStorageState() : loaded;
+    }
+
+    private synchronized JsonStorageState state() {
+        if (this.state == null) {
+            this.state = loadState();
+        }
+        return this.state;
+    }
+
+    private synchronized void saveState() {
+        this.plugin.getPersist().save(state(), getStateFile());
+    }
+
+    private User loadUser(UUID uniqueId) {
+        User user = this.users.get(uniqueId);
+        if (user != null) return user;
+        return this.plugin.getPersist().load(User.class, getUserFile(uniqueId));
+    }
+
+    private void saveUser(User user) {
+        if (user == null) return;
+        this.plugin.getPersist().save(user, getUserFile(user.getUniqueId()));
+    }
+
+    private void saveUser(UUID uniqueId) {
+        saveUser(loadUser(uniqueId));
+    }
+
+    private void updateUser(UUID uniqueId, Consumer<User> consumer) {
+        User user = loadUser(uniqueId);
+        if (user == null) return;
+        consumer.accept(user);
+        saveUser(user);
+        this.users.put(uniqueId, user);
+    }
+
+    private List<User> getAllUsers() {
+        Map<UUID, User> result = new LinkedHashMap<>(this.users);
+
+        File[] files = getFolder().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
+        if (files != null) {
+            for (File file : files) {
+                try {
+                    UUID uuid = UUID.fromString(file.getName().substring(0, file.getName().length() - 5));
+                    result.computeIfAbsent(uuid, key -> this.plugin.getPersist().load(User.class, file));
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        return result.values().stream().filter(Objects::nonNull).toList();
+    }
+
+    private UserDTO toUserDTO(User user) {
+        return new UserDTO(
+                user.getUniqueId(),
+                user.getName(),
+                locationAsString(user.getLastLocation()),
+                user.getActiveBanId() == 0 ? null : user.getActiveBanId(),
+                user.getActiveMuteId() == 0 ? null : user.getActiveMuteId(),
+                user.getPlayTime(),
+                new Date(),
+                new Date(),
+                user.getVote(),
+                user.getOfflineVotes(),
+                user.isFrozen(),
+                user.getFlySeconds(),
+                user.getPlayerTime(),
+                user.getPlayerWeather()
+        );
+    }
+
+    private void upsertVaultRecord(UUID uniqueId, int vaultId, String name, String icon) {
+        JsonStorageState backend = state();
+        backend.vaults.removeIf(vaultDTO -> vaultDTO.unique_id().equals(uniqueId) && vaultDTO.vault_id() == vaultId);
+        backend.vaults.add(new VaultDTO(uniqueId, vaultId, name, icon));
+        saveState();
+    }
+
+    private void upsertPlayerSlot(UUID uniqueId, int slots) {
+        JsonStorageState backend = state();
+        backend.playerSlots.removeIf(playerSlotDTO -> playerSlotDTO.unique_id().equals(uniqueId));
+        if (slots > 0) {
+            backend.playerSlots.add(new PlayerSlotDTO(uniqueId, slots));
+        }
+        saveState();
     }
 
     @Override
@@ -151,7 +239,10 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public void resetEconomy(Economy economy, BigDecimal amount) {
-        throw new NotImplementedException("resetEconomy is not implemented, use MYSQL storage");
+        for (User user : getAllUsers()) {
+            user.getBalances().put(economy.getName(), amount);
+            saveUser(user);
+        }
     }
 
     @Override
@@ -216,17 +307,21 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public void storeTransactions(UUID fromUuid, UUID toUuid, Economy economy, BigDecimal fromAmount, BigDecimal toAmount, String reason) {
-
+        state().transactions.add(new EconomyTransactionDTO(fromUuid, toUuid, economy.getName(), reason, toAmount.subtract(fromAmount), fromAmount, toAmount, new Date(), new Date()));
+        saveState();
     }
 
     @Override
     public List<EconomyTransactionDTO> getTransactions(UUID toUuid, Economy economy) {
-        return List.of();
+        return state().transactions.stream()
+                .filter(transaction -> transaction.to_unique_id().equals(toUuid) && transaction.economy_name().equalsIgnoreCase(economy.getName()))
+                .toList();
     }
 
     @Override
     public void upsertStorage(String key, Object value) {
-
+        state().serverStorage.put(key, this.plugin.getGson().toJson(value));
+        saveState();
     }
 
     @Override
@@ -345,67 +440,100 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public void insertSanction(Sanction sanction, Consumer<Integer> consumer) {
-        throw new NotImplementedException("insertSanction is not implemented, use MYSQL storage");
+        JsonStorageState backend = state();
+        sanction.setId((int) backend.nextSanctionId++);
+        backend.sanctions.add(new SanctionDTO(sanction.getId(), sanction.getPlayerUniqueId(), sanction.getSenderUniqueId(), sanction.getReason(), sanction.getCreatedAt(), sanction.getExpiredAt(), sanction.getSanctionType(), sanction.getDuration()));
+
+        if (sanction.getSanctionType() == fr.maxlego08.essentials.api.sanction.SanctionType.BAN) {
+            this.banSanctions.put(sanction.getPlayerUniqueId(), sanction);
+        } else if (sanction.getSanctionType() == fr.maxlego08.essentials.api.sanction.SanctionType.UNBAN) {
+            this.banSanctions.remove(sanction.getPlayerUniqueId());
+        }
+
+        saveState();
+        consumer.accept(sanction.getId());
     }
 
     @Override
     public void updateUserBan(UUID uuid, Integer index) {
-        throw new NotImplementedException("updateUserBan is not implemented, use MYSQL storage");
+        updateUser(uuid, user -> user.setSanction(index, user.getActiveMuteId()));
     }
 
     @Override
     public void updateUserMute(UUID uuid, Integer index) {
-        throw new NotImplementedException("updateMuteBan is not implemented, use MYSQL storage");
+        updateUser(uuid, user -> user.setSanction(user.getActiveBanId(), index));
     }
 
     @Override
     public boolean isMute(UUID uuid) {
-        throw new NotImplementedException("isMute is not implemented, use MYSQL storage");
+        Sanction sanction = getMute(uuid);
+        return sanction != null && sanction.isActive();
     }
 
     @Override
     public Sanction getMute(UUID uuid) {
-        throw new NotImplementedException("getMute is not implemented, use MYSQL storage");
+        User user = loadUser(uuid);
+        if (user == null || user.getActiveMuteId() <= 0) return null;
+        return state().sanctions.stream()
+                .filter(sanctionDTO -> sanctionDTO.id() == user.getActiveMuteId())
+                .findFirst()
+                .map(Sanction::fromDTO)
+                .orElse(null);
     }
 
     @Override
     public List<SanctionDTO> getSanctions(UUID uuid) {
-        throw new NotImplementedException("getSanctions is not implemented, use MYSQL storage");
+        return state().sanctions.stream().filter(sanctionDTO -> sanctionDTO.player_unique_id().equals(uuid)).toList();
     }
 
     @Override
     public void insertChatMessage(UUID uuid, String content) {
-        // throw new NotImplementedException("insertChatMessage is not implemented, use MYSQL storage");
+        state().chatMessages.add(new ChatMessageDTO(uuid, content, new Date()));
+        saveState();
     }
 
     @Override
     public void insertPrivateMessage(UUID sender, UUID receiver, String content) {
-        throw new NotImplementedException("insertPrivateMessage is not implemented, use MYSQL storage");
+        state().privateMessages.add(new PrivateMessageDTO(sender, receiver, content, new Date()));
+        saveState();
     }
 
     @Override
     public void insertCommand(UUID uuid, String command) {
-        // throw new NotImplementedException("insertCommand is not implemented, use MYSQL storage");
+        state().commands.add(new CommandDTO(uuid, command, new Date()));
+        saveState();
     }
 
     @Override
     public void insertPlayTime(UUID uniqueId, long sessionPlayTime, long playtime, String address) {
-        // throw new NotImplementedException("insertPlayTime is not implemented, use MYSQL storage");
+        if (sessionPlayTime > 0) {
+            state().playTimes.add(new PlayTimeDTO(uniqueId, sessionPlayTime, address, new Date()));
+        }
+        updateUser(uniqueId, user -> {
+            user.setPlayTime(playtime);
+            user.setAddress(address);
+        });
+        saveState();
     }
 
     @Override
     public UserRecord fetchUserRecord(UUID uuid) {
-        throw new NotImplementedException("UserRecord is not implemented, use MYSQL storage");
+        User user = loadUser(uuid);
+        if (user == null) {
+            user = createOrLoad(uuid, Bukkit.getOfflinePlayer(uuid).getName() == null ? uuid.toString() : Bukkit.getOfflinePlayer(uuid).getName());
+        }
+        List<PlayTimeDTO> playTimeDTOS = state().playTimes.stream().filter(playTimeDTO -> playTimeDTO.unique_id().equals(uuid)).toList();
+        return new UserRecord(toUserDTO(user), playTimeDTOS);
     }
 
     @Override
     public List<UserDTO> getUsers(String ip) {
-        throw new NotImplementedException("getUsers is not implemented, use MYSQL storage");
+        return getAllUsers().stream().filter(user -> ip.equalsIgnoreCase(user.getAddress())).map(this::toUserDTO).toList();
     }
 
     @Override
     public List<ChatMessageDTO> getMessages(UUID targetUuid) {
-        return new ArrayList<>();
+        return state().chatMessages.stream().filter(chatMessageDTO -> chatMessageDTO.unique_id().equals(targetUuid)).toList();
     }
 
     @Override
@@ -423,7 +551,9 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public List<CooldownDTO> getCooldowns(UUID uniqueId) {
-        return new ArrayList<>();
+        User user = loadUser(uniqueId);
+        if (user == null) return new ArrayList<>();
+        return user.getCooldowns().entrySet().stream().map(entry -> new CooldownDTO(entry.getKey(), entry.getValue(), new Date())).toList();
     }
 
     @Override
@@ -438,17 +568,23 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public void addMailBoxItem(MailBoxItem mailBoxItem) {
-        throw new NotImplementedException("addMailBoxItem is not implemented, use MYSQL storage");
+        mailBoxItem.setId((int) state().nextMailBoxId++);
+        updateUser(mailBoxItem.getUniqueId(), user -> user.getMailBoxItems().add(mailBoxItem));
+        saveState();
     }
 
     @Override
     public void clearMailBox(UUID uuid) {
-        throw new NotImplementedException("addMailBoxItem is not clearMaiLBox, use MYSQL storage");
+        updateUser(uuid, user -> user.getMailBoxItems().clear());
     }
 
     @Override
     public void removeMailBoxItem(int id) {
-        throw new NotImplementedException("removeMailBoxItem is not implemented, use MYSQL storage");
+        for (User user : getAllUsers()) {
+            if (user.getMailBoxItems().removeIf(item -> item.getId() == id)) {
+                saveUser(user);
+            }
+        }
     }
 
     @Override
@@ -516,93 +652,114 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public List<UserEconomyRankingDTO> getEconomyRanking(Economy economy) {
-        return new ArrayList<>();
+        return getAllUsers().stream()
+                .map(user -> new UserEconomyRankingDTO(user.getUniqueId(), user.getName(), user.getBalance(economy)))
+                .sorted(Comparator.comparing(UserEconomyRankingDTO::amount).reversed())
+                .toList();
     }
 
     @Override
     public List<MailBoxDTO> getMailBox(UUID uuid) {
-        return new ArrayList<>();
+        User user = loadUser(uuid);
+        if (user == null) return new ArrayList<>();
+        return user.getMailBoxItems().stream().map(item -> new MailBoxDTO(item.getId(), item.getUniqueId(), ItemStackUtils.serializeItemStack(item.getItemStack()), item.getExpiredAt(), new Date())).toList();
     }
 
     @Override
     public void fetchOfflinePlayerEconomies(Consumer<List<UserEconomyDTO>> consumer) {
-        consumer.accept(new ArrayList<>());
+        consumer.accept(getAllUsers().stream().flatMap(user -> user.getBalances().entrySet().stream().map(entry -> new UserEconomyDTO(user.getUniqueId(), entry.getKey(), entry.getValue()))).toList());
     }
 
     @Override
     public void setVote(UUID uuid, long vote, long offline) {
-        throw new NotImplementedException("setVote is not implemented, use MYSQL storage");
+        updateUser(uuid, user -> user.setWithDTO(new UserDTO(user.getUniqueId(), user.getName(), locationAsString(user.getLastLocation()), user.getActiveBanId() == 0 ? null : user.getActiveBanId(), user.getActiveMuteId() == 0 ? null : user.getActiveMuteId(), user.getPlayTime(), new Date(), new Date(), vote, offline, user.isFrozen(), user.getFlySeconds(), user.getPlayerTime(), user.getPlayerWeather())));
     }
 
     @Override
     public UserVoteDTO getVote(UUID uniqueId) {
-        throw new NotImplementedException("getVote is not implemented, use MYSQL storage");
+        User user = loadUser(uniqueId);
+        return user == null ? new UserVoteDTO(uniqueId, 0, 0) : new UserVoteDTO(uniqueId, user.getVote(), user.getOfflineVotes());
     }
 
     @Override
     public void updateServerStorage(String key, Object object) {
-        throw new NotImplementedException("updateServerStorage is not implemented, use MYSQL storage");
+        upsertStorage(key, object);
     }
 
     @Override
     public void setLastVote(UUID uniqueId, String site) {
-        throw new NotImplementedException("setLastVote is not implemented, use MYSQL storage");
+        saveUser(uniqueId);
     }
 
     @Override
     public void resetVotes() {
-        throw new NotImplementedException("resetVotes is not implemented, use MYSQL storage");
+        for (User user : getAllUsers()) {
+            user.setWithDTO(new UserDTO(user.getUniqueId(), user.getName(), locationAsString(user.getLastLocation()), user.getActiveBanId() == 0 ? null : user.getActiveBanId(), user.getActiveMuteId() == 0 ? null : user.getActiveMuteId(), user.getPlayTime(), new Date(), new Date(), 0, 0, user.isFrozen(), user.getFlySeconds(), user.getPlayerTime(), user.getPlayerWeather()));
+            saveUser(user);
+        }
     }
 
     @Override
     public void updateVaultQuantity(UUID uniqueId, int vaultId, int slot, long quantity) {
-        throw new NotImplementedException("updateVaultQuantity is not implemented, use MYSQL storage");
+        state().vaultItems.stream()
+                .filter(vaultItemDTO -> vaultItemDTO.unique_id().equals(uniqueId) && vaultItemDTO.vault_id() == vaultId && vaultItemDTO.slot() == slot)
+                .findFirst()
+                .ifPresent(vaultItemDTO -> {
+                    state().vaultItems.remove(vaultItemDTO);
+                    state().vaultItems.add(new VaultItemDTO(uniqueId, vaultId, slot, vaultItemDTO.item(), quantity));
+                    saveState();
+                });
     }
 
     @Override
     public void removeVaultItem(UUID uniqueId, int vaultId, int slot) {
-        throw new NotImplementedException("removeVaultItem is not implemented, use MYSQL storage");
+        if (state().vaultItems.removeIf(vaultItemDTO -> vaultItemDTO.unique_id().equals(uniqueId) && vaultItemDTO.vault_id() == vaultId && vaultItemDTO.slot() == slot)) {
+            saveState();
+        }
     }
 
     @Override
     public void createVaultItem(UUID uniqueId, int vaultId, int slot, long quantity, String item) {
-        throw new NotImplementedException("createVaultItem is not implemented, use MYSQL storage");
-
+        state().vaultItems.removeIf(vaultItemDTO -> vaultItemDTO.unique_id().equals(uniqueId) && vaultItemDTO.vault_id() == vaultId && vaultItemDTO.slot() == slot);
+        state().vaultItems.add(new VaultItemDTO(uniqueId, vaultId, slot, item, quantity));
+        saveState();
     }
 
     @Override
     public Optional<VaultItemDTO> getVaultItem(UUID uniqueId, int vaultId, int slot) {
-        throw new NotImplementedException("getVaultItem is not implemented, use MYSQL storage");
+        return state().vaultItems.stream().filter(vaultItemDTO -> vaultItemDTO.unique_id().equals(uniqueId) && vaultItemDTO.vault_id() == vaultId && vaultItemDTO.slot() == slot).findFirst();
     }
 
     @Override
     public boolean forceRemoveVaultItem(UUID uniqueId, int vaultId, int slot) {
-        throw new NotImplementedException("forceRemoveVaultItem is not implemented, use MYSQL storage");
+        boolean removed = state().vaultItems.removeIf(vaultItemDTO -> vaultItemDTO.unique_id().equals(uniqueId) && vaultItemDTO.vault_id() == vaultId && vaultItemDTO.slot() == slot);
+        if (removed) saveState();
+        return removed;
     }
 
     @Override
     public void setVaultSlot(UUID uniqueId, int slots) {
-        throw new NotImplementedException("setVaultSlot is not implemented, use MYSQL storage");
+        upsertPlayerSlot(uniqueId, slots);
     }
 
     @Override
     public List<VaultDTO> getVaults() {
-        return new ArrayList<>();
+        return state().vaults;
     }
 
     @Override
     public List<VaultItemDTO> getVaultItems() {
-        return new ArrayList<>();
+        return state().vaultItems;
     }
 
     @Override
     public List<PlayerSlotDTO> getPlayerVaultSlots() {
-        return new ArrayList<>();
+        return state().playerSlots;
     }
 
     @Override
     public void updateVault(UUID uniqueId, Vault vault) {
-        throw new NotImplementedException("updateVault is not implemented, use MYSQL storage");
+        upsertVaultRecord(uniqueId, vault.getVaultId(), vault.getName(), vault.getIconItemStack() == null ? null : ItemStackUtils.serializeItemStack(vault.getIconItemStack()));
     }
 
     @Override
@@ -612,12 +769,13 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public void upsertFlySeconds(UUID uniqueId, long flySeconds) {
-        throw new NotImplementedException("upsertFly is not implemented, use MYSQL storage");
+        saveUser(uniqueId);
     }
 
     @Override
     public long getFlySeconds(UUID uniqueId) {
-        return 0;
+        User user = loadUser(uniqueId);
+        return user == null ? 0 : user.getFlySeconds();
     }
 
     @Override
@@ -627,56 +785,109 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     @Override
     public void deleteWorldData(String worldName) {
-        throw new NotImplementedException("upsertFly is not implemented, use MYSQL storage");
+        for (User user : getAllUsers()) {
+            boolean changed = false;
+            if (user.getLastLocation() != null && user.getLastLocation().getWorld() != null && worldName.equalsIgnoreCase(user.getLastLocation().getWorld().getName())) {
+                user.setLastLocation(null);
+                changed = true;
+            }
+            if (user.getHomes().removeIf(home -> home.getLocation() != null && home.getLocation().getWorld() != null && worldName.equalsIgnoreCase(home.getLocation().getWorld().getName()))) {
+                changed = true;
+            }
+            if (changed) saveUser(user);
+        }
     }
 
     @Override
     public void linkDiscordAccount(UUID uniqueId, String minecraftName, String discordName, long userId) {
-        throw new NotImplementedException("linkDiscordAccount is not implemented, use MYSQL storage");
+        JsonStorageState backend = state();
+        backend.discordAccounts.removeIf(discordAccountDTO -> discordAccountDTO.unique_id().equals(uniqueId));
+        backend.discordAccounts.add(new DiscordAccountDTO(userId, uniqueId, minecraftName, discordName, new java.sql.Timestamp(System.currentTimeMillis())));
+        saveState();
     }
 
     @Override
     public Optional<DiscordAccountDTO> selectDiscordAccount(UUID uniqueId) {
-        return Optional.empty();
+        return state().discordAccounts.stream().filter(discordAccountDTO -> discordAccountDTO.unique_id().equals(uniqueId)).findFirst();
     }
 
     @Override
     public Optional<DiscordCodeDTO> selectCode(String code) {
-        return Optional.empty();
+        return state().discordCodes.stream().filter(discordCodeDTO -> discordCodeDTO.code().equals(code)).findFirst();
     }
 
     @Override
     public void clearCode(DiscordCodeDTO code) {
-        throw new NotImplementedException("clearCode is not implemented, use MYSQL storage");
+        if (state().discordCodes.removeIf(discordCodeDTO -> discordCodeDTO.code().equals(code.code()))) {
+            saveState();
+        }
     }
 
     @Override
     public void insertDiscordLog(DiscordAction action, UUID uniqueId, String minecraftName, String discordName, long userId, String data) {
-        throw new NotImplementedException("insertDiscordLog is not implemented, use MYSQL storage");
+        state().discordLogs.add(new DiscordLogEntry(action, uniqueId, minecraftName, discordName, userId, data, new Date()));
+        saveState();
     }
 
     @Override
     public void unlinkDiscordAccount(UUID uniqueId) {
-        throw new NotImplementedException("unlinkDiscordAccount is not implemented, use MYSQL storage");
+        if (state().discordAccounts.removeIf(discordAccountDTO -> discordAccountDTO.unique_id().equals(uniqueId))) {
+            saveState();
+        }
     }
 
     @Override
     public StepDTO selectStep(UUID uniqueId, Step step) {
-        throw new NotImplementedException("canCreateStep is not implemented, use MYSQL storage");
+        return state().steps.stream().filter(stepDTO -> stepDTO.unique_id().equals(uniqueId) && stepDTO.step_name().equalsIgnoreCase(step.name())).findFirst().orElse(null);
     }
 
     @Override
     public void createStep(UUID uniqueId, Step step, long playTime) {
-        throw new NotImplementedException("registerStep is not implemented, use MYSQL storage");
+        JsonStorageState backend = state();
+        backend.steps.removeIf(stepDTO -> stepDTO.unique_id().equals(uniqueId) && stepDTO.step_name().equalsIgnoreCase(step.name()));
+        backend.steps.add(new StepDTO(uniqueId, step.name(), null, new Date(), new Date(), playTime, 0, 0, null));
+        saveState();
     }
 
     @Override
     public void finishStep(UUID uniqueId, Step step, String data, long playTimeEnd, long playTimeBetween) {
-        throw new NotImplementedException("finishStep is not implemented, use MYSQL storage");
+        JsonStorageState backend = state();
+        backend.steps.stream()
+                .filter(stepDTO -> stepDTO.unique_id().equals(uniqueId) && stepDTO.step_name().equalsIgnoreCase(step.name()))
+                .findFirst()
+                .ifPresent(stepDTO -> {
+                    backend.steps.remove(stepDTO);
+                    backend.steps.add(new StepDTO(uniqueId, step.name(), data, stepDTO.created_at(), new Date(), stepDTO.play_time_start(), playTimeEnd, playTimeBetween, new Date()));
+                    saveState();
+                });
     }
 
     @Override
     public List<String> getPlayerNames() {
-        return List.of();
+        return getAllUsers().stream().map(User::getName).filter(name -> name != null && !name.isBlank()).distinct().sorted(String.CASE_INSENSITIVE_ORDER).toList();
+    }
+
+    private static class JsonStorageState {
+        private List<EconomyTransactionDTO> transactions = new ArrayList<>();
+        private List<CommandDTO> commands = new ArrayList<>();
+        private List<ChatMessageDTO> chatMessages = new ArrayList<>();
+        private List<PrivateMessageDTO> privateMessages = new ArrayList<>();
+        private List<PlayTimeDTO> playTimes = new ArrayList<>();
+        private List<SanctionDTO> sanctions = new ArrayList<>();
+        private List<MailBoxDTO> mailBoxes = new ArrayList<>();
+        private List<UserVoteDTO> votes = new ArrayList<>();
+        private List<VaultDTO> vaults = new ArrayList<>();
+        private List<VaultItemDTO> vaultItems = new ArrayList<>();
+        private List<PlayerSlotDTO> playerSlots = new ArrayList<>();
+        private List<DiscordAccountDTO> discordAccounts = new ArrayList<>();
+        private List<DiscordCodeDTO> discordCodes = new ArrayList<>();
+        private List<DiscordLogEntry> discordLogs = new ArrayList<>();
+        private List<StepDTO> steps = new ArrayList<>();
+        private Map<String, String> serverStorage = new HashMap<>();
+        private long nextSanctionId = 1;
+        private long nextMailBoxId = 1;
+    }
+
+    private record DiscordLogEntry(DiscordAction action, UUID uniqueId, String minecraftName, String discordName, long userId, String data, Date createdAt) {
     }
 }

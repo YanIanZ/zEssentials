@@ -120,7 +120,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
     private final List<Material> materials = Arrays.stream(Material.values()).filter(e -> !e.name().startsWith("LEGACY_")).toList();
     private final Enchantments enchantments = new ZEnchantments();
     private final List<PermissionChecker> permissionCheckers = new ArrayList<>();
-    private final BukkitContext context = new BukkitContext.Factory(this, "28e08a99fe06fe15372d51ee3919757f").metrics(dev.faststats.Metrics.Factory::create).create();
+    private final BukkitContext context = new BukkitContext.Factory(this, "e5fc0a2f2a9d4a6210593e3af10a5de1").metrics(dev.faststats.Metrics.Factory::create).create();
     private volatile Map<String, Warp> warpsByName = Collections.emptyMap();
     private EssentialsUtils essentialsUtils;
     private ServerStorage serverStorage = new ZServerStorage(this);
