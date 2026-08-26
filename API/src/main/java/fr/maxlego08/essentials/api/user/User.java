@@ -84,6 +84,14 @@ public interface User {
     void sendTeleportHereRequest(User targetUser);
 
     /**
+     * Sends a teleport-here request to every given user at once.
+     * Targets that ignore the sender or disabled teleport requests are skipped silently.
+     *
+     * @param targetUsers The users to send the teleport request to.
+     */
+    void sendTeleportHereRequestToAll(Collection<User> targetUsers);
+
+    /**
      * Cancels a teleport request sent to another user.
      *
      * @param targetUser The user to cancel the teleport request for.

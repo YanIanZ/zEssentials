@@ -45,9 +45,7 @@ public class ButtonSanction extends Button {
             case BAN -> sanctionModule.ban(player, targetuser.getUniqueId(), targetuser.getName(), duration, reason);
             case UNBAN -> sanctionModule.unban(player, targetuser.getUniqueId(), targetuser.getName(), reason);
             case UNMUTE -> sanctionModule.unmute(player, targetuser.getUniqueId(), targetuser.getName(), reason);
-            case WARN -> {
-                player.sendMessage("§cTODO");
-            }
+            case WARN -> sanctionModule.warn(player, targetuser.getUniqueId(), targetuser.getName(), reason);
             case FREEZE -> {
                 sanctionModule.freeze(player, targetuser.getUniqueId(), targetuser.getName());
             }

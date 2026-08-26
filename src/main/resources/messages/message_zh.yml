@@ -135,6 +135,10 @@ command-repair-all-success: <success>您刚刚修复了背包中的所有物品�
 command-near-empty: <error>附近没有其他玩家。
 command-near-player: '&f附近的玩家&7:%players%'
 command-near-info: "<newline>&6%direction% &7%player% &8(&e%distance%m&8)"
+command-list-header: '&7在线玩家 &f%amount%&8/&f%max%&8:%players%'
+command-list-player: '&f%player%'
+
+
 command-play-time:
 - '&7您玩了&8: <primary>%playtime%'
 - '&7当前会话&8: <primary>%playtime_session%'
@@ -203,6 +207,14 @@ command-tpa-error: '<error>您已经向 #99E0FF%player%<error> 发送了一个�
 command-tpa-error-same: <error>您不能传送到自己。
 command-tpa-here-error: <error>您已经向#99E0FF%player%<error>发送了请求。
 command-tpa-here-error-same: <error>您不能传送到自己。
+command-tpa-all-sender: '&7您刚刚向 &f%amount% &7名玩家发送了传送请求。'
+command-tpa-all-empty: '<error>没有玩家可以接收您的传送请求。'
+
+
+command-screen-not-found: '<error>界面 &f%screen% <error>不存在。'
+message-screen-condition: '<error>你无法在这里打开此界面。'
+
+
 command-tpa-error-offline: <error>无法找到玩家，可能已离线。
 command-tpa-error-to-late-empty: <error>您没有传送请求。
 command-tpa-error-to-late-expire: <error>传送请求已过期。
@@ -300,6 +312,9 @@ description-tpa-here: 将玩家传送到您这里
 description-tpa-deny: 拒绝传送请求
 description-tpa-cancel: 取消传送请求
 description-tp-all: 将所有玩家传送到您的位置
+description-tpa-all: 向所有在线玩家发送传送请求
+
+
 description-god: 切换上帝模式
 description-vanish: 切换隐身模式
 description-heal: 治愈一名玩家
@@ -378,6 +393,9 @@ description-repair: 修复手中的物品
 description-repair-all: 修复背包中的所有物品
 description-ext: 停止燃烧
 description-near: 显示附近的玩家
+description-list: 显示在线玩家列表
+
+
 description-play-time: 显示玩家的游戏时间
 description-lag: 显示每个世界的实体数量
 description-lag-world: 显示世界中实体的详细统计
@@ -402,6 +420,9 @@ description-item-lore-set: 定义一个行的传说
 description-item-lore-add: 添加一行到传说
 description-item-lore-clear: 清空物品传说
 description-give: 给予物品
+description-itemdb: 显示您手中物品的信息
+
+
 description-give-all: 给予在线玩家物品
 description-power-tools: 为您的物品添加命令
 description-pay-toggle: 切换对玩家的付款
@@ -670,6 +691,11 @@ command-unban-notify:
   message: '<hover:show_text:''<gray>由: <white>%sender%<newline><gray>持续时间: <white>%duration%<newline><gray>原因:
     <white>%reason%<newline><gray>日期: <white>%created_at%''><click:run_command:''/sc
     %target%''>&8(#f59e07处罚&8) #8aebeb%player% #e33414刚刚解除了对玩家 #e0d12d%target%#e33414的封禁。</click></hover>'
+command-warn-notify:
+  type: WITHOUT_PREFIX
+  message: '<hover:show_text:''<gray>由: <white>%sender%<newline><gray>原因: <white>%reason%<newline><gray>日期: <white>%created_at%''><click:run_command:''/sc %target%''>&8(#f59e07处罚&8) #8aebeb%player% #e33414刚刚警告了玩家 #e0d12d%target%#e33414。</click></hover>'
+
+
 command-ban-error-duration: <error>封禁的时间必须至少为1秒。
 command-mute-error-duration: <error>禁言的时间必须至少为1秒。
 command-un-mute-error: '&f%player% <error>并未被禁言。'
@@ -725,6 +751,13 @@ message-un-freeze:
 - ''
 - '&f你刚刚被解冻。'
 - ''
+message-warn:
+- ''
+- '&e您刚刚被 &f%player% &e<u>警告</u>。'
+- '&f原因&8: #82d1ff%reason%'
+- ''
+
+
 command-freeze-success: '&7你刚刚冻结了玩家 &f%player%&7。'
 command-un-freeze_success: '&7你刚刚解冻了玩家 &f%player%&7。'
 
@@ -1154,3 +1187,77 @@ command-home-import-start: "<success>正在从 &f%source%<success> 导入家…�
 command-home-import-done: "<success>导入完成：&f%imported% <success>个已导入，&f%skipped% <success>个已跳过，&f%errors% <success>个错误。"
 command-home-import-unknown: "<error>未知的导入来源 &f%source%<error>。可用：essentialsx。"
 command-home-import-error: "<error>导入过程中发生错误，请检查控制台。"
+
+
+command-itemdb-empty: '<error>您的手中必须持有物品。'
+command-itemdb:
+- '&7物品&8: &f%material% &8(&f%key%&8)'
+- '&7数量&8: &f%amount% &8- &7最大堆叠数&8: &f%stack%'
+command-endersee-error: '<error>无法加载 &f%player% <error>的末影箱。'
+command-tpa-error-no-request-from-player: '<error>您没有来自 &f%player% <error>的传送请求。'
+command-tpa-accept-all-success: '<success>您已接受 &f%count% <success>个传送请求。'
+command-tpa-deny-all-success: '<success>您已拒绝 &f%count% <success>个传送请求。'
+command-teleport-request-disabled: '<error>玩家 &f%player% <error>已禁用传送请求。'
+command-teleport-here-request-disabled: '<error>玩家 &f%player% <error>已禁用传送至此请求。'
+
+# Toggle commands
+command-tp-toggle-enable: '&7传送请求已为 &f%player% <success>开启&7。'
+command-tp-toggle-disable: '&7传送请求已为 &f%player% <error>关闭&7。'
+description-tp-toggle: 切换接收传送请求
+command-tpa-here-toggle-enable: '&7传送至此请求已为 &f%player% <success>开启&7。'
+command-tpa-here-toggle-disable: '&7传送至此请求已为 &f%player% <error>关闭&7。'
+description-tpa-here-toggle: 切换接收传送至此请求
+command-pay-notification-toggle-enable: '&7付款通知已为 &f%player% <success>开启&7。'
+command-pay-notification-toggle-disable: '&7付款通知已为 &f%player% <error>关闭&7。'
+description-pay-notification-toggle: 切换接收付款通知
+
+# Item frame
+description-itemframe: 切换展示框可见性
+command-itemframe-invisible: '<success>展示框现在<white>不可见<success>。'
+command-itemframe-visible: '<success>展示框现在<white>可见<success>。'
+command-itemframe-not-found: '<error>未找到展示框。请注视一个展示框后重试。'
+
+# Teleport queue / cross-server
+teleport-already-in-queue: '<error>您已经在传送队列中！'
+teleport-added-to-queue: '<success>您已被加入传送队列。位置: #0EEA93%position%'
+teleport-cross-server-not-supported: '<error>此服务器不支持跨服传送。'
+teleport-cross-server-connecting: '<success>正在连接到服务器 &f%server%<success>...'
+teleport-cross-server-player-not-found: '<error>在任何服务器上都找不到玩家 &f%player%<error>。'
+
+# Death message module
+description-death-message: 自定义死亡消息
+description-death-message-toggle: 切换死亡消息可见性
+command-death-message-toggle-disable: '#C084FC☠ #B794F4死亡消息现已对 %player% #E9D5FF隐藏'
+command-death-message-toggle-enable: '#C084FC☠ #B794F4死亡消息现已对 %player% #E9D5FF可见'
+death-generic: '#C084FC☠ #E9D5FF%player% #B794F4死亡了。'
+death-by-player: '#C084FC⚔ #E9D5FF%player% #B794F4被 #E9D5FF%killer% #B794F4击杀了。'
+death-by-mob: '#C084FC☠ #E9D5FF%player% #B794F4被 #E9D5FF%killer% #B794F4杀死了。'
+death-by-projectile: '#C084FC🏹 #E9D5FF%player% #B794F4被 #E9D5FF%killer% #B794F4射杀了。'
+death-by-mob-explosion: '#C084FC💥 #E9D5FF%player% #B794F4被 #E9D5FF%killer% #B794F4炸死了。'
+death-by-fall: '#C084FC⬇ #E9D5FF%player% #B794F4从高处摔落了。'
+death-by-fire: '#C084FC🔥 #E9D5FF%player% #B794F4被烧死了。'
+death-by-lava: '#C084FC🌋 #E9D5FF%player% #B794F4试图在岩浆中游泳。'
+death-by-drowning: '#C084FC💧 #E9D5FF%player% #B794F4溺水身亡了。'
+death-by-explosion: '#C084FC💥 #E9D5FF%player% #B794F4被炸死了。'
+death-by-lightning: '#C084FC⚡ #E9D5FF%player% #B794F4被闪电击中了。'
+death-by-suffocation: '#C084FC▓ #E9D5FF%player% #B794F4在墙中窒息了。'
+death-by-starvation: '#C084FC🍖 #E9D5FF%player% #B794F4饿死了。'
+death-by-poison: '#C084FC☣ #E9D5FF%player% #B794F4中毒身亡了。'
+death-by-magic: '#C084FC✦ #E9D5FF%player% #B794F4被魔法杀死了。'
+death-by-wither: '#C084FC💀 #E9D5FF%player% #B794F4凋零而死了。'
+death-by-falling-block: '#C084FC▼ #E9D5FF%player% #B794F4被掉落的方块压扁了。'
+death-by-fly-into-wall: '#C084FC💨 #E9D5FF%player% #B794F4体验了动能的伤害。'
+death-by-void: '#C084FC✧ #E9D5FF%player% #B794F4掉出了世界。'
+death-by-cactus: '#C084FC🌵 #E9D5FF%player% #B794F4被戳死了。'
+death-by-cramming: '#C084FC⊞ #E9D5FF%player% #B794F4被挤压得太厉害了。'
+death-by-freeze: '#C084FC❄ #E9D5FF%player% #B794F4被冻死了。'
+death-by-sonic-boom: '#C084FC◈ #E9D5FF%player% #B794F4被音爆消灭了。'
+death-by-magma: '#C084FC♨ #E9D5FF%player% #B794F4发现地板是岩浆做的。'
+death-by-thorns: '#C084FC✵ #E9D5FF%player% #B794F4在试图伤害他人时被杀死了。'
+death-by-campfire: '#C084FC🔥 #E9D5FF%player% #B794F4走进了篝火。'
+death-hover-details: "#D8B4FE☠ 死亡地点#B794F4:\n#E9D5FF▸ 世界: #D8B4FE%world%\n#E9D5FF▸ 坐标: #D8B4FE%x%#E9D5FF, #D8B4FE%y%#E9D5FF, #D8B4FE%z%\n\n#9F7AEA&o点击传送"
+death-message-generic: '#99E0FF%player% &7死亡了。'
+death-message-player: '#99E0FF%player% &7被 #34cfe0%killer% &7使用 %weapon% &7击杀了。'
+death-message-mob: '#99E0FF%player% &7被 &c%mob%&7 杀死了。'
+death-message-mythic-mob: '#99E0FF%player% &7被 <gradient:#ff6600:#ff0000>%mob%</gradient>&7 击杀了！'
+death-message-fists: '空手'

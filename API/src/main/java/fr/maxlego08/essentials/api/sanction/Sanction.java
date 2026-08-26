@@ -60,6 +60,18 @@ public class Sanction {
     }
 
     /**
+     * Creates a new warn sanction.
+     *
+     * @param playerUniqueId the UUID of the player being warned
+     * @param senderUniqueId the UUID of the sender issuing the warn
+     * @param reason        the reason for the warn
+     * @return a new Sanction instance representing a warn
+     */
+    public static Sanction warn(UUID playerUniqueId, UUID senderUniqueId, String reason) {
+        return new Sanction(-1, playerUniqueId, senderUniqueId, reason, 0, new Date(), new Date(), SanctionType.WARN);
+    }
+
+    /**
      * Creates a new ban sanction.
      *
      * @param playerUniqueId the UUID of the player being banned

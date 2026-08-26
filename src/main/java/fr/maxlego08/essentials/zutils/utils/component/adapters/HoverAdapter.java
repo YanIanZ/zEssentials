@@ -3,6 +3,7 @@ package fr.maxlego08.essentials.zutils.utils.component.adapters;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import fr.maxlego08.essentials.zutils.utils.component.AbstractComponent;
@@ -12,7 +13,7 @@ import fr.maxlego08.essentials.zutils.utils.component.components.TextComponent;
 import java.io.IOException;
 import java.util.UUID;
 
-// ToDo REWORK Hover, doesnt work very well
+// Handles both legacy {"action":"show_item","value":{...}} and modern {"action":"show_item","contents":{...}} formats
 public class HoverAdapter extends TypeAdapter<HoverEvent> {
 
     @Override
@@ -64,14 +65,26 @@ public class HoverAdapter extends TypeAdapter<HoverEvent> {
                 case "show_item" -> value = AbstractComponent.GSON.fromJson(element, ShowItem.class);
                 case "show_entity" -> value = AbstractComponent.GSON.fromJson(element, ShowEntity.class);
             }
-        } else if (jsonObject.has("contents")) {
+        } else if (jsonObject.has("contents") && action != null) {
             JsonElement element = jsonObject.get("contents");
-            value = AbstractComponent.GSON.fromJson(element, TextComponent.class);
+            switch (action) {
+                case "show_item" -> value = element.isJsonObject() ? AbstractComponent.GSON.fromJson(element, ShowItem.class) : new TextComponent(element.getAsString());
+                case "show_entity" -> value = element.isJsonObject() ? AbstractComponent.GSON.fromJson(element, ShowEntity.class) : new TextComponent(element.getAsString());
+                default -> {
+                    if (element.isJsonPrimitive()) {
+                        value = new TextComponent(element.getAsString());
+                    } else {
+                        value = AbstractComponent.GSON.fromJson(element, TextComponent.class);
+                    }
+                }
+            }
         }
         return new HoverEvent(action, value);
     }
 
     public static final class ShowItem {
+
+        @SerializedName(value = "item", alternate = "id")
         private String item;
 
         private int count;

@@ -134,6 +134,10 @@ command-repair-all-success: "<success>Vous venez de réparer tous les objets dan
 command-near-empty: "<error>Aucun joueur à proximité de vous."
 command-near-player: "&fJoueurs à proximité de vous&7:%players%"
 command-near-info: "<newline>&6%direction% &7%player% &8(&e%distance%m&8)"
+command-list-header: "&7Joueurs en ligne &f%amount%&8/&f%max%&8:%players%"
+command-list-player: "&f%player%"
+
+
 command-play-time:
   - "&7Vous avez joué&8: <primary>%playtime%"
   - "&7Session en cours&8: <primary>%playtime_session%"
@@ -204,6 +208,14 @@ command-tpa-error: "<error>Vous avez déjà envoyé une demande à #99E0FF%playe
 command-tpa-error-same: "<error>Vous ne pouvez pas vous téléporter à vous-même."
 command-tpa-here-error: "<error>Vous avez déjà envoyé une demande à #99E0FF%player%<error>."
 command-tpa-here-error-same: "<error>Vous ne pouvez pas vous téléporter à vous-même."
+command-tpa-all-sender: "&7Vous venez d'envoyer une demande de téléportation à &f%amount% &7joueurs."
+command-tpa-all-empty: "<error>Aucun joueur ne peut recevoir votre demande de téléportation."
+
+
+command-screen-not-found: "<error>L'écran &f%screen% <error>n'existe pas."
+message-screen-condition: "<error>Vous ne pouvez pas ouvrir cet écran ici."
+
+
 command-tpa-error-offline: "<error>Impossible de trouver le joueur, il doit être hors ligne."
 command-tpa-error-to-late-empty: "<error>Vous n'avez pas de demande de téléportation."
 command-tpa-error-to-late-expire: "<error>La demande de téléportation a expiré."
@@ -300,6 +312,9 @@ description-tpa-accept: "Accepter une demande de téléportation"
 description-tpa-deny: "Refuser une demande de téléportation"
 description-tpa-cancel: "Annuler une demande de téléportation"
 description-tp-all: "Téléporter tous les joueurs à votre position"
+description-tpa-all: "Envoyer une demande de téléportation à tous les joueurs en ligne"
+
+
 description-god: "Activer/désactiver le mode divin"
 description-vanish: "Activer/désactiver le mode vanish"
 description-heal: "Soigner un joueur"
@@ -379,6 +394,9 @@ description-repair: "Réparer l'objet dans votre main"
 description-repair-all: "Réparer tous les objets dans votre inventaire"
 description-ext: "Arrêter de brûler"
 description-near: "Afficher les joueurs proches de vous"
+description-list: "Afficher la liste des joueurs en ligne"
+
+
 description-play-time: "Afficher le temps de jeu du joueur"
 description-bottom: "Téléporter en haut"
 description-compact-all: "Compacter tous les objets de votre inventaire, alias : /blocksall, /condenseall"
@@ -401,6 +419,9 @@ description-item-lore-set: "Définir une ligne de lore"
 description-item-lore-add: "Ajouter une ligne au lore"
 description-item-lore-clear: "Effacer le lore de l'objet"
 description-give: "Donner des objets"
+description-itemdb: "Afficher les informations de l'item dans votre main"
+
+
 description-give-all: "Donner des objets aux joueurs en ligne"
 description-power-tools: "Ajouter une commande à vos objets"
 description-pay-toggle: "Activer ou non la réception d'argent"
@@ -661,6 +682,11 @@ command-unmute-notify:
 command-unban-notify:
   type: WITHOUT_PREFIX
   message: "<hover:show_text:'<gray>Par : <white>%sender%<newline><gray>Durée : <white>%duration%<newline><gray>Raison : <white>%reason%<newline><gray>Date : <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanction&8) #8aebeb%player% #e33414a débanni le joueur #e0d12d%target%#e33414.</click></hover>"
+command-warn-notify:
+  type: WITHOUT_PREFIX
+  message: "<hover:show_text:'<gray>Par : <white>%sender%<newline><gray>Raison : <white>%reason%<newline><gray>Date : <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanction&8) #8aebeb%player% #e33414vient d'avertir le joueur #e0d12d%target%#e33414.</click></hover>"
+
+
 command-ban-error-duration: "<error>La durée d'un bannissement doit être d'au moins 1 seconde."
 command-mute-error-duration: "<error>La durée d'un mute doit être d'au moins 1 seconde."
 command-un-mute-error: "&f%player% <error>n'est pas muet."
@@ -809,6 +835,11 @@ command-give-all: "<success>Vous venez de donner &n&fx%amount% %item%&r <success
 command-give-vault: "<success>Vous venez de donner &n&fx%amount% %item%&r <success> au vault de &f%player%<success>."
 
 command-power-tool-error-item: "<error>Vous n'avez aucun objet dans votre main."
+
+command-itemdb-empty: "<error>Vous devez avoir un item dans votre main."
+command-itemdb:
+  - "&7Item&8 : &f%material% &8(&f%key%&8)"
+  - "&7Quantité&8 : &f%amount% &8- &7Taille max du stack&8 : &f%stack%"
 command-power-tool-error-reset: "<error>Cet objet n'a pas de commande enregistrée."
 command-power-tool-info: "<success>Vous venez d'attribuer la commande &f/%command%<success> à l'objet &f%item%<success>."
 command-power-tool-reset: "<success>Vous avez supprimé la commande de l'objet &f%item%<success>."
@@ -1018,6 +1049,13 @@ message-un-freeze:
   - ""
   - "&fVous venez d'être dégelé."
   - ""
+message-warn:
+  - ""
+  - "&eVous venez d'être <u>averti</u> par &f%player%&e."
+  - "&fRaison&8: #82d1ff%reason%"
+  - ""
+
+
 command-freeze-success: "&7Vous venez de geler le joueur &f%player%&7."
 command-un-freeze_success: "&7Vous venez de dégeler le joueur &f%player%&7."
 experience-granted: "<success>Vous venez de donner <white>%amount% %type% <success>à <white>%player%<success>."

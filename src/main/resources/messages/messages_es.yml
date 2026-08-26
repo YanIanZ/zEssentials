@@ -121,6 +121,10 @@ command-repair-all-success: "<success>Acabas de reparar todos los objetos en tu 
 command-near-empty: "<error>No hay jugadores cerca de ti."
 command-near-player: "&fJugadores cercanos a ti&7:%players%"
 command-near-info: "<newline>&6%direction% &7%player% &8(&e%distance%m&8)"
+command-list-header: "&7Jugadores conectados &f%amount%&8/&f%max%&8:%players%"
+command-list-player: "&f%player%"
+
+
 command-play-time:
   - "&7Has jugado&8: <primary>%playtime%"
   - "&7Sesión actual&8: <primary>%playtime_session%"
@@ -266,6 +270,9 @@ description-tpa-accept: "Aceptar una solicitud de teletransporte"
 description-tpa-deny: "Rechazar una solicitud de teletransporte"
 description-tpa-cancel: "Cancelar una solicitud de teletransporte"
 description-tp-all: "Teletransportar a todos los jugadores a tu posición"
+description-tpa-all: "Enviar una solicitud de teletransporte a todos los jugadores conectados"
+
+
 description-god: "Activar/Desactivar el modo dios"
 description-vanish: "Activar/Desactivar el modo vanish"
 description-heal: "Curar a un jugador"
@@ -336,6 +343,9 @@ description-repair: "Reparar el objeto en tu mano"
 description-repair-all: "Reparar todos los objetos en tu inventario"
 description-ext: "Detener la quema"
 description-near: "Mostrar jugadores cercanos a ti"
+description-list: "Mostrar la lista de jugadores conectados"
+
+
 description-play-time: "Mostrar el tiempo de juego del jugador"
 description-lag: "Mostrar el número de entidades por mundo"
 description-lag-world: "Mostrar conteos detallados de entidades para un mundo"
@@ -360,6 +370,9 @@ description-item-lore-set: "Definir una línea de un lore"
 description-item-lore-add: "Agregar una línea al lore"
 description-item-lore-clear: "Limpiar el lore del objeto"
 description-give: "Dar objetos"
+description-itemdb: "Muestra información sobre el objeto en tu mano"
+
+
 description-give-all: "Dar objetos a los jugadores en línea"
 description-power-tools: "Agregar comandos a tus objetos"
 description-pay-toggle: "Activar o desactivar el recibo de dinero"
@@ -593,6 +606,11 @@ command-unmute-notify:
 command-unban-notify:
   type: WITHOUT_PREFIX
   message: "<hover:show_text:'<gray>Por: <white>%sender%<newline><gray>Duración: <white>%duration%<newline><gray>Razón: <white>%reason%<newline><gray>Fecha: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanción&8) #8aebeb%player% #e33414acaba de desbanear al jugador #e0d12d%target%#e33414.</click></hover>"
+command-warn-notify:
+  type: WITHOUT_PREFIX
+  message: "<hover:show_text:'<gray>Por: <white>%sender%<newline><gray>Razón: <white>%reason%<newline><gray>Fecha: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanción&8) #8aebeb%player% #e33414acaba de advertir al jugador #e0d12d%target%#e33414.</click></hover>"
+
+
 command-ban-error-duration: "<error>La duración de un baneo debe ser de al menos 1 segundo."
 command-mute-error-duration: "<error>La duración de un silencio debe ser de al menos 1 segundo."
 command-un-mute-error: "&f%player% <error>no está silenciado."
@@ -616,6 +634,13 @@ message-unmute:
   - "&f¡Has recuperado tu <u>voz</u>, felicitaciones!"
   - "&fRazón&8: #82d1ff%reason%"
   - ""
+message-warn:
+  - ""
+  - "&eAcabas de ser <u>advertido</u> por &f%player%&e."
+  - "&fRazón&8: #82d1ff%reason%"
+  - ""
+
+
 message-mute-talk:
   - ""
   - "&fNo tienes derecho a hablar."
@@ -623,6 +648,16 @@ message-mute-talk:
   - "&fDuración&8: <gradient:#7ae856:#a1d909>%duration%</gradient>"
   - "&fRazón&8: #82d1ff%reason%"
   - ""
+message-freeze:
+  - ""
+  - "&fAcabas de ser congelado."
+  - ""
+message-un-freeze:
+  - ""
+  - "&fYa no estás congelado."
+  - ""
+
+
 message-ban:
   - ""
   - "<error>Has sido baneado del servidor por la siguiente razón:"
@@ -741,6 +776,11 @@ command-give-all: "<success>Acabas de dar &n&fx%amount% %item%&r <success>a los 
 command-give-vault: "<success>Acabas de dar &n&fx%amount% %item%&r <success>al vault de &f%player%<success>."
 
 command-power-tool-error-item: "<error>No tienes ningún objeto en la mano."
+
+command-itemdb-empty: "<error>Debes tener un objeto en tu mano."
+command-itemdb:
+  - "&7Objeto&8: &f%material% &8(&f%key%&8)"
+  - "&7Cantidad&8: &f%amount% &8- &7Tamaño máx. de pila&8: &f%stack%"
 command-power-tool-error-reset: "<error>Este objeto no tiene ningún comando registrado."
 command-power-tool-info: "<success>Acabas de poner el comando &f/%command%<success> en el objeto &f%item%<success>."
 command-power-tool-reset: "<success>Acabas de eliminar el comando en el objeto &f%item%<success>."
@@ -932,6 +972,18 @@ command-fly-set: "<success>Acabas de establecer %time% <success>de tiempo de vue
 command-freeze-success: "&7Acabas de congelar al jugador &f%player%&7."
 command-home-admin-list-empty: "<error>El jugador no tiene hogar."
 command-home-error-teleport: "<error>No se encontró una posición para teletransportarse, elimina tu hogar."
+command-home-delete-confirm:
+  - ""
+  - "#99E0FF¿Realmente quieres eliminar el home &f%name%#99E0FF?"
+  - "<success><hover:show_text:'&fHaz clic para sobrescribir el home %name%'><click:run_command:'/delhomeconfirm %name%'>ᴄᴏɴғɪʀᴍ</click></hover>"
+  - ""
+command-set-home-create-confirm:
+  - ""
+  - "#99E0FFEl home &f%name%#99E0FF ya existe. ¿Quieres sobrescribirlo?"
+  - "<hover:show_text:'&fHaz clic para sobrescribir el home %name%'><click:run_command:'/sethomeconfirm %name%'><success>ᴄᴏɴғɪʀᴍ</click></hover>"
+  - ""
+
+
 command-kit-delete-error: "<error>Es imposible eliminar el kit &f%kit%<error>."
 command-kit-give: "<success>Acabas de dar el kit &f%kit%<success> a <u>%player%<u><success>."
 command-link-account-already-linked: "<error>Ya estás vinculado a una cuenta."
@@ -953,6 +1005,26 @@ command-tpa-here-accept-receiver: "#99E0FFAcabas de #00FF00aceptar #99E0FFla sol
 command-tpa-here-accept-sender: "#99E0FF%player%<success> acaba de aceptar tu solicitud de teletransporte."
 command-tpa-here-error: "<error>Ya has enviado una solicitud a #99E0FF%player%<error>."
 command-tpa-here-error-same: "<error>No puedes teletransportarte a ti mismo."
+command-tpa-here-sender:
+  - "#00FF00✔ #99E0FFSolicitud de teletransporte enviada a &f%displayName%#99E0FF."
+  - "  <hover:show_text:'<error>✘ Cancelar teletransporte'><click:run_command:/tpacancel %player%>#99E0FFEscribe #00FF00/tpacancel %player%#99E0FF para cancelar tu solicitud.</click></hover>"
+command-tpa-here-receiver:
+  - ""
+  - "#F8F327⚠ &f%displayName% #99E0FFquiere teletransportarte hacia él!"
+  - "  <hover:show_text:'#00FF00✔ Aceptar teletransporte'><click:run_command:/tpaccept>#99E0FFEscribe #00FF00/tpaccept #99E0FFpara #00FF00<u>aceptar</u>#99E0FF.</click></hover>"
+  - "  <hover:show_text:'<error>✘ Rechazar teletransporte'><click:run_command:/tpdeny>#99E0FFEscribe <error>/tpdeny #99E0FFpara <error><u>rechazar</u>#99E0FF.</click></hover>"
+  - ""
+  - "&7&oTienes 60 segundos para aceptar la solicitud de teletransporte."
+
+
+command-tpa-all-sender: "&7Acabas de enviar una solicitud de teletransporte a &f%amount% &7jugadores."
+command-tpa-all-empty: "<error>Ningún jugador puede recibir tu solicitud de teletransporte."
+
+
+command-screen-not-found: "<error>La pantalla &f%screen% <error>no existe."
+message-screen-condition: "<error>No puedes abrir esta pantalla aquí."
+
+
 command-un-freeze_success: "&7Acabas de descongelar al jugador &f%player%&7."
 command-vault-info: "<success>Información de la bóveda de &f%player%<success>: máx. &7%max%<success>, permiso &7%permissionSlots%<success>, plugin &7%pluginSlots%<success>, usados &7%used%<success>, libres &7%available%<success>."
 command-warp-invalid: "<error>El warp &f%name% <error>tiene una ubicación inválida."

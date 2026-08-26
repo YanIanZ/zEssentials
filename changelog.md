@@ -4,7 +4,27 @@
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
-# Unreleased
+# 1.0.4.0
+
+- Added a **runtime dependency loader** (package `dev.yanianz.essentials.dependency`) modeled after Intave's library system:
+    - Detects whether a dependency is already available on the classpath (plugin.yml libraries, shaded jar or another plugin) — if so nothing is installed
+    - Otherwise restores it from the local cache folder (`plugins/zEssentials/libs`, maven layout) or downloads it from Maven Central
+    - Downloads are verified against the published SHA-256 / SHA-1 / MD5 checksums and written atomically, a corrupted download never reaches the cache
+    - The jar is pushed into the running classloader without restarting the server (URLClassLoader `addURL`, Unsafe fallback on modern JVMs)
+    - The JDBC driver (MariaDB/MySQL) is resolved automatically before the database storage connects
+- Added a new **custom screens** module (`modules/customscreens/config.yml`) to create your own inventory screens opened with a command:
+    - Each entry defines the `command` (with `aliases`, `permission`, `description`) that opens the zMenu inventory stored in `modules/customscreens/screens/<name>.yml`
+    - Screens use the standard zMenu format: items per slot, click actions (console/player commands, messages, sounds, open another screen), patterns, pagination and PlaceholderAPI placeholders
+    - Optional open conditions per screen: restricted `worlds` and/or `gamemodes`
+    - Optional `open-sound` played when the screen opens; close sounds are available natively with zMenu `close-actions`
+    - Commands are registered at runtime, removed safely on `/ezreload` without duplicating anything, and a screen command that would override an existing zEssentials command is refused with a message in the console
+- Added `/tpaall` command — sends a teleport request to every online player at once; players who ignored you or disabled teleport requests are skipped silently (permission `essentials.tpa.all`)
+- Added `/list` command — displays online players sorted alphabetically with the player count, vanished players are hidden from viewers who cannot see them (permission `essentials.list`)
+- Added `/itemdb` command — displays information about the item in your hand: material name, namespaced key, amount and max stack size (permission `essentials.itemdb`)
+- Added warn sanctions through the sanction GUI — warns are saved like other sanctions, the target receives a configurable message (`message-warn`) and staff with `essentials.warn.notify` receive a broadcast (`command-warn-notify`)
+- Fixed hover events (`show_item` and `show_entity`) when reading components using the modern `contents` JSON format — items are now parsed from both the legacy `item` field and the vanilla `id` field instead of being misread as text
+- Fixed expired ban/mute sanctions never being cleared when using SQLite storage — expired sanctions are now resolved with an `IN` subquery instead of an unsupported `UPDATE ... LEFT JOIN`
+- Completed the missing translations of every language file: 71 keys for Chinese (death message module, toggle commands, teleport queue, item frame), 17-20 for German/Spanish/Italian and 13 for French/Dutch
 
 # 1.0.3.9
 

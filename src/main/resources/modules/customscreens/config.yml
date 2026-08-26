@@ -1,0 +1,46 @@
+########################################################################################################################
+#
+# Create your own screens (inventories), opened with a command.
+# Perfect for a server menu, a rules screen, a shop category selector, a links screen...
+#
+# Documentation: https://zessentials.groupez.dev/modules/customscreens
+#
+########################################################################################################################
+
+enable: true
+
+# Every screen you create here.
+# The layout of each screen is stored in modules/customscreens/screens/<name>.yml and uses the
+# zMenu inventory format: items, actions, patterns, pagination and PlaceholderAPI placeholders
+# are all supported, exactly like every other zEssentials inventory.
+#
+# command:     the command that opens the screen, without the slash. Required.
+#              A command that already exists in zEssentials will be ignored, check your console on startup.
+# aliases:     other names for the command. Optional.
+# permission:  the permission needed to open the screen. Optional, empty means everyone can use it.
+# description: the description of the command, displayed in the tab completion of some server softwares. Optional.
+# worlds:      list of worlds where the screen can be opened. Optional, empty means every world.
+# gamemodes:   list of gamemodes (SURVIVAL, CREATIVE, ADVENTURE, SPECTATOR) where the screen can
+#              be opened. Optional, empty means every gamemode.
+# open-sound:  sound played when the screen is opened. Optional.
+#
+# A new screen needs its layout file to exist before it can be used: copy an existing file from
+# modules/customscreens/screens/, rename it with the name of your entry and edit it.
+
+screens:
+
+  example:
+    command: "screen"
+    aliases: [ "menu" ]
+    permission: ""
+    description: "Open the example custom screen"
+    # worlds:
+    #   - "world"
+    # gamemodes:
+    #   - SURVIVAL
+    #   - ADVENTURE
+    open-sound:
+      enabled: true
+      sound: BLOCK_CHEST_OPEN
+      volume: 1.0
+      pitch: 1.2

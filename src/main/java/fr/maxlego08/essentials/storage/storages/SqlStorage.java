@@ -55,6 +55,15 @@ public class SqlStorage extends StorageHelper implements IStorage {
     public SqlStorage(EssentialsPlugin plugin, StorageType storageType) {
         super(plugin);
         DatabaseConfiguration databaseConfiguration = getDatabaseConfiguration(plugin, storageType);
+
+        // Resolve the jdbc driver at runtime when it is not provided by the server,
+        // an already available driver is detected and never downloaded twice
+        dev.yanianz.essentials.dependency.MavenDependency driver = driverFor(storageType);
+        if (driver != null) {
+            dev.yanianz.essentials.dependency.DependencyManager.getInstance()
+                    .resolve(plugin.getDataFolder().toPath(), plugin.getClass().getClassLoader(), driver);
+        }
+
         this.connection = switch (storageType) {
             case SQLITE -> new SqliteConnection(databaseConfiguration, plugin.getDataFolder(), JULogger.from(plugin.getLogger()));
             default -> new HikariDatabaseConnection(databaseConfiguration, JULogger.from(plugin.getLogger()));
@@ -157,6 +166,12 @@ public class SqlStorage extends StorageHelper implements IStorage {
 
         long ms = plugin.getConfiguration().getBatchAutoSave();
         plugin.getScheduler().runTimer(this::processBatchs, ms, ms, TimeUnit.MILLISECONDS);
+    }
+
+    private dev.yanianz.essentials.dependency.MavenDependency driverFor(StorageType storageType) {
+        return storageType == StorageType.MYSQL || storageType == StorageType.MARIADB || storageType == StorageType.HIKARICP
+                ? dev.yanianz.essentials.dependency.KnownDependencies.MARIADB_DRIVER
+                : null;
     }
 
     public void processBatchs() {

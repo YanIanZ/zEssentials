@@ -145,6 +145,29 @@ public class SanctionModule extends ZModule implements SanctionManager {
     }
 
     @Override
+    public void warn(CommandSender sender, UUID uuid, String playerName, String reason) {
+
+        if (isProtected(playerName)) {
+            message(sender, Message.COMMAND_SANCTION_ERROR);
+            return;
+        }
+
+        EssentialsServer server = plugin.getEssentialsServer();
+        IStorage iStorage = plugin.getStorageManager().getStorage();
+
+        // Create and save the sanction
+        Sanction sanction = Sanction.warn(uuid, getSenderUniqueId(sender), reason);
+        iStorage.insertSanction(sanction, sanction::setId);
+        this.expiringCache.clear(uuid);
+
+        // Warn the player with the specified reason
+        server.sendMessage(uuid, Message.MESSAGE_WARN, "%reason%", reason, "%player%", sender.getName());
+
+        // Broadcast a notification message to players with the warn notify permission
+        server.broadcastMessage(Permission.ESSENTIALS_WARN_NOTIFY, Message.COMMAND_WARN_NOTIFY, "%player%", sender.getName(), "%target%", playerName, "%reason%", reason, "%sender%", getSanctionBy(sender), "%created_at%", this.simpleDateFormat.format(new Date()));
+    }
+
+    @Override
     public void ban(CommandSender sender, UUID uuid, String playerName, Duration duration, String reason) {
 
         if (isProtected(playerName)) {

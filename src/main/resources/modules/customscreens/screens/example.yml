@@ -1,0 +1,96 @@
+########################################################################################################################
+#
+# zEssentials - Example custom screen
+#
+# This file is the layout of the "example" screen defined in modules/customscreens/config.yml.
+# It uses the standard zMenu inventory format, so everything below also works:
+#
+#   - items:      material, name, lore, amount, glow, playerHead, flags...
+#   - actions:    run commands (as CONSOLE or PLAYER), send messages/titles, play sounds,
+#                 close the inventory or open another inventory
+#   - pagination: add a "pagination" item type with a pattern to build multi-page lists
+#   - patterns:   reusable layouts shared between your screens
+#   - placeholders: PlaceholderAPI and zEssentials placeholders everywhere
+#
+# You can also react to the screen being closed with close-actions, for example to play
+# a sound when the player closes it:
+#
+#   close-actions:
+#     - type: sound
+#       sound: BLOCK_CHEST_CLOSE
+#
+# The registered name of this inventory is the file name ("example"), it must match the entry
+# in modules/customscreens/config.yml. The "name" field is the title displayed to the player.
+#
+########################################################################################################################
+
+name: '<gradient:#00f986:#00c4f9>My Screen</gradient>'
+size: 27
+
+items:
+
+  information:
+    slot: 4
+    item:
+      material: BOOK
+      name: '#00f986Information'
+      lore:
+        - '&7Welcome &f%player_name%&7!'
+        - ''
+        - '&7This screen was created from the'
+        - '&7custom screens module.'
+        - ''
+        - '&7Online players&8: &f%zessentials_server_online%'
+        - '&7Your world&8: &f%player_world%'
+        - ''
+        - '&#ffff00Edit this file to build your own screen!'
+
+  # A button that runs console and player commands when clicked
+  shop:
+    slot: 11
+    closeInventory: true
+    item:
+      material: EMERALD
+      name: '#00ff00Server Shop'
+      lore:
+        - '&7Click to open the shop'
+    actions:
+      - type: console_command
+        command: 'say %player_name% opened the shop'
+
+  discord:
+    slot: 13
+    closeInventory: true
+    item:
+      material: PAPER
+      name: '#7289daDiscord'
+      lore:
+        - '&7Click to get the Discord link'
+    actions:
+      - type: message
+        messages:
+          - ''
+          - '<primary>Join our Discord server:'
+          - '<click:open_url:''https://discord.gg/your-invite''><hover:show_text:''&fClick to open''><secondary>https://discord.gg/your-invite</secondary></hover></click>'
+          - ''
+
+  # A button that opens another screen, here the same one with more pages if you duplicate items
+  refresh:
+    slot: 15
+    item:
+      material: CLOCK
+      name: '#ffff00Refresh'
+      lore:
+        - '&7Click to refresh the screen'
+    actions:
+      - type: inventory
+        plugin: zEssentials
+        inventory: example
+        page: 1
+
+  close:
+    slot: 22
+    closeInventory: true
+    item:
+      material: BARRIER
+      name: '#ff0000Close'

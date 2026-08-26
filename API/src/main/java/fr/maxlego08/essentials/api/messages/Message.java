@@ -136,6 +136,12 @@ public enum Message {
     COMMAND_TPA_HERE_ACCEPT_RECEIVER("<success>You have just accepted the teleport request from #34cfe0%player%<success>."),
     COMMAND_TPA_HERE_ACCEPT_SENDER("#34cfe0%player%<success> has just accepted your teleport request."),
 
+    COMMAND_TPA_ALL_SENDER("&7You have just sent a teleport request to &f%amount% &7players."),
+    COMMAND_TPA_ALL_EMPTY("<error>No player can receive your teleport request."),
+
+    COMMAND_SCREEN_NOT_FOUND("<error>The screen &f%screen% <error>does not exist."),
+    MESSAGE_SCREEN_CONDITION("<error>You cannot open this screen here."),
+
     COMMAND_TELEPORT_IGNORE_PLAYER("<error>You cannot send a teleport request to #34cfe0%player%<error> they are ignoring you."),
     COMMAND_TELEPORT_WORLD("<error>You need to be in the same world to teleport."),
     COMMAND_TPA_ERROR_TO_LATE("<error>You do not have a teleport request."),
@@ -212,6 +218,7 @@ public enum Message {
     DESCRIPTION_FLY_SPEED("Change your fly speed"),
     DESCRIPTION_TPA("Teleport to a player"),
     DESCRIPTION_TPA_HERE("Teleport a player to your location"),
+    DESCRIPTION_TPA_ALL("Send a teleport request to all online players"),
     DESCRIPTION_TP("Teleport to a player"),
     DESCRIPTION_TP_ALL("Teleport all player to your position"),
     DESCRIPTION_TP_RANDOM("Random Teleport in the world"),
@@ -307,6 +314,7 @@ public enum Message {
     DESCRIPTION_REPAIR_ALL("Repair all items in your inventory"),
     DESCRIPTION_EXT("Stop burning"),
     DESCRIPTION_NEAR("Show players close to you"),
+    DESCRIPTION_LIST("Show the list of online players"),
     DESCRIPTION_PLAY_TIME("Show player's playtime"),
     DESCRIPTION_VERSION("Show plugin version"),
     DESCRIPTION_KILL_ALL("Kill entities"),
@@ -333,6 +341,7 @@ public enum Message {
     DESCRIPTION_ITEM_LORE_CLEAR("Clear item lore"),
     DESCRIPTION_GIVE("Give items"),
     DESCRIPTION_GIVE_ALL("Give items to online players"),
+    DESCRIPTION_ITEMDB("Show information about the item in your hand"),
     DESCRIPTION_POWER_TOOLS("Add command to your items"),
     DESCRIPTION_MAIL("Open mailbox"),
     DESCRIPTION_MAIL_OPEN("Open player's mailbox"),
@@ -627,6 +636,7 @@ public enum Message {
     COMMAND_MUTE_NOTIFY(MessageType.WITHOUT_PREFIX, "<hover:show_text:'&7By: <white>%sender%<newline>&7Duration: <white>%duration%<newline>&7Reason: <white>%reason%<newline>&7Date: <white>%created_at%<newline>&7Expires: <white>%expired_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanction&8) #8aebeb%player% #e33414just muted the player #e0d12d%target%#e33414.</click></hover>"),
     COMMAND_UNMUTE_NOTIFY(MessageType.WITHOUT_PREFIX, "<hover:show_text:'&7By: <white>%sender%<newline>&7Duration: <white>%duration%<newline>&7Reason: <white>%reason%<newline>&7Date: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanction&8) #8aebeb%player% #e33414just unmuted the player #e0d12d%target%#e33414.</click></hover>"),
     COMMAND_UNBAN_NOTIFY(MessageType.WITHOUT_PREFIX, "<hover:show_text:'&7By: <white>%sender%<newline>&7Duration: <white>%duration%<newline>&7Reason: <white>%reason%<newline>&7Date: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanction&8) #8aebeb%player% #e33414just unbanned the player #e0d12d%target%#e33414.</click></hover>"),
+    COMMAND_WARN_NOTIFY(MessageType.WITHOUT_PREFIX, "<hover:show_text:'&7By: <white>%sender%<newline>&7Reason: <white>%reason%<newline>&7Date: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanction&8) #8aebeb%player% #e33414just warned the player #e0d12d%target%#e33414.</click></hover>"),
     COMMAND_BAN_ERROR_DURATION("<error>The duration of a banishment must be at least 1 second."),
     COMMAND_MUTE_ERROR_DURATION("<error>The duration of a mute must be at least 1 second."),
     COMMAND_UN_MUTE_ERROR("&f%player% <error>is not mute."),
@@ -654,6 +664,13 @@ public enum Message {
     MESSAGE_UN_FREEZE(
             "",
             "&aYou have just been unfrozen.",
+            ""
+    ),
+
+    MESSAGE_WARN(
+            "",
+            "&eYou have just been <u>warned</u> by &f%player%&e.",
+            "&fReason&8: #82d1ff%reason%",
             ""
     ),
 
@@ -771,6 +788,8 @@ public enum Message {
     COMMAND_NEAR_EMPTY("<error>No player near to you."),
     COMMAND_NEAR_PLAYER("&fPlayers near to you&7:%players%"),
     COMMAND_NEAR_INFO("<newline>&6%direction% &7%player% &8(&e%distance%m&8)"),
+    COMMAND_LIST_HEADER("&7Online players &f%amount%&8/&f%max%&8:%players%"),
+    COMMAND_LIST_PLAYER("&f%player%"),
     COMMAND_PLAY_TIME(
             "&7You played&8: <primary>%playtime%",
             "&7Current session&8: <primary>%playtime_session%"
@@ -833,6 +852,11 @@ public enum Message {
     COMMAND_GIVE_ALL("<success>You just gave &n&fx%amount% %item%&r <success>to online player."),
 
     COMMAND_POWER_TOOL_ERROR_ITEM("<error>You have no item in your hand."),
+    COMMAND_ITEMDB_EMPTY("<error>You must have an item in your hand."),
+    COMMAND_ITEMDB(
+            "&7Item&8: &f%material% &8(&f%key%&8)",
+            "&7Amount&8: &f%amount% &8- &7Max stack size&8: &f%stack%"
+    ),
     COMMAND_POWER_TOOL_ERROR_RESET("<error>This item has no recorded command."),
     COMMAND_POWER_TOOL_INFO("<success>You just put the command &f/%command%<success> on the item &f%item%<success>."),
     COMMAND_POWER_TOOL_RESET("<success>You have just deleted the command on the item &f%item%<success>."),

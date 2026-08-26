@@ -29,6 +29,16 @@ public interface SanctionManager {
     void kick(CommandSender sender, UUID uuid, String playerName, String reason);
 
     /**
+     * Warn a player with a specified reason.
+     *
+     * @param sender     The command sender.
+     * @param uuid       The UUID of the player to warn.
+     * @param playerName The name of the player to warn.
+     * @param reason     The reason for the warn.
+     */
+    void warn(CommandSender sender, UUID uuid, String playerName, String reason);
+
+    /**
      * Ban a player for a specified duration with a reason.
      *
      * @param sender     The command sender.

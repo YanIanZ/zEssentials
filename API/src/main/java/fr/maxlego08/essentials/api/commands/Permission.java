@@ -121,6 +121,8 @@ public enum Permission {
     ESSENTIALS_FREEZE,
     ESSENTIALS_KICK,
     ESSENTIALS_KICK_NOTIFY,
+
+    ESSENTIALS_WARN_NOTIFY("Allows you to receive notifications when a player is warned"),
     ESSENTIALS_KICK_ALL,
     ESSENTIALS_KICK_BYPASS_ALL("Allows not to be kicked during the kickall"),
     ESSENTIALS_KITTY_CANNON,
@@ -218,6 +220,7 @@ public enum Permission {
     ESSENTIALS_KIT_SHOW,
     ESSENTIALS_MAIL,
     ESSENTIALS_TP_ALL,
+    ESSENTIALS_TPA_ALL,
     ESSENTIALS_RULES,
     ESSENTIALS_HOLOGRAM,
     ESSENTIALS_HOLOGRAM_CREATE,
@@ -329,7 +332,9 @@ public enum Permission {
     ESSENTIALS_SILENT_DEATH("Allows you to die silently without a death message"),
     ESSENTIALS_DEATH_MESSAGE_TELEPORT("Allows clicking death messages to teleport to death location"),
     ESSENTIALS_DEATH_MESSAGE_TOGGLE("Allows toggling death messages visibility"),
-    ESSENTIALS_DEATH_MESSAGE_TOGGLE_OTHER("Allows toggling death messages for other players");
+    ESSENTIALS_DEATH_MESSAGE_TOGGLE_OTHER("Allows toggling death messages for other players"),
+    ESSENTIALS_LIST,
+    ESSENTIALS_ITEMDB;
 
     private final String description;
     private final String[] args;

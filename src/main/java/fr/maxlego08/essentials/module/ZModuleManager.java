@@ -11,6 +11,7 @@ import fr.maxlego08.essentials.module.modules.hologram.HologramModule;
 import fr.maxlego08.essentials.module.modules.kit.KitModule;
 import fr.maxlego08.essentials.module.modules.chat.ChatModule;
 import fr.maxlego08.essentials.module.modules.customcommands.CustomCommandModule;
+import fr.maxlego08.essentials.module.modules.customscreens.CustomScreenModule;
 import fr.maxlego08.essentials.module.modules.HomeModule;
 import fr.maxlego08.essentials.module.modules.ItemModule;
 import fr.maxlego08.essentials.module.modules.JoinQuitModule;
@@ -83,6 +84,7 @@ public class ZModuleManager implements ModuleManager {
         this.modules.put(AFKModule.class, new AFKModule(this.plugin));
         this.modules.put(AutoMessageModule.class, new AutoMessageModule(this.plugin));
         this.modules.put(CustomCommandModule.class, new CustomCommandModule(this.plugin));
+        this.modules.put(CustomScreenModule.class, new CustomScreenModule(this.plugin));
         if (plugin.isPaperVersion()) {
             this.modules.put(DeathMessageModule.class, new DeathMessageModule(this.plugin));
         }

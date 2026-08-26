@@ -2,6 +2,7 @@ package fr.maxlego08.essentials.storage.database.repositeries;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.dto.FlyDTO;
+import fr.maxlego08.essentials.api.dto.SanctionDTO;
 import fr.maxlego08.essentials.api.dto.UserDTO;
 import fr.maxlego08.essentials.api.dto.UserEconomyRankingDTO;
 import fr.maxlego08.essentials.api.dto.UserVoteDTO;
@@ -57,21 +58,23 @@ public class UserRepository extends Repository {
     public void clearExpiredSanctions() {
         if (this.connection.getDatabaseConfiguration().getDatabaseType() == DatabaseType.SQLITE) {
 
-            // TODO - Update Sarah SQLITE for left join
-            plugin.getLogger().warning("Attention, SQLITE does not allow to execute all sql queries, the query that allows to delete inactive sanctions is currently not working.");
-            /*update(table -> {
-                table.string("ban_sanction_id", null);
-                table.whereIn("ban_sanction_id", "%prefix%sanctions", "zs", "id", "%prefix%users", "mute_sanction_id", subTable -> {
-                    subTable.where("zs.expired_at", "<", new Date());
-                });
-            });
+            // SQLite does not support UPDATE with LEFT JOIN, so we first select the expired
+            // sanctions and then clear the references with a simple IN clause
+            List<SanctionDTO> expiredSanctions = select(SanctionDTO.class, table -> table.where("expired_at", "<", new Date()));
+            if (expiredSanctions.isEmpty()) return;
 
+            Object[] expiredIds = expiredSanctions.stream().map(SanctionDTO::id).toArray();
+
+            // Removes ban sanctions
+            update(table -> {
+                table.string("ban_sanction_id", null);
+                table.whereIn("ban_sanction_id", expiredIds);
+            });
+            // Removes mute sanctions
             update(table -> {
                 table.string("mute_sanction_id", null);
-                table.whereIn("ban_sanction_id", "%prefix%sanctions", "zs", "id", "%prefix%users", "ban_sanction_id", subTable -> {
-                    subTable.where("zs.expired_at", "<", new Date());
-                });
-            });*/
+                table.whereIn("mute_sanction_id", expiredIds);
+            });
 
         } else {
             // Removes ban sanctions

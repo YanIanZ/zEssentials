@@ -136,6 +136,10 @@ command-repair-all-success: "<success>Je hebt zojuist alle items in je inventari
 command-near-empty: "<error>Er is geen speler in de buurt van jou."
 command-near-player: "&fSpelers in de buurt van jou&7:%players%"
 command-near-info: "<newline>&6%direction% &7%player% &8(&e%distance%m&8)"
+command-list-header: "&7Spelers online &f%amount%&8/&f%max%&8:%players%"
+command-list-player: "&f%player%"
+
+
 command-play-time:
   - "&7Totale Speeltijd&8: <primary>%playtime%"
   - "&7Huidige Sessie&8: <primary>%playtime_session%"
@@ -205,6 +209,14 @@ command-tpa-error: "<error>Je hebt al een verzoek gestuurd naar #99E0FF%player%<
 command-tpa-error-same: "<error>Je kunt niet naar jezelf teleporteren."
 command-tpa-here-error: "<error>Je hebt al een verzoek gestuurd naar #99E0FF%player%<error>."
 command-tpa-here-error-same: "<error>Je kunt niet naar jezelf teleporteren."
+command-tpa-all-sender: "&7Je hebt zojuist een teleportverzoek gestuurd naar &f%amount% &7spelers."
+command-tpa-all-empty: "<error>Geen speler kan je teleportverzoek ontvangen."
+
+
+command-screen-not-found: "<error>Het scherm &f%screen% <error>bestaat niet."
+message-screen-condition: "<error>Je kunt dit scherm hier niet openen."
+
+
 command-tpa-error-offline: "<error>Kan speler niet vinden, mogelijk offline."
 command-tpa-error-to-late-empty: "<error>Je hebt geen teleportverzoek."
 command-tpa-error-to-late-expire: "<error>Het teleportverzoek is verlopen."
@@ -305,6 +317,9 @@ description-tpa-accept: "Accepteer een teleportatieverzoek"
 description-tpa-deny: "Weiger een teleportatieverzoek"
 description-tpa-cancel: "Annuleer een teleportatieverzoek"
 description-tp-all: "Teleport alle spelers naar je positie"
+description-tpa-all: "Stuur een teleportverzoek naar alle online spelers"
+
+
 description-god: "Schakel godmodus in of uit"
 description-vanish: "Schakel vanishmodus in of uit"
 description-heal: "Genees een speler"
@@ -387,6 +402,9 @@ description-repair: "Repareer het item in je hand"
 description-repair-all: "Repareer alle items in je inventaris"
 description-ext: "Stop met branden"
 description-near: "Toon spelers in de buurt"
+description-list: "Toon de lijst met online spelers"
+
+
 description-play-time: "Toon de speeltijd van een speler"
 description-lag: "Toon aantal entiteiten per wereld"
 description-lag-world: "Toon gedetailleerde entiteitentellingen voor een wereld"
@@ -413,6 +431,9 @@ description-item-lore-set: "Definieer een regel van een lore"
 description-item-lore-add: "Voeg een regel toe aan de lore"
 description-item-lore-clear: "Verwijder de lore van het item"
 description-give: "Geef items"
+description-itemdb: "Toon informatie over het item in je hand"
+
+
 description-give-all: "Geef items aan online spelers"
 description-power-tools: "Voeg commando's toe aan je items"
 description-pay-toggle: "Activeer of deactiveer het ontvangen van geld"
@@ -681,6 +702,11 @@ command-unmute-notify:
 command-unban-notify:
   type: WITHOUT_PREFIX
   message: "<hover:show_text:'<gray>Door: <white>%sender%<newline><gray>Duur: <white>%duration%<newline><gray>Reden: <white>%reason%<newline><gray>Datum: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanctie&8) #8aebeb%player% #e33414heeft de speler #e0d12d%target%#e33414ontbannen.</click></hover>"
+command-warn-notify:
+  type: WITHOUT_PREFIX
+  message: "<hover:show_text:'<gray>Door: <white>%sender%<newline><gray>Reden: <white>%reason%<newline><gray>Datum: <white>%created_at%'><click:run_command:'/sc %target%'>&8(#f59e07Sanctie&8) #8aebeb%player% #e33414heeft de speler #e0d12d%target%#e33414 gewaarschuwd.</click></hover>"
+
+
 command-ban-error-duration: "<error>De duur van een verbanning moet minstens 1 seconde zijn."
 command-mute-error-duration: "<error>De duur van een mute moet minstens 1 seconde zijn."
 command-un-mute-error: "&f%player% <error>is niet gemute."
@@ -736,6 +762,13 @@ message-un-freeze:
   - ""
   - "&fJe bent ontdooid."
   - ""
+message-warn:
+  - ""
+  - "&eJe bent zojuist <u>gewaarschuwd</u> door &f%player%&e."
+  - "&fReden&8: #82d1ff%reason%"
+  - ""
+
+
 command-freeze-success: "&7Je hebt zojuist de speler &f%player%&7 bevroren."
 command-un-freeze_success: "&7Je hebt zojuist de speler &f%player%&7 ontdooid."
 
@@ -844,6 +877,11 @@ command-give-all: "<success>Je hebt &n&fx%amount% %item%&r <success>gegeven aan 
 command-give-vault: "<success>Je hebt zojuist &n&fx%amount% %item%&r <success>gegeven aan de kluis van &f%player%<success>."
 
 command-power-tool-error-item: "<error>Je hebt geen item in je hand."
+
+command-itemdb-empty: "<error>Je moet een item in je hand houden."
+command-itemdb:
+  - "&7Item&8: &f%material% &8(&f%key%&8)"
+  - "&7Aantal&8: &f%amount% &8- &7Maximale stapelgrootte&8: &f%stack%"
 command-power-tool-error-reset: "<error>Dit item heeft geen geregistreerd commando."
 command-power-tool-info: "<success>Je hebt het commando &f/%command%<success> aan het item &f%item%<success> toegevoegd."
 command-power-tool-reset: "<success>Je hebt het commando van het item &f%item%<success> verwijderd."
