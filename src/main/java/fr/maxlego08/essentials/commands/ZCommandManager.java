@@ -325,7 +325,7 @@ public class ZCommandManager extends ZUtils implements CommandManager {
             this.registeredCommands.put(essentialsCommand, command);
 
             if (!commandMap.register(command.getName(), plugin.getDescription().getName(), command)) {
-                plugin.getLogger().warning("Unable to add the command /" + mainCommand + " (already registered by another plugin). Use /zessentials:" + mainCommand + " instead.");
+                plugin.getLogger().warning("Unable to add the command /" + mainCommand + " (already registered by another plugin). Use /essentials:" + mainCommand + " instead.");
             }
 
             if (essentialsCommand.getPermission() != null) {

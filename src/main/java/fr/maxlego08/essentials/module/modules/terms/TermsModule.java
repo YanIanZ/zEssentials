@@ -3,17 +3,23 @@ package fr.maxlego08.essentials.module.modules.terms;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
-import fr.maxlego08.essentials.zutils.utils.paper.PaperComponent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +30,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Shows the server rules to every new player, they have to accept them to play.
- * Players who refuse or ignore the terms are kicked.
+ * Shows the server rules inside a custom screen to every new player, they have
+ * to accept them to play. Players who refuse or ignore the terms are kicked.
  */
 public class TermsModule extends ZModule {
 
@@ -46,8 +52,6 @@ public class TermsModule extends ZModule {
     private final Set<UUID> pending = ConcurrentHashMap.newKeySet();
     @NonLoadable
     private final List<UUID> accepted = new ArrayList<>();
-    @NonLoadable
-    private final PaperComponent paperComponent = new PaperComponent();
 
     public TermsModule(ZEssentialsPlugin plugin) {
         super(plugin, "terms");
@@ -63,8 +67,8 @@ public class TermsModule extends ZModule {
         this.title = configuration.getString("title", "&lTERMS OF SERVICE");
         this.rules = configuration.getStringList("rules");
         this.question = configuration.getString("question", "");
-        this.acceptButton = configuration.getString("accept-button", "&a[ACCEPT]");
-        this.denyButton = configuration.getString("deny-button", "&c[REFUSE]");
+        this.acceptButton = configuration.getString("accept-button", "&a&l[ ✔ I ACCEPT ]");
+        this.denyButton = configuration.getString("deny-button", "&c&l[ ✘ I REFUSE ]");
         this.acceptHover = configuration.getString("accept-hover", "Accept the terms");
         this.denyHover = configuration.getString("deny-hover", "Refuse the terms");
         this.acceptedMessage = configuration.getString("accepted-message", "&aTerms accepted!");
@@ -75,7 +79,7 @@ public class TermsModule extends ZModule {
     }
 
     /**
-     * Sends the terms to the player on join when they never accepted them.
+     * Opens the terms screen when a player who never accepted them joins.
      */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -88,7 +92,7 @@ public class TermsModule extends ZModule {
         if (this.bypassPermission != null && player.hasPermission(this.bypassPermission)) return;
 
         this.pending.add(player.getUniqueId());
-        sendTerms(player);
+        openScreen(player);
 
         // When the timeout expires without an answer, kick the player
         this.plugin.getScheduler().runLater(() -> {
@@ -121,30 +125,105 @@ public class TermsModule extends ZModule {
         }
     }
 
+    /**
+     * Handles the accept and deny buttons of the screen.
+     */
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof TermsHolder)) return;
+
+        event.setCancelled(true);
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!isPending(player.getUniqueId())) return;
+
+        switch (event.getSlot()) {
+            case SLOT_ACCEPT -> accept(player);
+            case SLOT_DENY -> deny(player);
+            default -> {
+            }
+        }
+    }
+
+    /**
+     * The terms cannot be closed without an answer, reopening them instantly.
+     */
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        if (!(event.getInventory().getHolder() instanceof TermsHolder)) return;
+        if (!(event.getPlayer() instanceof Player player)) return;
+        if (!isPending(player.getUniqueId())) return;
+
+        // Reopen one tick later so the closing process finished
+        this.plugin.getScheduler().runAtLocationLater(player.getLocation(),
+                () -> {
+                    if (isPending(player.getUniqueId()) && player.isOnline()) {
+                        openScreen(player);
+                    }
+                }, 1L);
+    }
+
     private boolean isPending(UUID uniqueId) {
         return this.isEnable && this.pending.contains(uniqueId);
     }
 
-    private void sendTerms(Player player) {
+    private static final int SLOT_ACCEPT = 20;
+    private static final int SLOT_DENY = 24;
 
-        player.sendMessage(Component.empty());
-        player.sendMessage(component(this.title));
-        for (String rule : this.rules) {
-            player.sendMessage(component(rule));
+    private final class TermsHolder implements InventoryHolder {
+
+        private Inventory inventory;
+
+        @Override
+        public Inventory getInventory() {
+            return this.inventory;
         }
-        player.sendMessage(component(this.question));
-        player.sendMessage(Component.empty());
+    }
 
-        // Two clickable buttons, one accepts the terms, the other kicks the player
-        Component accept = component(this.acceptButton)
-                .clickEvent(ClickEvent.runCommand("/terms accept"))
-                .hoverEvent(HoverEvent.showText(component(this.acceptHover)));
-        Component deny = component(this.denyButton)
-                .clickEvent(ClickEvent.runCommand("/terms deny"))
-                .hoverEvent(HoverEvent.showText(component(this.denyHover)));
+    /**
+     * Builds and opens the terms screen for the player.
+     */
+    public void openScreen(Player player) {
 
-        player.sendMessage(Component.empty().append(accept).append(Component.space()).append(deny));
-        player.sendMessage(Component.empty());
+        TermsHolder holder = new TermsHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 45, component(this.title));
+        holder.inventory = inventory;
+
+        ItemStack filler = buildItem(Material.GRAY_STAINED_GLASS_PANE, "&7", null);
+        for (int slot = 0; slot < 45; slot++) {
+            inventory.setItem(slot, filler);
+        }
+
+        List<String> bookLore = new ArrayList<>();
+        if (!this.question.isEmpty()) {
+            bookLore.add(colorize(this.question));
+            bookLore.add("");
+        }
+        for (String rule : this.rules) {
+            String colorized = colorize(rule);
+            if (!colorized.isBlank()) bookLore.add(colorized);
+        }
+        inventory.setItem(22, buildItem(Material.WRITABLE_BOOK, this.title, bookLore));
+
+        inventory.setItem(SLOT_ACCEPT, buildItem(Material.LIME_STAINED_GLASS,
+                this.acceptButton, List.of(colorize(this.acceptHover))));
+        inventory.setItem(SLOT_DENY, buildItem(Material.RED_STAINED_GLASS,
+                this.denyButton, List.of(colorize(this.denyHover))));
+
+        player.openInventory(inventory);
+    }
+
+    private ItemStack buildItem(Material material, String name, List<String> lore) {
+
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return itemStack;
+
+        meta.displayName(component(name));
+        if (lore != null && !lore.isEmpty()) {
+            meta.lore(lore.stream().filter(line -> !line.isBlank()).map(this::component).toList());
+        }
+        itemStack.setItemMeta(meta);
+        return itemStack;
     }
 
     /**
@@ -157,6 +236,7 @@ public class TermsModule extends ZModule {
         saveAccepted();
 
         player.sendMessage(component(this.acceptedMessage));
+        player.closeInventory();
     }
 
     /**
@@ -189,11 +269,8 @@ public class TermsModule extends ZModule {
         this.plugin.getScheduler().runAtLocation(player.getLocation(), wrappedTask -> player.kickPlayer(builder.toString()));
     }
 
-    /**
-     * Parses a config line supporting legacy colors, hex colors, MiniMessage and placeholders.
-     */
     private Component component(String text) {
-        return this.paperComponent.getComponent(colorize(text));
+        return LegacyComponentSerializer.legacySection().deserialize(colorize(text));
     }
 
     private String colorize(String text) {

@@ -149,6 +149,24 @@ public interface SanctionManager {
     void freeze(CommandSender sender, UUID uuid, String userName);
 
     /**
+     * Unfreezes a frozen player, restoring their movement and removing every freeze effect.
+     *
+     * @param sender   The command sender issuing the unfreeze.
+     * @param uuid     The UUID of the player to unfreeze.
+     * @param userName The name of the player to unfreeze.
+     */
+    void unfreeze(CommandSender sender, UUID uuid, String userName);
+
+    /**
+     * Toggles the freeze state of a player.
+     *
+     * @param sender   The command sender toggling the freeze.
+     * @param uuid     The UUID of the player to toggle.
+     * @param userName The name of the player to toggle.
+     */
+    void toggleFreeze(CommandSender sender, UUID uuid, String userName);
+
+    /**
      * Cancels a chat event for a specific player, if necessary.
      *
      * @param event  The cancellable chat event to be potentially cancelled.

@@ -759,6 +759,7 @@ message-warn:
   - "&eYou have just been <u>warned</u> by &f%player%&e."
   - "&fReason&8: #82d1ff%reason%"
   - ""
+description-un-freeze: "Unfreeze a frozen player"
 command-freeze-success: "&7You just freeze the player &f%player%&7."
 command-un-freeze_success: "&7You just unfreeze the player &f%player%&7."
 

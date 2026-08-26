@@ -6,6 +6,13 @@
 
 # 1.0.4.0
 
+- **Reworked the freeze system**: `/freeze <player>` now freezes (idempotent) and a new `/unfreeze <player>` releases; a frozen player cannot move at all, glows blue and is surrounded by a continuous circle of snowflake particles; walk/fly speeds are correctly restored on unfreeze (fixing players stuck unable to move); the sanction GUI freeze button keeps its toggle behavior
+- The main command is now `/essentials` (`/zessentials` kept as alias)
+- The custom screens module moved to the `dev.yanianz.essentials.customscreens` package — all new features now live under `dev.yanianz.essentials`
+- **Fixed** the effects module being silently disabled: runtime fields are no longer overwritten by the configuration loader (this also fixes missing effects on `/tpa` and `/rtp`)
+- **The terms of service is now a custom screen** instead of chat messages: a 45 slots interface with the rules, clickable accept and refuse buttons, that cannot be closed without an answer
+- New startup/shutdown console banners with an rgb gradient title and server informations
+
 - **Fixed** the scoreboard crashing on join with `IllegalAccessException` on modern Paper servers — upgraded FastBoard to 2.2.1 which converts components correctly on Mojang-mapped runtimes
 - **Fixed** the chat crashing when showing an item with `NoSuchFieldError: ClickEvent$Action.RUN_COMMAND` — the click event now uses the version-stable adventure factory
 - Added a console startup/shutdown banner with versions, command/module counts and timings

@@ -19,25 +19,36 @@ import fr.maxlego08.essentials.module.ZModule;
 import fr.maxlego08.essentials.user.ZUser;
 import fr.maxlego08.essentials.zutils.utils.TimerBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scoreboard.Team;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class SanctionModule extends ZModule implements SanctionManager {
 
     private final ExpiringCache<UUID, User> expiringCache = new ExpiringCache<>(1000 * 60 * 60); // 1 hour cache
+
+    private static final String FROZEN_TEAM_NAME = "zessentials_frozen";
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private final Map<UUID, com.tcoded.folialib.wrapper.task.WrappedTask> particleTasks = new HashMap<>();
     // Default messages for kick and ban
     // Do not make those fields final, javac would inline the constant and the configuration would be ignored
     private String kickDefaultReason = "";
@@ -428,6 +439,25 @@ public class SanctionModule extends ZModule implements SanctionManager {
 
     @Override
     public void freeze(CommandSender sender, UUID uuid, String userName) {
+        this.setFrozenState(sender, uuid, userName, true);
+    }
+
+    @Override
+    public void unfreeze(CommandSender sender, UUID uuid, String userName) {
+        this.setFrozenState(sender, uuid, userName, false);
+    }
+
+    @Override
+    public void toggleFreeze(CommandSender sender, UUID uuid, String userName) {
+        User current = this.plugin.getUser(uuid);
+        this.setFrozenState(sender, uuid, userName, current == null || !current.isFrozen());
+    }
+
+    /**
+     * Freezes or unfreezes a player. A frozen player cannot move, chat or run commands,
+     * glows blue and is surrounded by a continuous circle of snowflake particles.
+     */
+    private void setFrozenState(CommandSender sender, UUID uuid, String userName, boolean frozen) {
 
         if (isProtected(userName)) {
             message(sender, Message.COMMAND_SANCTION_ERROR);
@@ -440,51 +470,143 @@ public class SanctionModule extends ZModule implements SanctionManager {
             return;
         }
 
-        user.setFrozen(!user.isFrozen());
-        IStorage iStorage = this.plugin.getStorageManager().getStorage();
-        Sanction sanction = Sanction.freeze(uuid, getSenderUniqueId(sender));
-        iStorage.insertSanction(sanction, index -> {
-            sanction.setId(index);
-            iStorage.updateUserFrozen(uuid, user.isFrozen());
-        });
+        if (user.isFrozen() == frozen && sender != null) {
+            message(sender, frozen ? Message.COMMAND_FREEZE_SUCCESS : Message.COMMAND_UN_FREEZE_SUCCESS, "%player%", userName);
+            return;
+        }
+
+        user.setFrozen(frozen);
+
+        // Audit the freeze in the database, unfreezes are not stored as sanctions
+        if (frozen) {
+            IStorage iStorage = this.plugin.getStorageManager().getStorage();
+            Sanction sanction = Sanction.freeze(uuid, getSenderUniqueId(sender));
+            iStorage.insertSanction(sanction, index -> {
+                sanction.setId(index);
+                iStorage.updateUserFrozen(uuid, true);
+            });
+        } else {
+            IStorage iStorage = this.plugin.getStorageManager().getStorage();
+            iStorage.updateUserFrozen(uuid, false);
+        }
 
         Player player = user.getPlayer();
+        if (player != null) {
+            this.applyFrozenVisuals(player, frozen);
+        }
 
-        if (user.isFrozen()) {
+        if (frozen) {
             message(sender, Message.COMMAND_FREEZE_SUCCESS, "%player%", userName);
             this.plugin.getEssentialsServer().sendMessage(uuid, Message.MESSAGE_FREEZE);
-
-            if (player != null) {
-                player.setAllowFlight(true);
-                player.setFlying(true);
-                player.setFlySpeed(0f);
-                this.plugin.getScheduler().teleportAsync(player, player.getLocation().add(0, 0.1, 0));
-            }
         } else {
-            if (player != null) {
-                player.setAllowFlight(false);
-                player.setFlying(false);
-                player.setFlySpeed(0.1f);
-            }
-
             message(sender, Message.COMMAND_UN_FREEZE_SUCCESS, "%player%", userName);
             this.plugin.getEssentialsServer().sendMessage(uuid, Message.MESSAGE_UN_FREEZE);
+        }
+    }
+
+    /**
+     * Applies or removes every visual and movement restriction of the freeze.
+     */
+    private void applyFrozenVisuals(Player player, boolean frozen) {
+
+        player.setWalkSpeed(frozen ? 0f : 0.2f);
+        player.setFlySpeed(frozen ? 0f : 0.1f);
+
+        // Blue glow through a colored scoreboard team
+        Team team = getFrozenTeam();
+        if (frozen) {
+            team.addEntry(player.getName());
+            player.setGlowing(true);
+        } else {
+            team.removeEntry(player.getName());
+            player.setGlowing(false);
+        }
+
+        // Continuous circle of blue particles around the target
+        UUID uniqueId = player.getUniqueId();
+        com.tcoded.folialib.wrapper.task.WrappedTask existing = this.particleTasks.remove(uniqueId);
+        if (existing != null) existing.cancel();
+
+        if (!frozen) return;
+
+        Location center = player.getLocation().clone();
+        var task = this.plugin.getScheduler().runAtLocationTimer(center, new Runnable() {
+
+            private double angle = 0;
+
+            @Override
+            public void run() {
+                if (!player.isOnline() || !player.isFrozen()) {
+                    com.tcoded.folialib.wrapper.task.WrappedTask self = particleTasks.remove(uniqueId);
+                    if (self != null) self.cancel();
+                    return;
+                }
+
+                angle += Math.PI / 16;
+                Location base = player.getLocation();
+                World world = base.getWorld();
+                if (world == null) return;
+
+                // Two opposite points orbiting the player, at three heights
+                for (int level = 0; level < 3; level++) {
+                    double y = 0.2 + level * 0.7;
+                    double offset = level % 2 == 0 ? angle : -angle + Math.PI;
+                    world.spawnParticle(Particle.SNOWFLAKE,
+                            base.getX() + Math.cos(offset) * 1.0,
+                            base.getY() + y,
+                            base.getZ() + Math.sin(offset) * 1.0,
+                            2, 0, 0, 0, 0);
+                    world.spawnParticle(Particle.SNOWFLAKE,
+                            base.getX() + Math.cos(offset + Math.PI) * 1.0,
+                            base.getY() + y,
+                            base.getZ() + Math.sin(offset + Math.PI) * 1.0,
+                            2, 0, 0, 0, 0);
+                }
+            }
+        }, 4L, 4L);
+
+        this.particleTasks.put(uniqueId, task);
+    }
+
+    private Team getFrozenTeam() {
+
+        Team team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(FROZEN_TEAM_NAME);
+        if (team != null) return team;
+
+        team = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam(FROZEN_TEAM_NAME);
+        team.setColor(org.bukkit.ChatColor.BLUE);
+        team.setCanSeeFriendlyInvisibles(false);
+        return team;
+    }
+
+    /**
+     * A frozen player cannot move at all, rotations stay possible.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onMove(org.bukkit.event.player.PlayerMoveEvent event) {
+
+        User user = this.getUser(event.getPlayer());
+        if (user == null || !user.isFrozen()) return;
+
+        Location from = event.getFrom();
+        Location to = event.getTo();
+        if (to == null) return;
+
+        if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ()) {
+            event.setTo(from);
         }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         User user = this.getUser(event.getPlayer());
-        if (user != null && user.isFrozen()) {
-            Player player = user.getPlayer();
-            if (player != null) {
-                player.setAllowFlight(true);
-                player.setFlying(true);
-                player.setFlySpeed(0f);
-                this.plugin.getScheduler().teleportAsync(player, player.getLocation().add(0, 0.1, 0));
-            }
-            this.plugin.getEssentialsServer().sendMessage(user.getUniqueId(), Message.MESSAGE_FREEZE);
+        if (user == null || !user.isFrozen()) return;
+
+        Player player = user.getPlayer();
+        if (player != null) {
+            this.applyFrozenVisuals(player, true);
         }
+        this.plugin.getEssentialsServer().sendMessage(user.getUniqueId(), Message.MESSAGE_FREEZE);
     }
 
     @EventHandler

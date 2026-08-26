@@ -95,6 +95,7 @@ import fr.maxlego08.essentials.zutils.utils.spigot.SpigotUtils;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.menu.api.pattern.PatternManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -189,7 +190,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
         // Commands
         this.registerListener(this.commandManager = new ZCommandManager(this));
-        this.registerCommand("zessentials", new CommandEssentials(this), "ess");
+        this.registerCommand("essentials", new CommandEssentials(this), "ess", "zessentials");
 
         CommandLoader commandLoader = new CommandLoader(this);
         commandLoader.loadCommands(this.commandManager);
@@ -264,13 +265,51 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
     private void printEnableBanner() {
 
         long ms = System.currentTimeMillis() - this.serverStartUptime;
-        String line = "§8§m                                                                          ";
+        String line = "§8§m                                                                            ";
 
         this.getLogger().info(line);
-        this.getLogger().info("  §b§lzEssentials §f" + this.getDescription().getVersion() + " §7has been §aenabled §7in §f" + ms + "ms");
-        this.getLogger().info("  §7" + this.commandManager.countCommands() + " commands §8• §7" + this.moduleManager.getModules().size() + " modules §8• §7Java §f" + System.getProperty("java.version"));
-        this.getLogger().info("  §7Author §fYanIanZ §8• §7Docs §fdocs.zessentials.groupez.dev");
+        this.getLogger().info("   " + hexGradient("zESSENTIALS", "#00d4ff", "#7b2fff") + " §f" + this.getDescription().getVersion()
+                + " §8» §aenabled §7in §f" + ms + "ms");
+        this.getLogger().info("   §7" + this.commandManager.countCommands() + " commands §8• §7"
+                + this.moduleManager.getModules().size() + " modules §8• §7java §f"
+                + System.getProperty("java.version") + " §8• §7" + Bukkit.getBukkitVersion());
+        this.getLogger().info("   §7author §fYanIanZ §8• §7docs §fdocs.zessentials.groupez.dev");
         this.getLogger().info(line);
+    }
+
+    /**
+     * Colors every character of the text with a linear interpolation between
+     * two hex colors, rendered through legacy §x codes so the console shows real rgb.
+     */
+    @SuppressWarnings("SameParameterValue")
+    private static String hexGradient(String text, String fromHex, String toHex) {
+
+        int[] from = parseHex(fromHex);
+        int[] to = parseHex(toHex);
+        StringBuilder builder = new StringBuilder();
+
+        for (int index = 0; index < text.length(); index++) {
+            double ratio = text.length() <= 1 ? 0 : (double) index / (text.length() - 1);
+            int red = (int) Math.round(from[0] + (to[0] - from[0]) * ratio);
+            int green = (int) Math.round(from[1] + (to[1] - from[1]) * ratio);
+            int blue = (int) Math.round(from[2] + (to[2] - from[2]) * ratio);
+
+            builder.append(String.format("§x§%c§%c§%c§%c§%c§%c",
+                    Character.forDigit((red >> 4) & 0xF, 16), Character.forDigit(red & 0xF, 16),
+                    Character.forDigit((green >> 4) & 0xF, 16), Character.forDigit(green & 0xF, 16),
+                    Character.forDigit((blue >> 4) & 0xF, 16), Character.forDigit(blue & 0xF, 16)));
+            builder.append(text.charAt(index));
+        }
+        return builder.toString();
+    }
+
+    private static int[] parseHex(String hex) {
+        String clean = hex.replace("#", "");
+        return new int[]{
+                Integer.parseInt(clean.substring(0, 2), 16),
+                Integer.parseInt(clean.substring(2, 4), 16),
+                Integer.parseInt(clean.substring(4, 6), 16)
+        };
     }
 
     @Override

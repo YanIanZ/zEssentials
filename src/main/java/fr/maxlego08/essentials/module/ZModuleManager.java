@@ -11,7 +11,7 @@ import fr.maxlego08.essentials.module.modules.hologram.HologramModule;
 import fr.maxlego08.essentials.module.modules.kit.KitModule;
 import fr.maxlego08.essentials.module.modules.chat.ChatModule;
 import fr.maxlego08.essentials.module.modules.customcommands.CustomCommandModule;
-import fr.maxlego08.essentials.module.modules.customscreens.CustomScreenModule;
+import dev.yanianz.essentials.customscreens.CustomScreenModule;
 import fr.maxlego08.essentials.module.modules.effects.EffectsModule;
 import fr.maxlego08.essentials.module.modules.terms.TermsModule;
 import fr.maxlego08.essentials.module.modules.HomeModule;

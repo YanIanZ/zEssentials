@@ -1,6 +1,7 @@
 package fr.maxlego08.essentials.module.modules.effects;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -20,20 +21,32 @@ import java.util.Locale;
  */
 public class EffectsModule extends ZModule {
 
+    @NonLoadable
     private boolean teleportEnabled;
+    @NonLoadable
     private Particle teleportParticle;
+    @NonLoadable
     private Sound teleportSound;
 
+    @NonLoadable
     private boolean gamemodeEnabled;
+    @NonLoadable
     private Particle gamemodeParticle;
+    @NonLoadable
     private Sound gamemodeSound;
 
+    @NonLoadable
     private boolean flyEnabled;
+    @NonLoadable
     private Particle flyParticle;
+    @NonLoadable
     private Sound flySound;
 
+    @NonLoadable
     private boolean blessingEnabled;
+    @NonLoadable
     private Particle blessingParticle;
+    @NonLoadable
     private Sound blessingSound;
 
     public EffectsModule(ZEssentialsPlugin plugin) {

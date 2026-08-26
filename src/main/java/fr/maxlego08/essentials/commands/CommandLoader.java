@@ -155,6 +155,7 @@ public class CommandLoader {
         register("homeimport", CommandHomeImport.class);
 
         register("freeze", CommandFreeze.class);
+        register("unfreeze", CommandUnfreeze.class);
         register("ban", CommandBan.class);
         register("mute", CommandMute.class);
         register("unmute", CommandUnMute.class);

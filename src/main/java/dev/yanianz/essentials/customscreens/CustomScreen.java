@@ -1,4 +1,4 @@
-package fr.maxlego08.essentials.module.modules.customscreens;
+package dev.yanianz.essentials.customscreens;
 
 import fr.maxlego08.menu.api.sound.SoundOption;
 import org.bukkit.GameMode;

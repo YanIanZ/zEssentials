@@ -14,6 +14,10 @@
 Sorted by priority:
 
 ## Fixes
+- [x] Rework freeze system: separate /freeze and /unfreeze, total immobility, continuous blue particle circle and blue glow
+- [x] Fix fly speed stuck at 0 after unfreeze
+- [x] Fix effects module silently disabled (yaml loader overwriting runtime fields)
+- [x] Fix tpa/rtp having no teleport effect (same root cause)
 - [x] Scoreboard crash on modern Paper (fastboard 2.1.5 -> 2.2.1 + customScoresSupported)
 - [x] Chat crash `ClickEvent.Action.RUN_COMMAND` missing on new adventure versions
 

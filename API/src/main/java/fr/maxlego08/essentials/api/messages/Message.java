@@ -655,6 +655,7 @@ public enum Message {
     ),
 
     COMMAND_FREEZE_SUCCESS("&7You just freeze the player &f%player%&7."),
+    DESCRIPTION_UN_FREEZE("Unfreeze a frozen player"),
     COMMAND_UN_FREEZE_SUCCESS("&7You just unfreeze the player &f%player%&7."),
 
     MESSAGE_FREEZE(
