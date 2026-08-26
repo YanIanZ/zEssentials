@@ -36,7 +36,9 @@ public class ClickAdapter extends TypeAdapter<ClickEvent> {
      */
     @Override
     public ClickEvent read(JsonReader in) throws IOException {
-        String action = net.kyori.adventure.text.event.ClickEvent.Action.RUN_COMMAND.name();
+        // Literal on purpose: ClickEvent.Action.RUN_COMMAND does not exist in newer
+        // adventure versions and reading the constant would crash the read path
+        String action = "RUN_COMMAND";
         String value = "/say Hummm, its doesnt work !";
 
         in.beginObject();

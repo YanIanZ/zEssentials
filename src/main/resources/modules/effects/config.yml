@@ -1,0 +1,33 @@
+########################################################################################################################
+#
+# zEssentials - Effects
+# Plays particle and sound effects around players for teleports and key actions.
+#
+########################################################################################################################
+
+enable: true
+
+# Ring of particles when a player teleports (tpa, warp, spawn, home, tp...)
+# The ender pearl and chorus fruit are skipped, they already have their own effects.
+teleport:
+  enabled: true
+  particle: PORTAL
+  sound: ENTITY_ENDERMAN_TELEPORT
+
+# Burst when the game mode of a player changes (/gamemode, /gmc...)
+gamemode:
+  enabled: true
+  particle: HAPPY_VILLAGER
+  sound: ENTITY_PLAYER_LEVELUP
+
+# Puff of clouds when a player starts or stops flying (/fly, double jump...)
+fly:
+  enabled: true
+  particle: CLOUD
+  sound: ENTITY_BREEZE_IDLE_GROUND
+
+# Sparkles when a player is healed (/heal) or turns god mode on (/god)
+blessing:
+  enabled: true
+  particle: TOTEM_OF_UNDYING
+  sound: ENTITY_PLAYER_LEVELUP

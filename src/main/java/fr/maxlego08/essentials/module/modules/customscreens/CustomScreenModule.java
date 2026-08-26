@@ -99,6 +99,13 @@ public class CustomScreenModule extends ZModule {
 
         File file = new File(getFolder(), "screens/" + name + ".yml");
         if (!file.exists()) {
+            // Extract the bundled layout when we ship one, custom entries have to be created manually
+            String resourcePath = "modules/" + getName() + "/screens/" + name + ".yml";
+            if (this.plugin.resourceExist(resourcePath)) {
+                this.plugin.saveResource(resourcePath, false);
+            }
+        }
+        if (!file.exists()) {
             this.plugin.getLogger().severe("The screen " + path + " has no layout file (" + file.getPath() + "), it will be ignored.");
             return;
         }

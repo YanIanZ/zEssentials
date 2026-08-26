@@ -6,10 +6,9 @@ description: Provides an essential, core set of commands for Bukkit.
 website: https://groupez.dev/
 author: [ YanIanZ ]
 contributors: [ Maxlego08, Louis_Dew, Traqueur, JavaToastDev, Melon-Oof, alwyn974, Mapacheee, NeiiZun, groundbreakingmc ]
-depend:
+softdepend:
   - zMenu
   - PlaceholderAPI
-softdepend:
   - Vault
   - ProtocolLib
   - SuperiorSkyblock2

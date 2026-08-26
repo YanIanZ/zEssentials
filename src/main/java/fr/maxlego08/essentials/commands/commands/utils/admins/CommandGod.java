@@ -75,6 +75,12 @@ public class CommandGod extends VCommand {
     private void sendGodModeMessages(Player target, CommandSender sender, boolean isGodEnabled) {
         Message messageKey = isGodEnabled ? Message.COMMAND_GOD_ENABLE : Message.COMMAND_GOD_DISABLE;
 
+        // Blessing effect when god mode is enabled
+        if (isGodEnabled) {
+            var effectsModule = plugin.getModuleManager().getModule(fr.maxlego08.essentials.module.modules.effects.EffectsModule.class);
+            if (effectsModule != null) effectsModule.playGod(target);
+        }
+
         // Message for the sender
         boolean isSelf = sender.equals(target);
         String senderMessage = isSelf ? Message.YOU.getMessageAsString() : target.getName();

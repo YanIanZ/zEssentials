@@ -94,9 +94,7 @@ import fr.maxlego08.essentials.zutils.utils.paper.PaperUtils;
 import fr.maxlego08.essentials.zutils.utils.spigot.SpigotUtils;
 import fr.maxlego08.menu.api.ButtonManager;
 import fr.maxlego08.menu.api.InventoryManager;
-import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.pattern.PatternManager;
-import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -142,6 +140,14 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
         this.serverStartUptime = System.currentTimeMillis();
         this.saveDefaultConfig();
+
+        // The required plugins are soft dependencies, resolve the missing ones
+        // (download + load) before anything touches their api, abort when impossible
+        boolean autoRestart = this.getConfig().getBoolean("dependency-loader.auto-restart", false);
+        if (!dev.yanianz.essentials.dependency.PluginDependencyResolver.resolveRequired(this, autoRestart)) {
+            return;
+        }
+
         this.saveOrUpdateConfiguration("config.yml", true);
         this.enchantments.register();
 
@@ -210,7 +216,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         this.registerListener(new PlayerListener(this));
         this.registerPlaceholder(UserPlaceholders.class);
         this.registerPlaceholder(UserItemsPlaceholders.class);
-        if (MinecraftVersion.getCurrentVersion().isAtLeast(MinecraftVersion.parse("1.21"))) {
+        if (dev.yanianz.essentials.dependency.ZMenuBridge.isAtLeast121()) {
             this.registerPlaceholder(UserItems1_21Placeholders.class);
         }
         this.registerPlaceholder(UserHomePlaceholders.class);
@@ -248,6 +254,23 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         if (this.configuration.isTempFlyTask()) {
             new FlyTask(this);
         }
+
+        this.printEnableBanner();
+    }
+
+    /**
+     * Prints the startup summary box in the console.
+     */
+    private void printEnableBanner() {
+
+        long ms = System.currentTimeMillis() - this.serverStartUptime;
+        String line = "§8§m                                                                          ";
+
+        this.getLogger().info(line);
+        this.getLogger().info("  §b§lzEssentials §f" + this.getDescription().getVersion() + " §7has been §aenabled §7in §f" + ms + "ms");
+        this.getLogger().info("  §7" + this.commandManager.countCommands() + " commands §8• §7" + this.moduleManager.getModules().size() + " modules §8• §7Java §f" + System.getProperty("java.version"));
+        this.getLogger().info("  §7Author §fYanIanZ §8• §7Docs §fdocs.zessentials.groupez.dev");
+        this.getLogger().info(line);
     }
 
     @Override
@@ -279,37 +302,22 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         if (this.storageManager != null) this.storageManager.onDisable();
         if (this.persist != null) ConfigStorage.getInstance().save(this.persist);
 
-        this.essentialsServer.onDisable();
+        // The plugin can be disabled before finishing its enable when a required
+        // dependency could not be resolved, guard every field against null
+        if (this.essentialsServer != null) this.essentialsServer.onDisable();
 
-        context.shutdown();
+        if (this.context != null) context.shutdown();
+
+        String line = "§8§m                                                                          ";
+        this.getLogger().info(line);
+        this.getLogger().info("  §b§lzEssentials §7has been §cdisabled§7, see you soon!");
+        this.getLogger().info(line);
     }
 
     private void registerButtons() {
-
-        this.buttonManager.register(new NoneLoader(this, ButtonTeleportationConfirmHere.class, "ZESSENTIALS_TELEPORTATION_CONFIRM_HERE"));
-        this.buttonManager.register(new NoneLoader(this, ButtonTeleportationConfirm.class, "ZESSENTIALS_TELEPORTATION_CONFIRM"));
-        this.buttonManager.register(new NoneLoader(this, ButtonPayConfirm.class, "ZESSENTIALS_PAY_CONFIRM"));
-        this.buttonManager.register(new NoneLoader(this, ButtonHomes.class, "ZESSENTIALS_HOMES"));
-        this.buttonManager.register(new NoneLoader(this, ButtonPublicHomes.class, "ZESSENTIALS_PUBLIC_HOMES"));
-        this.buttonManager.register(new NoneLoader(this, ButtonSanctionInformation.class, "ZESSENTIALS_SANCTION_INFORMATION"));
-        this.buttonManager.register(new NoneLoader(this, ButtonSanctions.class, "ZESSENTIALS_SANCTIONS"));
-        this.buttonManager.register(new NoneLoader(this, ButtonKitPreview.class, "ZESSENTIALS_KIT_PREVIEW"));
-        this.buttonManager.register(new NoneLoader(this, ButtonMailBox.class, "ZESSENTIALS_MAILBOX"));
-        this.buttonManager.register(new NoneLoader(this, ButtonMailBoxAdmin.class, "ZESSENTIALS_MAILBOX_ADMIN"));
-        this.buttonManager.register(new NoneLoader(this, ButtonVaultSlotDisable.class, "ZESSENTIALS_VAULT_SLOTS_DISABLE"));
-        this.buttonManager.register(new NoneLoader(this, ButtonVaultSlotItems.class, "ZESSENTIALS_VAULT_SLOTS_ITEMS"));
-        this.buttonManager.register(new NoneLoader(this, ButtonVaultIcon.class, "ZESSENTIALS_VAULT_CHANGE_ICON"));
-        this.buttonManager.register(new NoneLoader(this, ButtonVaultRename.class, "ZESSENTIALS_VAULT_CHANGE_NAME"));
-        this.buttonManager.register(new ButtonWarpLoader(this));
-        this.buttonManager.register(new ButtonSanctionLoader(this));
-        this.buttonManager.register(new ButtonKitCooldownLoader(this));
-        this.buttonManager.register(new ButtonKitGetLoader(this));
-        this.buttonManager.register(new ButtonVaultOpenLoader(this));
-        this.buttonManager.register(new ButtonVaultNoPermissionLoader(this));
-        this.buttonManager.register(new ButtonVaultOpenAdminLoader(this));
-        this.buttonManager.register(new ButtonVaultNoPermissionAdminLoader(this));
-        this.buttonManager.register(new ButtonOptionLoader(this));
-
+        // The button loaders come from the zMenu api, the call lives in the bridge so
+        // the verification of this class does not require zMenu to be installed yet
+        dev.yanianz.essentials.dependency.ZMenuBridge.registerButtons(this);
     }
 
     @Override
@@ -535,13 +543,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
     @Override
     public void openInventory(Player player, String inventoryName) {
-        this.inventoryManager.getInventory(this, inventoryName).ifPresent(inventory -> {
-            this.platformScheduler.runAtLocation(player.getLocation(), wrappedTask -> {
-                this.inventoryManager.getCurrentPlayerInventory(player).ifPresentOrElse(oldInventory -> {
-                    this.inventoryManager.openInventory(player, inventory, 1, oldInventory);
-                }, () -> this.inventoryManager.openInventory(player, inventory));
-            });
-        });
+        dev.yanianz.essentials.dependency.ZMenuBridge.openInventory(this, player, inventoryName);
     }
 
     @Override

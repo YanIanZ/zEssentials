@@ -14,6 +14,16 @@
 # Displays debug items in the console, if you request support, please enable debug and send logs with debugs
 enable-debug: false
 
+# Required plugins (zMenu, PlaceholderAPI) are installed automatically at startup.
+#
+# PlaceholderAPI is loaded instantly without any restart.
+# zMenu can only be loaded by the server itself (Paper restriction), so its very first
+# installation needs one restart. With auto-restart enabled, the server shuts down by
+# itself after the download: a host with automatic restart brings it back fully installed,
+# without any manual action.
+dependency-loader:
+  auto-restart: false
+
 # Storage:
 # SQLITE - For the launch of the plugin only.
 # MYSQL - Allows creating a simple connection to the database, only for small servers.

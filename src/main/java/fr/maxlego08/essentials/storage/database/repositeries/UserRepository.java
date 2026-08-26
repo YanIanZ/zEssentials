@@ -59,8 +59,9 @@ public class UserRepository extends Repository {
         if (this.connection.getDatabaseConfiguration().getDatabaseType() == DatabaseType.SQLITE) {
 
             // SQLite does not support UPDATE with LEFT JOIN, so we first select the expired
-            // sanctions and then clear the references with a simple IN clause
-            List<SanctionDTO> expiredSanctions = select(SanctionDTO.class, table -> table.where("expired_at", "<", new Date()));
+            // sanctions from the sanctions table and then clear the references with a simple IN clause
+            String sanctionsTable = this.connection.getDatabaseConfiguration().getTablePrefix() + "sanctions";
+            List<SanctionDTO> expiredSanctions = this.select(sanctionsTable, SanctionDTO.class, table -> table.where("expired_at", "<", new Date()));
             if (expiredSanctions.isEmpty()) return;
 
             Object[] expiredIds = expiredSanctions.stream().map(SanctionDTO::id).toArray();

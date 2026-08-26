@@ -141,6 +141,8 @@ public enum Message {
 
     COMMAND_SCREEN_NOT_FOUND("<error>The screen &f%screen% <error>does not exist."),
     MESSAGE_SCREEN_CONDITION("<error>You cannot open this screen here."),
+    DESCRIPTION_TERMS("Accept or manage the server terms of service"),
+    COMMAND_TERMS_RESET("<success>The terms acceptance of &f%player% <success>has been reset."),
 
     COMMAND_TELEPORT_IGNORE_PLAYER("<error>You cannot send a teleport request to #34cfe0%player%<error> they are ignoring you."),
     COMMAND_TELEPORT_WORLD("<error>You need to be in the same world to teleport."),

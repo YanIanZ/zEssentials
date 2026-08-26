@@ -1,0 +1,55 @@
+########################################################################################################################
+#
+# zEssentials - Terms of Service
+# Shows the server rules to new players, they have to accept them to play.
+#
+########################################################################################################################
+
+enable: true
+
+# Seconds before kicking a player who did not answer
+timeout: 60
+
+# Permission that skips the terms completely
+bypass-permission: essentials.terms.bypass
+
+# Title shown at the top of the screen while the rules are displayed
+title: "&#ff6b35&lTERMS OF SERVICE"
+
+# Every line of the terms, supports colors, MiniMessage and placeholders
+rules:
+  - ""
+  - "&#ffd93d&lRULES"
+  - "&71. Be respectful towards every player."
+  - "&72. No cheating, hacking or exploiting bugs."
+  - "&73. No spam, advertising or griefing."
+  - "&74. Staff decisions are final."
+  - ""
+
+# Message above the buttons
+question: "&7Do you accept the terms to play on this server?"
+
+# The two clickable buttons
+accept-button: "&a&l[ ✔ I ACCEPT ]"
+deny-button: "&c&l[ ✘ I REFUSE ]"
+accept-hover: "&fClick to accept the terms"
+deny-hover: "&fClick to refuse and leave the server"
+
+# Sent when the player accepts
+accepted-message: "&aTerms accepted, welcome and have fun!"
+
+# Kick reason when the player refuses or does not answer in time
+refuse-kick:
+  - ""
+  - "&#ff6b35&lzEssentials"
+  - ""
+  - "&cYou refused the server terms."
+  - "&7You can reconnect and accept them to play."
+  - ""
+timeout-kick:
+  - ""
+  - "&#ff6b35&lzEssentials"
+  - ""
+  - "&cYou did not answer the terms in time."
+  - "&7Reconnect to read and accept them."
+  - ""

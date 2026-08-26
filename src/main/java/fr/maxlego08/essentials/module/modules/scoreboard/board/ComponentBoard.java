@@ -61,4 +61,9 @@ public class ComponentBoard extends FastBoard implements PlayerBoard {
     public int getLineModifier(int line) {
         return this.linesModifier.getOrDefault(line, line);
     }
+
+    @Override
+    public boolean customScoresSupported() {
+        return CustomScoresSupport.isSupported();
+    }
 }

@@ -86,5 +86,9 @@ public class CommandHeal extends VCommand {
                     && user.getOption(Option.NIGHT_VISION)) return;
             player.removePotionEffect(effect.getType());
         });
+
+        // Blessing effect from the effects module
+        var effectsModule = plugin.getModuleManager().getModule(fr.maxlego08.essentials.module.modules.effects.EffectsModule.class);
+        if (effectsModule != null) effectsModule.playHeal(player);
     }
 }

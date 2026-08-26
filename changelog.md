@@ -6,12 +6,27 @@
 
 # 1.0.4.0
 
+- **Fixed** the scoreboard crashing on join with `IllegalAccessException` on modern Paper servers — upgraded FastBoard to 2.2.1 which converts components correctly on Mojang-mapped runtimes
+- **Fixed** the chat crashing when showing an item with `NoSuchFieldError: ClickEvent$Action.RUN_COMMAND` — the click event now uses the version-stable adventure factory
+- Added a console startup/shutdown banner with versions, command/module counts and timings
+- Added a new **effects** module (`modules/effects/config.yml`): configurable particle rings and sounds for teleports (tpa/warp/spawn/home/tp...), game mode changes, flight toggles plus blessing sparkles for `/heal` and `/god`
+- Added a new **terms of service** module (`modules/terms/config.yml`): new players receive the server rules with clickable accept/refuse buttons, players who refuse or do not answer in time are kicked; acceptances are remembered (`/terms reload`, `/terms reset <player>` admin commands)
+- **Fixed** expired sanction cleanup on SQLite querying the wrong table (`no such column: expired_at`)
+- **Fixed** duplicate message keys in the default configuration triggering warnings on every start
+- **Fixed** the custom screens example layout not being extracted from the jar on first launch
+
 - Added a **runtime dependency loader** (package `dev.yanianz.essentials.dependency`) modeled after Intave's library system:
     - Detects whether a dependency is already available on the classpath (plugin.yml libraries, shaded jar or another plugin) — if so nothing is installed
     - Otherwise restores it from the local cache folder (`plugins/zEssentials/libs`, maven layout) or downloads it from Maven Central
     - Downloads are verified against the published SHA-256 / SHA-1 / MD5 checksums and written atomically, a corrupted download never reaches the cache
     - The jar is pushed into the running classloader without restarting the server (URLClassLoader `addURL`, Unsafe fallback on modern JVMs)
     - The JDBC driver (MariaDB/MySQL) is resolved automatically before the database storage connects
+- **zMenu and PlaceholderAPI are no longer hard dependencies**: the server now loads zEssentials without them and installs the missing ones at startup
+    - PlaceholderAPI is downloaded automatically from Hangar and enabled immediately, without any restart
+    - zMenu is downloaded automatically from Modrinth (latest paper build); because it ships a paper-plugin.yml bootstrapper, Paper forbids hot-loading it at runtime, so one restart is required the very first time only
+    - Downloads are idempotent: an already staged jar is never fetched again
+    - If a required plugin cannot be resolved, zEssentials disables itself cleanly instead of crashing the plugin loading
+    - Every direct zMenu api call moved out of the main plugin class into a bridge (`dev.yanianz.essentials.dependency.ZMenuBridge`), so its class verification succeeds even when zMenu is not installed yet and the auto-installer can run
 - Added a new **custom screens** module (`modules/customscreens/config.yml`) to create your own inventory screens opened with a command:
     - Each entry defines the `command` (with `aliases`, `permission`, `description`) that opens the zMenu inventory stored in `modules/customscreens/screens/<name>.yml`
     - Screens use the standard zMenu format: items per slot, click actions (console/player commands, messages, sounds, open another screen), patterns, pagination and PlaceholderAPI placeholders

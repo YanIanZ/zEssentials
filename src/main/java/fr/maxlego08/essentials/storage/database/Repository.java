@@ -76,7 +76,15 @@ public abstract class Repository extends ZUtils {
     }
 
     protected <T> List<T> select(Class<T> clazz, Consumer<Schema> consumer) {
-        Schema schema = SchemaBuilder.select(getTableName());
+        return this.select(getTableName(), clazz, consumer);
+    }
+
+    /**
+     * Runs a select on a foreign table of the repository,
+     * used for cross-table requests like the sanctions clean up.
+     */
+    protected <T> List<T> select(String tableName, Class<T> clazz, Consumer<Schema> consumer) {
+        Schema schema = SchemaBuilder.select(tableName);
         consumer.accept(schema);
         try {
             return schema.executeSelect(clazz, this.connection, JULogger.from(this.plugin.getLogger()));

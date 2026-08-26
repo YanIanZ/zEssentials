@@ -27,6 +27,7 @@ import fr.maxlego08.essentials.commands.commands.spawn.CommandSetFirstSpawn;
 import fr.maxlego08.essentials.commands.commands.spawn.CommandSetSpawn;
 import fr.maxlego08.essentials.commands.commands.spawn.CommandSpawn;
 import fr.maxlego08.essentials.commands.commands.step.CommandStep;
+import fr.maxlego08.essentials.commands.commands.terms.CommandTerms;
 import fr.maxlego08.essentials.commands.commands.teleport.*;
 import fr.maxlego08.essentials.commands.commands.teleport.random.CommandTeleportRandom;
 import fr.maxlego08.essentials.commands.commands.utils.*;
@@ -106,6 +107,7 @@ public class CommandLoader {
         register("furnace", CommandFurnace.class, "burn");
         register("skull", CommandSkull.class);
         register("rules", CommandRules.class, "?", "help", "aide");
+        register("terms", CommandTerms.class);
 
         register("tp", CommandTeleport.class);
         register("tpall", CommandTeleportAll.class);
