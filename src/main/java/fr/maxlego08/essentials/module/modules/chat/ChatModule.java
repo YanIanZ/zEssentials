@@ -411,7 +411,7 @@ public class ChatModule extends ZModule {
                 if (customizationModule != null) {
                     String tagText = customizationModule.resolveTagText(player.getUniqueId());
                     if (!tagText.isEmpty()) {
-                        chatFormatWithTag = fr.maxlego08.essentials.util.ColorUtil.sections(tagText)
+                        chatFormatWithTag = dev.yanianz.essentials.util.ColorUtil.sections(tagText)
                                 + " " + chatFormat;
                     }
                 }

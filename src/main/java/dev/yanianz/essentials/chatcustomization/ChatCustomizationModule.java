@@ -126,6 +126,13 @@ public class ChatCustomizationModule extends ZModule {
         return this.preferences.getOrDefault(uniqueId, Preference.DEFAULT);
     }
 
+    /**
+     * Legacy text of the selected tag of a player, empty when none is chosen.
+     */
+    public String resolveTagText(UUID uniqueId) {
+        return getPreference(uniqueId).tagText();
+    }
+
     /* ── Color gui ─────────────────────────────────────────── */
 
     /**
