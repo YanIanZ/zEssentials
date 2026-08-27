@@ -6,86 +6,71 @@
 
 # 1.0.4.0
 
-- **Screen factory**: added `openCategorized` — a category picker page followed by one paginated chain per category with back navigation
+## New modules & systems
 
-- Added a **Discord bridge** (`modules/discordbridge/config.yml`, disabled by default): forwards every public chat message to the main discord text channel through a soft reflection hook into DiscordSRV, without any compile time dependency; stays idle with clear logs when DiscordSRV is missing
+- **Custom screens** (`modules/customscreens/config.yml`) — create your own inventory screens opened by a command (`/screen`); zMenu layout format with actions, patterns, pagination and PlaceholderAPI support, runtime registered commands removed safely on reload
+- **Runtime dependency loader** (`dev.yanianz.essentials.dependency`, modeled after Intave) — detects classpath availability, caches in `libs/` (maven layout), downloads from Maven Central with SHA-256/SHA-1/MD5 verification and injects into the running classloader without restart; resolves the JDBC driver automatically before database connect
+- **Auto plugin installer** — zMenu & PlaceholderAPI are no longer hard dependencies; PlaceholderAPI hot-installs from Hangar without any restart, zMenu stages from Modrinth (one restart required, Paper forbids hot-loading bootstrapper plugins); idempotent downloads, clean self-disable when impossible
+- **Effects** (`modules/effects/config.yml`) — particle rings & sounds on teleports (tpa/warp/spawn/home/rtp/tp), gamemode changes, flight toggles, plus blessing sparkles on `/heal` and `/god`
+- **Terms of service** (`modules/terms/config.yml`) — native **Mojang dialog screen** (chest fallback) with clickable accept/refuse buttons, chat+command lock until answered, timeout kick, persistent acceptances (`/terms accept|deny|reload|reset <player>`)
+- **Chat games** (`modules/chatgames/config.yml`) — six types: math race, word scramble, fast typing, reverse word, trivia, hot letter; automatic random rounds, console reward commands, `/chatgames <type|stop|reload>`
+- **Polls** — `/poll create <seconds> <question> | option 1 | option 2 ...`, clickable one-vote-per-player options, live percentage bars, winner announcement, `/poll stop`
+- **Reputation** — `/rep <player>` (+1 with 24h cooldown per giver), `/reputation [player]`, persisted in json
+- **Raid protection** — identical chat spam from several players inside a rolling window gets cancelled, moderators alerted once, configurable console actions
+- **Warning escalation** — `warning-escalation` thresholds run console commands when a player reaches N warnings (default 3→1d ban, 5→30d); `/warnings <player>` lists stored warnings
+- **Staff notes** — `/note add <player> <text>`, `/notes <player>`, `/notes clear <player>` persisted in json
+- **Nicknames** — `/nick <name|off>` with colors, length/character validation, impersonation guard, cooldown, json persistence re-applied on join; staff: `/nick <player> <name|off>`
+- **Reports** — `/report <player> <reason>` with cooldown; staff get clickable sound alerts; `/reports` lists open ones with resolve/teleport buttons
+- **Chat customization** (`/chatcolor`, `/tags`) — color gui (16 colors + bold/italic), tag gui from config, preferences persist and render live in chat
 
-- Added a **network chat relay** (`modules/bungeechat/config.yml`, disabled by default): public chat is broadcast across BungeeCord/Velocity networks through the plugin messaging channel with a configurable `%server% %player% %message%` format
-- Polished `/r`: answering without a previous private message now explains it instead of failing silently
+## Screen framework
 
-- Added **chat bubbles** (`modules/bubbles/config.yml`): every chat message appears as a text display floating above the speaker head, messages stack on top of each other and disappear after a configured time; background color, scale, stack offset and view distance are configurable
+- Reusable `ScreenFactory` (`dev.yanianz.essentials.screens`): paginated list inventories, control row, slot-bound clicks, categories picker via `openCategorized`; public api for addons through `EssentialsScreens.get().factory()`
+- New screens built on it: `/baltopgui [economy]` (paginated heads) and `/warpgui` (permission filtered warps)
 
-- Added a reusable **screen factory** (`dev.yanianz.essentials.screens`) for list style inventories with pagination, control row and slot bound click callbacks; other plugins can reuse it through `EssentialsScreens.get().factory()`
-- Added `/baltopgui [economy]`: the balance top as a paginated player head screen
-- Added `/warpgui`: every permitted warp as a clickable entry teleporting on click
+## New commands
 
-- Added a **chat customization** module (`/chatcolor` and `/tags`): guis to pick a chat color (16 colors, bold and italic with a permission), decorations are toggleable and every choice is saved in json and applied live in the rendered chat; configurable prefix **tags** with per tag permissions (`modules/chatcustomization/config.yml`)
+- `/tpaall` — send your teleport request to everyone online at once (`essentials.tpa.all`)
+- `/list` — online player list excluding hidden vanished players (`essentials.list`)
+- `/itemdb` — material, namespaced key, amount and stack size of your held item (`essentials.itemdb`)
+- `/chatcolor`, `/tags`, `/chatgames`, `/poll`, `/rep`, `/reputation`, `/dnd [player]`, `/chatslowmode <seconds>`, `/warn`, `/warnings <player>`, `/note`, `/notes`, `/nick`, `/report`, `/reports`, `/baltopgui`, `/warpgui`
 
-- Added a **nickname** module (`/nick`): colored display names with length/character validation, impersonation protection, a change cooldown (`essentials.nicknames.bypass.cooldown`) and json persistence re-applied on join; staff target others with `/nick <player> <name|off>`
-- Added a **report** system (`/report <player> <reason>`): staff online receive a clickable alert with sound, `/reports` lists the open reports with resolve and teleport buttons, everything is persisted in `reports.json`
+## Chat module v2
 
-- **Raid protection**: identical chat messages from several different players inside a short window cancel the messages, alert every moderator and can run configured console actions (`raid-protection` in `modules/chat/config.yml`)
-- **Warning escalation**: `warning-escalation` thresholds in the sanction configuration run console commands when a player reaches an amount of warnings (3 -> 1 day ban, 5 -> long ban by default)
-- Added `/warnings <player>` listing every stored warning with reason and date
-- Added private **staff notes**: `/note add <player> <text...>`, `/notes <player>` and `/notes clear <player>` persisted in json
+- `[inv]` / `[ender]` / `[pos]` display keywords with item hovers, copy-to-clipboard and click-to-suggest `/tp`
+- Custom interactive keywords (config `chat-placeholders`) shipped with 14 defaults including health, food, store link, ip...
+- `@mention` highlighting per viewer with notification sound for the target; hover/click built in
+- Emoji shortcuts: ten defaults like `:heart:` replaced in messages (`emoji-shortcuts`)
+- Slowmode: `/chatslowmode <seconds>` flat cooldown, bypass permission supported
+- Do not disturb: `/dnd [player]` suppresses mention sounds
+- Staff message deletion: clickable `[✖]` inside `/chathistory <player>` removes the stored message instantly
+- Full MiniMessage rendering pipeline shared by every display
 
-- Added **polls** (`/poll create <seconds> <question> | option 1 | option 2 ...`): clickable voting lines broadcast to everyone, one vote per player, live result bars and winner announcement; `/poll vote <index>` and `/poll stop`
-- Added a **reputation** system: `/rep <player>` gives one point with a configurable cooldown per giver (24h default), `/reputation [player]` displays the score, persisted in `reputations.json`
+## Integrations
 
-- Added a **chat games** module (`modules/chatgames/config.yml`): six game types — math race, word scramble, fast typing, reversed words, trivia and hot letter — with automatic random rounds (`auto-interval-minutes`), console reward commands (`%player%`) and `/chatgames <type|stop|reload>` for staff
+- **Discord bridge** (`modules/discordbridge/config.yml`, off by default) — outbound chat forwarding to the main Discord channel through DiscordSRV reflection, zero hard dependency
+- **Network relay** (`modules/bungeechat/config.yml`, off by default) — public chat broadcast across BungeeCord/Velocity networks via plugin messaging with `%server% %player% %message%` format
 
-- Chat slowmode: `/chatslowmode <seconds>` staff command with `essentials.chat.bypass.slowmode` bypass
-- Do not disturb mode: `/dnd [player]` disables mention notification sounds per player
-- Emoji shortcuts: ten defaults like `:heart:` or `:100:` replaced in every chat message (`emoji-shortcuts`)
-- Staff message deletion: moderators see a clickable `[✖]` on every line of `/chathistory <player>` removing the stored message instantly
+## Fixes
 
-- Raised the build to **paper-api 26.2** with full **adventure 5** compatibility
-- Duration arguments now accept every unit with combinations: `30s`, `15m`, `12h`, `7d`, `2w`, `6mo`, `3y`, `1d12h30m` — used by `/fly add|set|remove`, bans and mutes; a plain number stays seconds
-- Economy amounts accept compact magnitudes everywhere: `1k`, `1.5m`, `2b`, `3t`
-- The terms of service screen uses the **native minecraft dialog ui** on 1.21.7+ servers (chest interface kept as fallback for older versions)
-- Added `freeze.persist-across-restarts` (default false): restarts always release frozen players, stale freeze flags from previous sessions are cleaned up automatically on join
+- Scoreboard crash on modern Paper (`IllegalAccessException` from FastBoard) — upgraded FastBoard to 2.2.1 + implemented `customScoresSupported()`
+- Chat crash when displaying an item (`NoSuchFieldError ClickEvent.Action.RUN_COMMAND`) — version-stable adventure factory
+- Expired sanction cleanup failing on SQLite (`no such column: expired_at`) — now selects the sanctions table then clears references with an IN clause
+- Effects module silently disabled: runtime fields are protected from the configuration loader (also restored missing tpa/rtp effects)
+- Fly stuck after unfreeze — walk/fly speeds restored correctly; freezes are session-only by default (`freeze.persist-across-restarts`, default false), stale flags clean themselves on join
+- Secure chat profile key warning — login checks moved from PlayerLoginEvent to AsyncPlayerPreLoginEvent so Paper keeps its configuration api available
+- Duplicate message keys in the default configuration no longer print warnings on start
+- Custom screens example layout now extracts from the jar on first launch
+- `/r` answers with a clear message instead of failing silently when nothing was received
 
-- **Reworked the freeze system**: `/freeze <player>` now freezes (idempotent) and a new `/unfreeze <player>` releases; a frozen player cannot move at all, glows blue and is surrounded by a continuous circle of snowflake particles; walk/fly speeds are correctly restored on unfreeze (fixing players stuck unable to move); the sanction GUI freeze button keeps its toggle behavior
-- The main command is now `/essentials` (`/zessentials` kept as alias)
-- The custom screens module moved to the `dev.yanianz.essentials.customscreens` package — all new features now live under `dev.yanianz.essentials`
-- **Fixed** the effects module being silently disabled: runtime fields are no longer overwritten by the configuration loader (this also fixes missing effects on `/tpa` and `/rtp`)
-- **The terms of service is now a custom screen** instead of chat messages: a 45 slots interface with the rules, clickable accept and refuse buttons, that cannot be closed without an answer
-- New startup/shutdown console banners with an rgb gradient title and server informations
+## Internal
 
-- **Fixed** the scoreboard crashing on join with `IllegalAccessException` on modern Paper servers — upgraded FastBoard to 2.2.1 which converts components correctly on Mojang-mapped runtimes
-- **Fixed** the chat crashing when showing an item with `NoSuchFieldError: ClickEvent$Action.RUN_COMMAND` — the click event now uses the version-stable adventure factory
-- Added a console startup/shutdown banner with versions, command/module counts and timings
-- Added a new **effects** module (`modules/effects/config.yml`): configurable particle rings and sounds for teleports (tpa/warp/spawn/home/tp...), game mode changes, flight toggles plus blessing sparkles for `/heal` and `/god`
-- Added a new **terms of service** module (`modules/terms/config.yml`): new players receive the server rules with clickable accept/refuse buttons, players who refuse or do not answer in time are kicked; acceptances are remembered (`/terms reload`, `/terms reset <player>` admin commands)
-- **Fixed** expired sanction cleanup on SQLite querying the wrong table (`no such column: expired_at`)
-- **Fixed** duplicate message keys in the default configuration triggering warnings on every start
-- **Fixed** the custom screens example layout not being extracted from the jar on first launch
-
-- Added a **runtime dependency loader** (package `dev.yanianz.essentials.dependency`) modeled after Intave's library system:
-    - Detects whether a dependency is already available on the classpath (plugin.yml libraries, shaded jar or another plugin) — if so nothing is installed
-    - Otherwise restores it from the local cache folder (`plugins/zEssentials/libs`, maven layout) or downloads it from Maven Central
-    - Downloads are verified against the published SHA-256 / SHA-1 / MD5 checksums and written atomically, a corrupted download never reaches the cache
-    - The jar is pushed into the running classloader without restarting the server (URLClassLoader `addURL`, Unsafe fallback on modern JVMs)
-    - The JDBC driver (MariaDB/MySQL) is resolved automatically before the database storage connects
-- **zMenu and PlaceholderAPI are no longer hard dependencies**: the server now loads zEssentials without them and installs the missing ones at startup
-    - PlaceholderAPI is downloaded automatically from Hangar and enabled immediately, without any restart
-    - zMenu is downloaded automatically from Modrinth (latest paper build); because it ships a paper-plugin.yml bootstrapper, Paper forbids hot-loading it at runtime, so one restart is required the very first time only
-    - Downloads are idempotent: an already staged jar is never fetched again
-    - If a required plugin cannot be resolved, zEssentials disables itself cleanly instead of crashing the plugin loading
-    - Every direct zMenu api call moved out of the main plugin class into a bridge (`dev.yanianz.essentials.dependency.ZMenuBridge`), so its class verification succeeds even when zMenu is not installed yet and the auto-installer can run
-- Added a new **custom screens** module (`modules/customscreens/config.yml`) to create your own inventory screens opened with a command:
-    - Each entry defines the `command` (with `aliases`, `permission`, `description`) that opens the zMenu inventory stored in `modules/customscreens/screens/<name>.yml`
-    - Screens use the standard zMenu format: items per slot, click actions (console/player commands, messages, sounds, open another screen), patterns, pagination and PlaceholderAPI placeholders
-    - Optional open conditions per screen: restricted `worlds` and/or `gamemodes`
-    - Optional `open-sound` played when the screen opens; close sounds are available natively with zMenu `close-actions`
-    - Commands are registered at runtime, removed safely on `/ezreload` without duplicating anything, and a screen command that would override an existing zEssentials command is refused with a message in the console
-- Added `/tpaall` command — sends a teleport request to every online player at once; players who ignored you or disabled teleport requests are skipped silently (permission `essentials.tpa.all`)
-- Added `/list` command — displays online players sorted alphabetically with the player count, vanished players are hidden from viewers who cannot see them (permission `essentials.list`)
-- Added `/itemdb` command — displays information about the item in your hand: material name, namespaced key, amount and max stack size (permission `essentials.itemdb`)
-- Added warn sanctions through the sanction GUI — warns are saved like other sanctions, the target receives a configurable message (`message-warn`) and staff with `essentials.warn.notify` receive a broadcast (`command-warn-notify`)
-- Fixed hover events (`show_item` and `show_entity`) when reading components using the modern `contents` JSON format — items are now parsed from both the legacy `item` field and the vanilla `id` field instead of being misread as text
-- Fixed expired ban/mute sanctions never being cleared when using SQLite storage — expired sanctions are now resolved with an `IN` subquery instead of an unsupported `UPDATE ... LEFT JOIN`
-- Completed the missing translations of every language file: 71 keys for Chinese (death message module, toggle commands, teleport queue, item frame), 17-20 for German/Spanish/Italian and 13 for French/Dutch
+- Raised the build to **paper-api 26.2** (adventure 5): ClickEvent payload/name migration, jetbrains annotations swap
+- Duration arguments parse combinations everywhere: `30s 15m 12h 7d 2w 6mo 3y 1d12h30m` (plain numbers stay seconds)
+- Economy amounts accept compact magnitudes: `1k`, `1.5m`, `2b`, `3t`
+- Startup/shutdown console banners rendered as adventure components with an rgb gradient title
+- Repetitive startup logs demoted to fine level for a cleaner console
+- Main command renamed to `/essentials` (`/zessentials` kept as alias)
 
 # 1.0.3.9
 
