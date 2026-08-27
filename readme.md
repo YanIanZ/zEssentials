@@ -57,11 +57,11 @@ Sorted by priority:
 - [x] Chat games (6 types): math race, scramble, fast-type, reverse, trivia, hot-letter — auto interval or /chatgames <type|stop|reload>
 - [x] Reputation system (/rep <player>, cooldown per giver) & interactive polls (/poll create <s> question | opt1 | opt2, clickable options with % bars)
 - [ ] Chat color selection GUI + tags system
-- [ ] Nicknames with colors (LuckPerms prefix/suffix used by default when present)
+- [x] Nicknames with colors (/nick, impersonation guard, per player cooldown, persisted and re-applied on join)
 - [x] Raid protection auto-detection (identical spam from N players in a window, staff alert + actions)
 - [x] Warning system with auto-escalation (configurable thresholds running console commands)
 - [x] Staff notes: /note add <player> <text>, /notes <player>, /notes clear <player> persisted in json
-- [ ] Report system with GUI review
+- [x] Report system: /report <player> <reason> with cooldown, staff alerts with teleport click, /reports list with resolve buttons
 - [ ] Chat bubbles above players (text displays, culling/fade/stack options)
 - [ ] DiscordSRV bridge sync
 - [ ] BungeeCord/Velocity network mode

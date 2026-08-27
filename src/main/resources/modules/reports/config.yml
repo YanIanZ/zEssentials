@@ -1,0 +1,17 @@
+########################################################################################################################
+#
+# zEssentials - Reports
+# Players report others, staff review and resolve them.
+#
+########################################################################################################################
+
+enable: true
+
+# Seconds between two reports of the same player
+cooldown-seconds: 60
+
+# Maximum amount of stored resolved reports per target
+resolved-history: 100
+
+# Notify every moderator joining that reports are waiting
+notify-staff-on-join: true

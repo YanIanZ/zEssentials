@@ -6,6 +6,9 @@
 
 # 1.0.4.0
 
+- Added a **nickname** module (`/nick`): colored display names with length/character validation, impersonation protection, a change cooldown (`essentials.nicknames.bypass.cooldown`) and json persistence re-applied on join; staff target others with `/nick <player> <name|off>`
+- Added a **report** system (`/report <player> <reason>`): staff online receive a clickable alert with sound, `/reports` lists the open reports with resolve and teleport buttons, everything is persisted in `reports.json`
+
 - **Raid protection**: identical chat messages from several different players inside a short window cancel the messages, alert every moderator and can run configured console actions (`raid-protection` in `modules/chat/config.yml`)
 - **Warning escalation**: `warning-escalation` thresholds in the sanction configuration run console commands when a player reaches an amount of warnings (3 -> 1 day ban, 5 -> long ban by default)
 - Added `/warnings <player>` listing every stored warning with reason and date

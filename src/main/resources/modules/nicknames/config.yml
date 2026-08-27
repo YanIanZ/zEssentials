@@ -1,0 +1,24 @@
+########################################################################################################################
+#
+# zEssentials - Nicknames
+# Players change their own display name, staff can change it for anyone.
+#
+########################################################################################################################
+
+enable: true
+
+# Maximum length of a nickname
+max-length: 16
+
+# Allowed characters of a nickname
+regex: "^[a-zA-Z0-9_&#§xﬀ0-9a-f]{1,32}$"
+
+# Block nicknames equal or similar to the name of another player (impersonation)
+block-impersonation: true
+
+# Colors players can use without a special permission.
+# When false the nickname is stripped from every color code unless
+# the player has essentials.nicknames.color
+allow-colors: true
+
+cooldown-seconds: 60
