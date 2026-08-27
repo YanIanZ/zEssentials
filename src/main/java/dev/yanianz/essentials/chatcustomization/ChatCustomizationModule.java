@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,7 +24,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,14 +34,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChatCustomizationModule extends ZModule {
 
-    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
-    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final String[] COLOR_CODES = {
             "&0", "&1", "&2", "&3", "&4", "&5", "&6", "&7",
             "&8", "&9", "&a", "&b", "&c", "&d", "&e", "&f"
     };
+    private static final String[] COLOR_NAMES = {
+            "Black", "Dark Blue", "Dark Green", "Dark Aqua", "Dark Red", "Purple", "Gold", "Gray",
+            "Dark Gray", "Blue", "Green", "Aqua", "Red", "Pink", "Yellow", "White"
+    };
+
+    // Stable clickable slots
+    private static final int SLOT_RESET = 4;
+    private static final int SLOT_CLOSE_COLOR = 40;
+    private static final int SLOT_BOLD = 28;
+    private static final int SLOT_ITALIC = 30;
 
     private String usePermission;
     private String decorationsPermission;
@@ -49,6 +57,8 @@ public class ChatCustomizationModule extends ZModule {
 
     @NonLoadable
     private final Map<UUID, Preference> preferences = new ConcurrentHashMap<>();
+    @NonLoadable
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public ChatCustomizationModule(ZEssentialsPlugin plugin) {
         super(plugin, "chatcustomization");
@@ -63,18 +73,22 @@ public class ChatCustomizationModule extends ZModule {
         public static final Preference DEFAULT = new Preference("", List.of(), "");
     }
 
-    private static final class CustomizationHolder implements InventoryHolder {
+    /** Marker holder carrying which gui an open inventory belongs to. */
+    private static final class Holder implements InventoryHolder {
 
         enum Kind {
             COLOR,
             TAGS
         }
 
-        private Inventory inventory;
         private Kind kind;
-        private final List<String> clickData = new ArrayList<>();
-        private final List<String[]> tagData = new ArrayList<>();
-        // clickData entries for colors: full legacy color code; tags: config text
+        // Tag gui: parallel lists of slot and tag index inside this.tags
+        private final List<Integer> tagSlots = new ArrayList<>();
+        private final List<Integer> tagIndexes = new ArrayList<>();
+        // Color gui: slot -> color index
+        private final Map<Integer, Integer> colorSlots = new HashMap<>();
+
+        private Inventory inventory;
 
         @Override
         public Inventory getInventory() {
@@ -92,20 +106,18 @@ public class ChatCustomizationModule extends ZModule {
 
         this.tags.clear();
         for (Object obj : config.getMapList("tags")) {
-            if (!(obj instanceof Map)) continue;
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) obj;
+            if (!(obj instanceof java.util.Map<?, ?> raw)) continue;
+            Object nameObj = ((Map<?, ?>) raw).get("name");
+            Object textObj = ((Map<?, ?>) raw).get("text");
+            Object permObj = ((Map<?, ?>) raw).get("permission");
             this.tags.add(new TagEntry(
-                    String.valueOf(map.getOrDefault("name", "tag")),
-                    String.valueOf(map.getOrDefault("text", "")),
-                    map.get("permission") == null ? "" : String.valueOf(map.get("permission"))));
+                    nameObj == null ? "tag" : String.valueOf(nameObj),
+                    textObj == null ? "" : String.valueOf(textObj),
+                    permObj == null ? "" : String.valueOf(permObj)));
         }
 
         loadStorage();
     }
-
-    @NonLoadable
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Returns the chat preference of a player, or the default one.
@@ -114,84 +126,209 @@ public class ChatCustomizationModule extends ZModule {
         return this.preferences.getOrDefault(uniqueId, Preference.DEFAULT);
     }
 
+    /* ── Color gui ─────────────────────────────────────────── */
+
     /**
-     * Opens the color selection gui.
+     * Opens the color and decoration gui (5 rows).
      */
     public void openColorGui(Player player) {
+
         if (!check(player)) return;
 
-        CustomizationHolder holder = new CustomizationHolder();
-        holder.kind = CustomizationHolder.Kind.COLOR;
-        Inventory inventory = Bukkit.createInventory(holder, 27,
-                LEGACY.deserialize(colorize("&bChat &lCOLORS")));
+        Holder holder = new Holder();
+        holder.kind = Holder.Kind.COLOR;
+        Inventory inventory = Bukkit.createInventory(holder, 45,
+                LEGACY.deserialize(colorize("&b&lChat Colors")));
         holder.inventory = inventory;
 
-        ItemStack filler = item(Material.GRAY_STAINED_GLASS_PANE, " ", null);
-        for (int slot = 0; slot < 27; slot++) inventory.setItem(slot, filler);
+        ItemStack filler = item(Material.GRAY_STAINED_GLASS_PANE, " ", null, false);
+        for (int slot = 0; slot < 45; slot++) inventory.setItem(slot, filler);
 
-        int slot = 10;
-        for (String code : COLOR_CODES) {
-            if (slot % 9 == 8) slot++;
-            holder.clickData.add(slot, code);
-            inventory.setItem(slot++, item(Material.WHITE_WOOL, code + "&lSample " + code.toUpperCase(Locale.ROOT),
-                    List.of(colorize("&7Click to select this color"))));
-        }
+        inventory.setItem(SLOT_RESET, item(Material.WATER_BUCKET, "&b&lReset All",
+                List.of(colorize("&7Removes your chat color"), colorize("&7and every decoration.")), false));
 
-        boolean canDecorate = player.hasPermission(this.decorationsPermission);
         Preference pref = getPreference(player.getUniqueId());
-        if (canDecorate) {
-            inventory.setItem(17, item(Material.GOLD_INGOT, "&e&lBOLD",
-                    List.of(colorize("&7Toggle bold"), "", "&7Current: " + (pref.decorations().contains("l") ? "§aon" : "§coff"))));
-            inventory.setItem(26, item(Material.IRON_INGOT, "&e&oITALIC",
-                    List.of(colorize("&7Toggle italic"), "", "&7Current: " + (pref.decorations().contains("o") ? "§aon" : "§coff"))));
+
+        // Sixteen colors over two centered rows
+        int firstRowStart = 10;
+        int secondRowStart = 19;
+        for (int index = 0; index < COLOR_CODES.length; index++) {
+            boolean selected = COLOR_CODES[index].equals(pref.colorCode());
+            int slot = index < 8 ? firstRowStart + index : secondRowStart + (index - 8);
+            holder.colorSlots.put(slot, index);
+
+            List<String> lore = new ArrayList<>();
+            lore.add(colorize("&7Sample&8: " + COLOR_CODES[index] + colorize(COLOR_NAMES[index])));
+            lore.add(colorize(selected ? "&aSelected" : "&7Click to select"));
+
+            ItemStack itemStack = item(Material.WHITE_WOOL,
+                    COLOR_CODES[index] + COLOR_NAMES[index], lore, selected);
+            inventory.setItem(slot, itemStack);
         }
 
-        player.sendMessage(LEGACY.deserialize(colorize("&7Pick your chat color!")));
+        boolean canDecorate = canDecorate(player);
+        placeToggle(inventory, SLOT_BOLD, Material.GOLD_INGOT, "&eBold",
+                pref.decorations().contains("l"), canDecorate);
+        placeToggle(inventory, SLOT_ITALIC, Material.IRON_INGOT, "&e&oItalic",
+                pref.decorations().contains("o"), canDecorate);
+
+        inventory.setItem(SLOT_CLOSE_COLOR, item(Material.BARRIER, "&cClose", null, false));
+
         player.openInventory(inventory);
+        clickSound(player);
     }
+
+    private void placeToggle(Inventory inventory, int slot, Material material,
+                             String legacyName, boolean active, boolean allowed) {
+
+        List<String> lore = new ArrayList<>();
+        lore.add(colorize(allowed ? "&7Click to toggle"
+                : "&cRequires " + this.decorationsPermission));
+        lore.add(colorize("&7State&8: " + (active ? "&aON" : "&cOFF")));
+
+        ItemStack itemStack = item(material, legacyName, lore, active && allowed);
+        inventory.setItem(slot, itemStack);
+    }
+
+    /* ── Tags gui ─────────────────────────────────────────── */
 
     /**
-     * Opens the tag selection gui.
+     * Opens the tag selection gui with a leading none entry.
      */
     public void openTagsGui(Player player) {
+
         if (!check(player)) return;
 
-        CustomizationHolder holder = new CustomizationHolder();
-        holder.kind = CustomizationHolder.Kind.TAGS;
-        Inventory inventory = Bukkit.createInventory(holder, 27,
-                LEGACY.deserialize(colorize("&6Chat &lTAGS")));
+        int entries = Math.min(this.tags.size(), 21);
+        int size = ((entries - 1) / 7 + 3) * 9;
+
+        Holder holder = new Holder();
+        holder.kind = Holder.Kind.TAGS;
+        Inventory inventory = Bukkit.createInventory(holder, size,
+                LEGACY.deserialize(colorize("&6&lChat Tags")));
         holder.inventory = inventory;
 
-        ItemStack filler = item(Material.BLUE_STAINED_GLASS_PANE, " ", null);
-        for (int slot = 0; slot < 27; slot++) inventory.setItem(slot, filler);
+        ItemStack filler = item(Material.BLUE_STAINED_GLASS_PANE, " ", null, false);
+        for (int slot = 0; slot < size; slot++) inventory.setItem(slot, filler);
+
+        Preference pref = getPreference(player.getUniqueId());
 
         int slot = 10;
-        for (TagEntry tag : this.tags) {
-            boolean allowed = tag.permission().isEmpty() || player.hasPermission(tag.permission());
+        for (int index = 0; index < this.tags.size(); index++, slot++) {
 
-            if (slot >= 25) break;
-            holder.clickData.add(slot, allowed ? tag.text() : null);
-            holder.tagData.add(new String[]{String.valueOf(slot), tag.name(), tag.text(), tag.permission()});
-            inventory.setItem(slot++, item(allowed ? Material.NAME_TAG : Material.BARRIER,
-                    tag.name(),
-                    allowed ? List.of(colorize("&7Click to select"),
-                            colorize("&7Preview: &f" + tag.text() + "message"))
-                            : List.of(colorize("&cYou cannot use this tag."))));
+            TagEntry tag = this.tags.get(index);
+            boolean allowed = tag.permission().isEmpty() || player.hasPermission(tag.permission());
+            boolean selected = tag.text().equals(pref.tagText());
+
+            List<String> lore = new ArrayList<>();
+            if (!tag.text().isBlank()) lore.add(colorize("&7Preview&8: &f" + tag.text().trim() + "hello"));
+            else lore.add(colorize("&7No tag before your messages."));
+            lore.add("");
+            lore.add(colorize(allowed ? (selected ? "&aSelected ✔" : "&7Click to select") : "&cLocked"));
+
+            ItemStack itemStack = item(allowed ? Material.WRITABLE_BOOK : Material.GRAY_DYE,
+                    colorize(tag.name()) + (selected && allowed ? " &a✔" : ""), lore, selected && allowed);
+            inventory.setItem(slot, itemStack);
+            holder.tagSlots.add(slot);
+            holder.tagIndexes.add(index);
+
+            if ((slot + 2) % 9 == 0) slot += 2;
+            if (slot >= size - 9) break;
         }
 
+        inventory.setItem(size - 5, item(Material.BARRIER, "&cClose", null, false));
+
         player.openInventory(inventory);
+        clickSound(player);
     }
+
+    /* ── Clicks ───────────────────────────────────────────── */
+
+    /**
+     * Handles every click of both guis through stable slot identifiers.
+     */
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+
+        if (!(event.getInventory().getHolder() instanceof Holder holder)) return;
+
+        event.setCancelled(true);
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        ItemStack current = event.getCurrentItem();
+        if (current == null || current.getType().isAir()) return;
+        if (event.getClickedInventory() != event.getInventory()) return;
+
+        Preference pref = getPreference(player.getUniqueId());
+        int slot = event.getSlot();
+
+        if (holder.kind == Holder.Kind.COLOR) {
+
+            switch (slot) {
+                case SLOT_CLOSE_COLOR -> player.closeInventory();
+                case SLOT_RESET -> {
+                    save(player, "", List.of(), pref.tagText());
+                    playSelectSound(player);
+                    openColorGui(player);
+                }
+                case SLOT_BOLD -> {
+                    List<String> decorations = new ArrayList<>(pref.decorations());
+                    toggle(decorations, "l");
+                    save(player, pref.colorCode(), decorations, pref.tagText());
+                    playSelectSound(player);
+                    openColorGui(player);
+                }
+                case SLOT_ITALIC -> {
+                    List<String> decorations = new ArrayList<>(pref.decorations());
+                    toggle(decorations, "o");
+                    save(player, pref.colorCode(), decorations, pref.tagText());
+                    playSelectSound(player);
+                    openColorGui(player);
+                }
+                default -> {
+                    Integer colorIndex = holder.colorSlots.get(slot);
+                    if (colorIndex != null) {
+                        save(player, COLOR_CODES[colorIndex], pref.decorations(), pref.tagText());
+                        playSelectSound(player);
+                        player.sendMessage(LEGACY.deserialize(colorize("&aChat color selected&7: "
+                                + COLOR_CODES[colorIndex] + COLOR_NAMES[colorIndex])));
+                        player.closeInventory();
+                    }
+                }
+            }
+            return;
+        }
+
+        // Tags gui: resolve through the recorded slot mapping
+        int tagIndexPosition = holder.tagSlots.indexOf(slot);
+        if (tagIndexPosition < 0 || tagIndexPosition >= holder.tagIndexes.size()) return;
+
+        TagEntry tag = this.tags.get(holder.tagIndexes.get(tagIndexPosition));
+        boolean allowed = tag.permission().isEmpty() || player.hasPermission(tag.permission());
+        if (!allowed) {
+            player.sendMessage(LEGACY.deserialize(colorize("&cYou cannot use this tag.")));
+            return;
+        }
+
+        save(player, pref.colorCode(), pref.decorations(), tag.text());
+        playSelectSound(player);
+        player.sendMessage(LEGACY.deserialize(colorize("&aTag updated! Messages now start with&7: &f"
+                + (tag.text().isBlank() ? "(no tag)" : tag.text().trim()))));
+        player.closeInventory();
+    }
+
+    /* ── Shared helpers ───────────────────────────────────── */
 
     private boolean check(Player player) {
         if (!this.isEnable) return false;
         if (!this.usePermission.isEmpty() && !player.hasPermission(this.usePermission)) {
-            player.sendMessage(legacy("&cYou cannot customize your chat."));
+            player.sendMessage(LEGACY.deserialize(colorize("&cYou cannot customize your chat.")));
             return false;
         }
         return true;
     }
 
-    private ItemStack item(Material material, String name, List<String> lore) {
+    private ItemStack item(Material material, String name, List<String> lore, boolean shine) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
@@ -199,66 +336,10 @@ public class ChatCustomizationModule extends ZModule {
             if (lore != null && !lore.isEmpty()) {
                 meta.lore(lore.stream().map(line -> LEGACY.deserialize(colorize(line))).toList());
             }
+            meta.setEnchantmentGlintOverride(shine);
             itemStack.setItemMeta(meta);
         }
         return itemStack;
-    }
-
-    /**
-     * Handles every click of both guis through the stored click data.
-     */
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder() instanceof CustomizationHolder holder)) return;
-
-        event.setCancelled(true);
-        if (!(event.getWhoClicked() instanceof Player player)) return;
-        ItemStack current = event.getCurrentItem();
-        if (current == null || current.getType().isAir()) return;
-        if (event.getClickedInventory() != event.getInventory()) return;
-
-        int slot = event.getSlot();
-        String data = slot < holder.clickData.size() ? holder.clickData.get(slot) : null;
-        if (data == null) return;
-
-        switch (holder.kind) {
-            case COLOR -> handleColorClick(player, slot, data);
-            case TAGS -> handleTagClick(player, data);
-        }
-    }
-
-    private void handleColorClick(Player player, int slot, String code) {
-
-        Preference pref = getPreference(player.getUniqueId());
-
-        // Decoration buttons share the same gui, slots 17 and 26
-        if (slot == 17 || slot == 26) {
-            if (!player.hasPermission(this.decorationsPermission)) return;
-            String decoration = slot == 17 ? "l" : "o";
-            List<String> decorations = new ArrayList<>(pref.decorations());
-            toggle(decorations, decoration);
-            save(player, pref.colorCode(), decorations, pref.tagText());
-            openColorGui(player); // reopen with fresh states
-            return;
-        }
-
-        String cleanedCode = code.equals("&f") ? "" : code;
-        save(player, cleanedCode, pref.decorations(), pref.tagText());
-
-        Component feedback = cleanedCode.isEmpty()
-                ? Component.text("§aChat color reset to default.")
-                : LEGACY.deserialize(cleanedCode + "&7Chat color set to that one.");
-        player.sendMessage(feedback);
-        player.closeInventory();
-    }
-
-    private void handleTagClick(Player player, String tagText) {
-
-        Preference pref = getPreference(player.getUniqueId());
-        save(player, pref.colorCode(), pref.decorations(), tagText);
-        player.sendMessage(LEGACY.deserialize(colorize(
-                "&aTag updated! Messages now start with: &f" + (tagText.isEmpty() ? "(no tag)" : tagText.trim()))));
-        player.closeInventory();
     }
 
     private void toggle(List<String> decorations, String code) {
@@ -266,20 +347,28 @@ public class ChatCustomizationModule extends ZModule {
         else decorations.add(code);
     }
 
+    private String colorize(String text) {
+        return text == null ? "" : text.replace("&", "§");
+    }
+
+    private void playSelectSound(Player player) {
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.6f);
+    }
+
+    private void clickSound(Player player) {
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.4f);
+    }
+
+    private boolean canDecorate(Player player) {
+        return this.decorationsPermission.isEmpty() || player.hasPermission(this.decorationsPermission);
+    }
+
     private void save(Player player, String colorCode, List<String> decorations, String tagText) {
         this.preferences.put(player.getUniqueId(),
                 new Preference(colorCode, List.copyOf(decorations), tagText));
     }
 
-    private Component legacy(String text) {
-        return LEGACY.deserialize(colorize(text));
-    }
-
-    private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
-    }
-
-    /* ── persistence ─────────────────────────────────────────── */
+    /* ── persistence ──────────────────────────────────────── */
 
     private File getStorageFile() {
         return new File(getFolder(), "preferences.json");
@@ -303,7 +392,7 @@ public class ChatCustomizationModule extends ZModule {
                 try {
                     this.preferences.put(UUID.fromString(entry.uuid),
                             new Preference(entry.color == null ? "" : entry.color,
-                                    entry.decorations == null ? java.util.List.<String>of() : java.util.Arrays.asList(entry.decorations),
+                                    entry.decorations == null ? List.<String>of() : java.util.Arrays.asList(entry.decorations),
                                     entry.tag == null ? "" : entry.tag));
                 } catch (IllegalArgumentException ignored) {
                 }
