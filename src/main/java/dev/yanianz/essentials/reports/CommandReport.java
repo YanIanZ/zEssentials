@@ -35,7 +35,16 @@ public class CommandReport extends VCommand {
 
         ReportsModule module = plugin.getModuleManager().getModule(ReportsModule.class);
 
-        String first = this.argAsString(0);
+                if (this.args.length == 0) {
+            if (hasPermission(sender, Permission.ESSENTIALS_REPORT_VIEW)) {
+                sendReportScreen(module, player != null ? player : sender instanceof Player p ? p : null);
+                return CommandResultType.SUCCESS;
+            }
+            message(sender, Message.DESCRIPTION_REPORT);
+            return CommandResultType.SUCCESS;
+        }
+
+        String first = this.args.length > 0 ? this.argAsString(0) : "";
 
         if (first.equalsIgnoreCase("list") || first.equalsIgnoreCase("resolve")
                 || first.equalsIgnoreCase("reopen") || first.equalsIgnoreCase("tp")) {

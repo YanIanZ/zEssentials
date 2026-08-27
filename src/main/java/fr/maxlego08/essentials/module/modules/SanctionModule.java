@@ -553,15 +553,20 @@ public class SanctionModule extends ZModule implements SanctionManager {
         player.setWalkSpeed(frozen ? 0f : 0.2f);
         player.setFlySpeed(frozen ? 0f : 0.1f);
 
-        // Blue glow through a colored scoreboard team
-        Team team = getFrozenTeam();
-        if (frozen) {
-            team.addEntry(player.getName());
-            player.setGlowing(true);
-        } else {
-            team.removeEntry(player.getName());
-            player.setGlowing(false);
-        }
+        // Scoreboard ops must run on the main/region thread
+        this.plugin.getScheduler().runNextTick(wrappedTask -> {
+            try {
+                Team team = getFrozenTeam();
+                if (frozen) {
+                    team.addEntry(player.getName());
+                    player.setGlowing(true);
+                } else {
+                    team.removeEntry(player.getName());
+                    player.setGlowing(false);
+                }
+            } catch (Throwable ignored) {
+            }
+        });
 
         // Continuous circle of blue particles around the target
         UUID uniqueId = player.getUniqueId();

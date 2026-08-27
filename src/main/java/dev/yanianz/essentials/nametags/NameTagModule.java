@@ -154,6 +154,20 @@ public class NameTagModule extends ZModule {
         }
     }
 
+    private void updateBelowNameScoresSafe() {
+        this.plugin.getScheduler().runNextTick(wrappedTask -> {
+            org.bukkit.scoreboard.Objective objective = belowNameObjective();
+            if (objective == null) return;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                try {
+                    String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
+                    objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
+                } catch (NumberFormatException | NullPointerException ignored) {
+                }
+            }
+        });
+    }
+
     /**
      * Cleans the tab name on quit so the next join starts fresh.
      */
@@ -192,23 +206,25 @@ public class NameTagModule extends ZModule {
 
         if (rule == null) return;
 
-        try {
-            Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-            String teamName = teamName(rule);
+        this.plugin.getScheduler().runNextTick(wrappedTask -> {
+            try {
+                Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+                String teamName = teamName(rule);
 
-            Team team = scoreboard.getTeam(teamName);
-            if (team == null) {
-                team = scoreboard.registerNewTeam(teamName);
-                team.prefix(rule.prefix());
-                team.suffix(rule.suffix());
-            }
+                Team team = scoreboard.getTeam(teamName);
+                if (team == null) {
+                    team = scoreboard.registerNewTeam(teamName);
+                    team.prefix(rule.prefix());
+                    team.suffix(rule.suffix());
+                }
 
-            if (!team.hasEntry(player.getName())) {
-                team.addEntry(player.getName());
+                if (!team.hasEntry(player.getName())) {
+                    team.addEntry(player.getName());
+                }
+            } catch (Throwable ignored) {
+                // Scoreboard manager unavailable during early joins
             }
-        } catch (Throwable ignored) {
-            // Scoreboard manager unavailable during early joins
-        }
+        });
 
         // Below name objective
         if (this.belowNameEnabled) {
@@ -234,17 +250,7 @@ public class NameTagModule extends ZModule {
     private void updateBelowNameScores() {
 
         if (!this.belowNameEnabled || !"PLACEHOLDER".equals(this.belowNameMode)) return;
-
-        org.bukkit.scoreboard.Objective objective = belowNameObjective();
-        if (objective == null) return;
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            try {
-                String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
-                objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
-            } catch (NumberFormatException | NullPointerException ignored) {
-            }
-        }
+        updateBelowNameScoresSafe();
     }
 
     private GroupRule firstMatch(Player player) {
