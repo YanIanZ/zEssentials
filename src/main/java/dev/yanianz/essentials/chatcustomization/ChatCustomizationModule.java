@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChatCustomizationModule extends ZModule {
 
+    @NonLoadable
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private static final String[] COLOR_CODES = {
@@ -46,9 +47,13 @@ public class ChatCustomizationModule extends ZModule {
     };
 
     // Stable clickable slots
+    @NonLoadable
     private static final int SLOT_RESET = 4;
+    @NonLoadable
     private static final int SLOT_CLOSE_COLOR = 40;
+    @NonLoadable
     private static final int SLOT_BOLD = 28;
+    @NonLoadable
     private static final int SLOT_ITALIC = 30;
 
     private String usePermission;

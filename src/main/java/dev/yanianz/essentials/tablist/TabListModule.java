@@ -23,6 +23,7 @@ import java.util.Map;
  */
 public class TabListModule extends ZModule {
 
+    @NonLoadable
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private long refreshSeconds;

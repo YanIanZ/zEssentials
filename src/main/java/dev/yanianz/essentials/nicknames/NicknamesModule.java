@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 public class NicknamesModule extends ZModule {
 
-    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    @NonLoadable
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private int maxLength;
