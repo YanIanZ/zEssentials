@@ -52,7 +52,7 @@ Sorted by priority:
 - [ ] Interactive player names: hover + click actions on every player name in chat
 - [ ] Player mention system: highlight @name, notify target with sound/title/actionbar/bossbar (togglable)
 - [ ] Slowmode per player/server with staff bypass
-- [ ] Message deletion button for staff (click-to-delete own log/history)
+- [x] Message deletion button for staff (click-to-delete own log/history)
 - [ ] DND mode, quick replies, emoji shortcuts
 - [ ] Chat games (6 types) with rewards
 - [ ] Reputation & polls systems

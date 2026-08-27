@@ -21,6 +21,14 @@ public class CommandChatHistory extends VCommand {
     @Override
     protected CommandResultType perform(EssentialsPlugin plugin) {
         String username = this.argAsString(0);
+        if (this.args.length >= 2 && this.args[1].equalsIgnoreCase("delete")) {
+            int index = this.argAsInteger(2, -1);
+            int page = this.argAsInteger(3, 1);
+            fetchUniqueId(username, uuid -> plugin.getModuleManager().getModule(ChatModule.class)
+                    .deleteHistoryMessage(sender, uuid, username, index, page));
+            return CommandResultType.SUCCESS;
+        }
+
         int page = this.argAsInteger(1, 1);
 
         fetchUniqueId(username, uuid -> plugin.getModuleManager().getModule(ChatModule.class).sendChatHistory(sender, uuid, username, page));

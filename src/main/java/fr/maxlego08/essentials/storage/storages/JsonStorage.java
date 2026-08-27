@@ -493,6 +493,19 @@ public class JsonStorage extends StorageHelper implements IStorage {
     }
 
     @Override
+    public int deleteChatMessage(UUID playerUuid, String content) {
+        List<ChatMessageDTO> toRemove = state().chatMessages.stream()
+                .filter(dto -> dto.unique_id().equals(playerUuid) && dto.content().equals(content))
+                .toList();
+
+        if (toRemove.isEmpty()) return 0;
+
+        state().chatMessages.removeAll(toRemove);
+        saveState();
+        return toRemove.size();
+    }
+
+    @Override
     public void insertPrivateMessage(UUID sender, UUID receiver, String content) {
         state().privateMessages.add(new PrivateMessageDTO(sender, receiver, content, new Date()));
         saveState();

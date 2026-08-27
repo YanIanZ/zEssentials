@@ -615,6 +615,27 @@ public class SqlStorage extends StorageHelper implements IStorage {
     }
 
     @Override
+    public int deleteChatMessage(UUID playerUuid, String content) {
+
+        // Remove the cached messages waiting for their batch insert
+        List<ChatMessageDTO> pending = this.cache.get(ChatMessageDTO.class);
+        List<ChatMessageDTO> toRemove = pending.stream()
+                .filter(dto -> dto.unique_id().equals(playerUuid) && dto.content().equals(content))
+                .toList();
+
+        if (!toRemove.isEmpty()) {
+            List<ChatMessageDTO> remaining = pending.stream()
+                    .filter(dto -> !toRemove.contains(dto))
+                    .toList();
+            this.cache.clear(ChatMessageDTO.class);
+            remaining.forEach(this.cache::add);
+        }
+
+        // Then remove the ones already stored
+        return toRemove.size() + with(ChatMessagesRepository.class).deleteMessages(playerUuid, content);
+    }
+
+    @Override
     public void insertPrivateMessage(UUID sender, UUID receiver, String content) {
         // async(() -> with(PrivateMessagesRepository.class).insert(new PrivateMessageDTO(sender, receiver, content, new Date())));
         this.cache.add(new PrivateMessageDTO(sender, receiver, content, new Date()));

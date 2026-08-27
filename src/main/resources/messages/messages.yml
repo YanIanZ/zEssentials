@@ -782,6 +782,8 @@ chat-caps: "<error>You don’t have to scream to talk !"
 chat-flood: "<error>You can’t talk like that."
 
 chat-default-format: "<white>%displayName% <#656665>• <gray>%message%"
+description-chat-history-delete: "internal"
+command-chat-message-deleted: "<success>Deleted &f%count% <success>message(s) of &f%player%<success>."
 chat-messages-empty: "&f%player% <error>did not write a message."
 chat-messages-line:
   type: WITHOUT_PREFIX

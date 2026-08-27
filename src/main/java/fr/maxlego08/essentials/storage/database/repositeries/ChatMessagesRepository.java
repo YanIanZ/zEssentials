@@ -33,4 +33,15 @@ public class ChatMessagesRepository extends Repository {
             table.string("content", dto.content());
         })).toList());
     }
+
+    /**
+     * Deletes every stored message of a player matching the exact content,
+     * used by the staff message deletion.
+     */
+    public int deleteMessages(UUID uuid, String content) {
+        return this.delete(table -> {
+            table.uuid("unique_id", uuid);
+            table.string("content", content);
+        });
+    }
 }

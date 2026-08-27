@@ -31,6 +31,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -419,12 +423,56 @@ public class ChatModule extends ZModule {
             int maxPage = getMaxPage(messages, 10);
             int page = targetPage > maxPage ? maxPage : targetPage < 0 ? 1 : targetPage;
 
-            pagination.paginate(messages, 10, page).forEach(chatMessageDTO -> message(sender, Message.CHAT_MESSAGES_LINE, "%date%", format(chatMessageDTO.created_at()), "%message%", chatMessageDTO.content()));
+            List<ChatMessageDTO> pageMessages = new Pagination<ChatMessageDTO>().paginate(messages, 10, page);
+            boolean moderator = sender instanceof Player playerSender && hasPermission(playerSender, Permission.ESSENTIALS_CHAT_MODERATOR);
+
+            for (int localIndex = 0; localIndex < pageMessages.size(); localIndex++) {
+                ChatMessageDTO dto = pageMessages.get(localIndex);
+                if (!moderator) {
+                    message(sender, Message.CHAT_MESSAGES_LINE, "%date%", format(dto.created_at()), "%message%", dto.content());
+                    continue;
+                }
+                int globalIndex = (page - 1) * 10 + localIndex;
+                Component line = LegacyComponentSerializer.legacySection().deserialize(
+                        plain(getMessage(Message.CHAT_MESSAGES_LINE, "%date%", format(dto.created_at()), "%message%", dto.content())));
+                line = line.append(Component.text(" §8[§c✖§8]")
+                        .hoverEvent(HoverEvent.showText(Component.text("§cDelete this message")))
+                        .clickEvent(ClickEvent.runCommand("/essentials:chathistory " + targetName + " delete " + globalIndex + " " + page)));
+                sender.sendMessage(line);
+            }
 
             message(sender, Message.CHAT_MESSAGES_FOOTER, "%page%", page, "%nextPage%", page + 1, "%previousPage%", page - 1, "%maxPage%", maxPage, "%player%", targetName);
         });
     }
 
+
+    /**
+     * Deletes one history message of a player using its index inside the full
+     * list, then re-sends the page so staff sees the result immediately.
+     */
+    public void deleteHistoryMessage(CommandSender sender, UUID targetUuid, String targetName, int globalIndex, int page) {
+        this.plugin.getScheduler().runAsync(wrappedTask -> {
+
+            List<ChatMessageDTO> messages = this.chatMessagesCache.get(targetUuid,
+                    () -> this.plugin.getStorageManager().getStorage().getMessages(targetUuid));
+
+            if (globalIndex < 0 || globalIndex >= messages.size()) {
+                message(sender, Message.CHAT_MESSAGE_DELETED, "%count%", "0", "%player%", targetName);
+                return;
+            }
+
+            ChatMessageDTO dto = messages.get(globalIndex);
+            int removed = this.plugin.getStorageManager().getStorage().deleteChatMessage(dto.unique_id(), dto.content());
+
+            this.chatMessagesCache.clear(targetUuid);
+            message(sender, Message.CHAT_MESSAGE_DELETED, "%count%", String.valueOf(removed), "%player%", targetName);
+            sendChatHistory(sender, targetUuid, targetName, page);
+        });
+    }
+
+    private String plain(String legacy) {
+        return legacy == null ? "" : legacy;
+    }
 
     private String format(Date date){
         if (date == null) return "";

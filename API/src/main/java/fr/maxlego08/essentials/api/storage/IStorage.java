@@ -366,6 +366,15 @@ public interface IStorage {
     List<ChatMessageDTO> getMessages(UUID targetUuid);
 
     /**
+     * Deletes every stored message of a player matching the given content.
+     *
+     * @param playerUuid the UUID of the message author
+     * @param content    the exact content of the messages to remove
+     * @return how many rows were removed
+     */
+    int deleteChatMessage(UUID playerUuid, String content);
+
+    /**
      * Retrieves options for a user.
      *
      * @param uuid the UUID of the user

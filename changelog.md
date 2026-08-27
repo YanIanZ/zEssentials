@@ -6,6 +6,11 @@
 
 # 1.0.4.0
 
+- Chat slowmode: `/chatslowmode <seconds>` staff command with `essentials.chat.bypass.slowmode` bypass
+- Do not disturb mode: `/dnd [player]` disables mention notification sounds per player
+- Emoji shortcuts: ten defaults like `:heart:` or `:100:` replaced in every chat message (`emoji-shortcuts`)
+- Staff message deletion: moderators see a clickable `[✖]` on every line of `/chathistory <player>` removing the stored message instantly
+
 - Raised the build to **paper-api 26.2** with full **adventure 5** compatibility
 - Duration arguments now accept every unit with combinations: `30s`, `15m`, `12h`, `7d`, `2w`, `6mo`, `3y`, `1d12h30m` — used by `/fly add|set|remove`, bans and mutes; a plain number stays seconds
 - Economy amounts accept compact magnitudes everywhere: `1k`, `1.5m`, `2b`, `3t`
