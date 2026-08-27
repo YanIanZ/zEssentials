@@ -6,6 +6,12 @@
 
 # 1.0.4.0
 
+- **Sleep acceleration** (`modules/sleep/config.yml`): when the configured percentage of a world players are in bed the night moves forward smoothly (`accelerate-ticks` per second) until dawn instead of skipping instantly; dawn and start broadcasts are configurable
+- Reports for staff now open as a **screen** (`/reports`): each entry is clickable paper, left click resolves it and right click teleports to the reported player
+- Chat bubbles: the newest message stays at the head while older ones are pushed upwards; bubbles follow the player exactly (passenger mount)
+- Teleport effects are triggered directly on plugin teleports so tpa/rtp/warp/home always show them
+- Fixed a list of hex color rendering spots (reputation broadcast, terms kick screen, nicknames) plus `[ec]` handling
+
 ## New modules & systems
 
 - **Custom screens** (`modules/customscreens/config.yml`) — create your own inventory screens opened by a command (

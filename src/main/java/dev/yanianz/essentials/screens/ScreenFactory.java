@@ -31,12 +31,13 @@ public final class ScreenFactory {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private final JavaPlugin plugin;
-    private final Map<PickerKey, Consumer<Player>> pickerActions = new ConcurrentHashMap<>();
+    private final Map<PickerKey, java.util.function.BiConsumer<Player, InventoryClickEvent>> pickerActions = new ConcurrentHashMap<>();
 
     private record PickerKey(Inventory inventory, int slot) {
     }
 
-    private void pickerAction(Inventory inventory, int slot, Consumer<Player> action) {
+    private void pickerAction(Inventory inventory, int slot,
+                              java.util.function.BiConsumer<Player, InventoryClickEvent> action) {
         this.pickerActions.put(new PickerKey(inventory, slot), action);
     }
 
@@ -47,7 +48,7 @@ public final class ScreenFactory {
 
     /** One clickable entry of a screen. */
     public record ScreenItem(Material material, String nameLegacy, List<String> loreLegacy,
-                             Consumer<Player> clickAction) {
+                             java.util.function.BiConsumer<Player, org.bukkit.event.inventory.InventoryClickEvent> clickAction) {
     }
 
     /** Holder carrying the slot actions and pagination state of one open page. */
@@ -58,7 +59,7 @@ public final class ScreenFactory {
         private final int pageIndex;
         private final int size;
         private Inventory inventory;
-        private final Map<Integer, Consumer<Player>> actions = new HashMap<>();
+        private final Map<Integer, java.util.function.BiConsumer<Player, InventoryClickEvent>> actions = new HashMap<>();
 
         Screen(UUID playerId, List<Inventory> allPages, int pageIndex, int size) {
             this.playerId = playerId;
@@ -67,11 +68,11 @@ public final class ScreenFactory {
             this.size = size;
         }
 
-        void action(int slot, Consumer<Player> consumer) {
+        void action(int slot, java.util.function.BiConsumer<Player, InventoryClickEvent> consumer) {
             if (consumer != null) this.actions.put(slot, consumer);
         }
 
-        Consumer<Player> actionAt(int slot) {
+        java.util.function.BiConsumer<Player, InventoryClickEvent> actionAt(int slot) {
             return this.actions.get(slot);
         }
 
@@ -116,9 +117,12 @@ public final class ScreenFactory {
 
             int slot = 0;
             for (ScreenItem item : chunks.get(pageIndex)) {
-                ItemStack itemStack = item(material(item.material()), item.nameLegacy(), item.loreLegacy());
+                ItemStack itemStack = button(item.material(), item.nameLegacy(), item.loreLegacy());
                 inventory.setItem(slot, itemStack);
-                screen.action(slot, item.clickAction());
+                var clickAction = item.clickAction();
+                if (clickAction != null) {
+                    screen.action(slot, (viewer, ev) -> clickAction.accept(viewer, ev));
+                }
                 if (++slot >= contentSlots) break;
             }
 
@@ -132,13 +136,13 @@ public final class ScreenFactory {
             final int current = pageIndex;
             if (pageIndex > 0) {
                 inventory.setItem(size - 9, button(Material.ARROW, "&7« Previous", null));
-                screen.action(size - 9, viewer -> viewer.openInventory(inventories.get(current - 1)));
+                screen.action(size - 9, (viewer, ev) -> viewer.openInventory(inventories.get(current - 1)));
             }
             inventory.setItem(size - 5, button(Material.BARRIER, "&cClose", null));
-            screen.action(size - 5, Player::closeInventory);
+            screen.action(size - 5, (viewer, ev) -> viewer.closeInventory());
             if (pageIndex < chunks.size() - 1) {
                 inventory.setItem(size - 1, button(Material.ARROW, "&7Next »", null));
-                screen.action(size - 1, viewer -> viewer.openInventory(inventories.get(current + 1)));
+                screen.action(size - 1, (viewer, ev) -> viewer.openInventory(inventories.get(current + 1)));
             }
         }
 
@@ -185,8 +189,8 @@ public final class ScreenFactory {
                 event.setCancelled(true);
                 if (!(event.getWhoClicked() instanceof Player player)) return;
 
-                Consumer<Player> pickerActionValue = this.pickerActions(event);
-                if (pickerActionValue != null) pickerActionValue.accept(player);
+                var pickerActionValue = this.pickerActions(event);
+                if (pickerActionValue != null) pickerActionValue.accept(player, event);
                 return;
             }
 
@@ -199,11 +203,11 @@ public final class ScreenFactory {
             if (current == null || current.getType().isAir()) return;
             if (event.getClickedInventory() != event.getInventory()) return;
 
-            Consumer<Player> action = screen.actionAt(event.getSlot());
-            if (action != null) action.accept(player);
+            java.util.function.BiConsumer<Player, InventoryClickEvent> action = screen.actionAt(event.getSlot());
+            if (action != null) action.accept(player, event);
         }
 
-        private Consumer<Player> pickerActions(InventoryClickEvent event) {
+        private java.util.function.BiConsumer<Player, InventoryClickEvent> pickerActions(InventoryClickEvent event) {
             return ScreenFactory.this.pickerActions
                     .get(new PickerKey(event.getInventory(), event.getSlot()));
         }
@@ -257,11 +261,11 @@ public final class ScreenFactory {
             picker.setItem(slot, button(icon, "&b" + entry.getKey(),
                     List.of(colorize("&7Open this category"))));
             final Inventory target = firstPage;
-            pickerAction(picker, slot, viewer -> viewer.openInventory(target));
+            pickerAction(picker, slot, (viewer, ev) -> viewer.openInventory(target));
 
             // First page of the chain closes back to the categories instead of a dead arrow
             if (chain.size() == 1) {
-                chainScreens.get(0).action(size - 9, Player::closeInventory);
+                chainScreens.get(0).action(size - 9, (viewer, ev) -> viewer.closeInventory());
                 chain.get(0).setItem(size - 9, button(Material.BARRIER, "&cClose", null));
             }
 
@@ -269,7 +273,7 @@ public final class ScreenFactory {
         }
 
         picker.setItem(26, button(Material.BARRIER, "&cClose", null));
-        pickerAction(picker, 26, Player::closeInventory);
+        pickerAction(picker, 26, (viewer, ev) -> viewer.closeInventory());
 
         player.openInventory(picker);
     }
@@ -297,9 +301,12 @@ public final class ScreenFactory {
 
             int slot = 0;
             for (ScreenItem item : chunks.get(pageIndex)) {
-                ItemStack itemStack = item(material(item.material()), item.nameLegacy(), item.loreLegacy());
+                ItemStack itemStack = button(item.material(), item.nameLegacy(), item.loreLegacy());
                 inventory.setItem(slot, itemStack);
-                screen.action(slot, item.clickAction());
+                var clickAction = item.clickAction();
+                if (clickAction != null) {
+                    screen.action(slot, (viewer, ev) -> clickAction.accept(viewer, ev));
+                }
                 if (++slot >= contentSlots) break;
             }
 
@@ -311,13 +318,13 @@ public final class ScreenFactory {
             final int current = pageIndex;
             if (pageIndex > 0) {
                 inventory.setItem(size - 9, button(Material.ARROW, "&7« Previous", null));
-                screen.action(size - 9, viewer -> viewer.openInventory(inventories.get(current - 1)));
+                screen.action(size - 9, (viewer, ev) -> viewer.openInventory(inventories.get(current - 1)));
             }
             inventory.setItem(size - 5, button(Material.BARRIER, "&cClose", null));
-            screen.action(size - 5, Player::closeInventory);
+            screen.action(size - 5, (viewer, ev) -> viewer.closeInventory());
             if (pageIndex < chunks.size() - 1) {
                 inventory.setItem(size - 1, button(Material.ARROW, "&7Next »", null));
-                screen.action(size - 1, viewer -> viewer.openInventory(inventories.get(current + 1)));
+                screen.action(size - 1, (viewer, ev) -> viewer.openInventory(inventories.get(current + 1)));
             }
         }
     }

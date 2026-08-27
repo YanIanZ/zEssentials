@@ -62,9 +62,9 @@ Inspired by FancyHolograms (https://github.com/FancyMcPlugins/FancyHolograms) â€
 - [ ] Autosave + reload without flicker
 
 Small quality features:
+- [x] Sleep through night acceleration (percentage based, smooth time speed up)
 - [ ] `/eat` fills hunger instantly
 - [ ] `/feed all` alias already exists through `*`
-- [ ] `/ping` shortcut into the ping placeholder output
 - [ ] `/near <radius>` optional radius argument
 - [ ] `/xyz` copies coordinates to clipboard with formatted colors
 - [ ] `/rules` alias into terms screen after acceptance flow

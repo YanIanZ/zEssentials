@@ -43,7 +43,7 @@ public class CommandWarpsGui extends VCommand {
                     Material.ENDER_PEARL,
                     "&b&l" + warp.name(),
                     java.util.List.of(colorize("&7Click to teleport to &f" + warp.name())),
-                    viewer -> warpModule.teleport(user, warp)));
+                    (viewer, ev) -> warpModule.teleport(user, warp)));
         }
 
         if (items.isEmpty()) {

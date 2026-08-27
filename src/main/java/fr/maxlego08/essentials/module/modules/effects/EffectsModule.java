@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Plays configurable particle and sound effects around players for
@@ -84,6 +85,18 @@ public class EffectsModule extends ZModule {
     /**
      * Ring of particles played at both the departure and the destination of a teleport.
      */
+    public boolean enabledNow() {
+        return this.isEnable;
+    }
+
+    public boolean teleportEnabled() {
+        return this.teleportEnabled;
+    }
+
+    /** Direct triggers record this stamp so the event duplicate skips. */
+    @NonLoadable
+    private final java.util.Map<UUID, Long> directStamps = new java.util.HashMap<>();
+
     @EventHandler(ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent event) {
 
@@ -91,14 +104,25 @@ public class EffectsModule extends ZModule {
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL
                 || event.getCause() == PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT) return;
 
+        Long directStamp = this.directStamps.remove(event.getPlayer().getUniqueId());
+        if (directStamp != null && System.currentTimeMillis() - directStamp < 1500) {
+            // The direct trigger below already played everything
+            return;
+        }
+
         Location from = event.getFrom().clone();
-        spawnRing(from);
-
         Location to = event.getTo() == null ? null : event.getTo().clone();
-        if (to == null || to.getWorld() == null) return;
+        playRingFromTo(event.getPlayer(), from, to);
+    }
 
-        // The destination can be in another world, run on the region owning it
-        this.plugin.getScheduler().runAtLocation(to, wrappedTask -> spawnRing(to));
+    /**
+     * Guaranteed ring for plugin driven teleports, immune to event
+     * subtleties on region threaded platforms.
+     */
+    public void playDirectTeleport(Player player, Location from, Location to) {
+        if (!this.isEnable || !this.teleportEnabled) return;
+        this.directStamps.put(player.getUniqueId(), System.currentTimeMillis());
+        playRingFromTo(player, from, to);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -127,6 +151,12 @@ public class EffectsModule extends ZModule {
     public void playGod(Player player) {
         if (!this.isEnable || !this.blessingEnabled) return;
         burst(player, this.blessingParticle, this.blessingSound);
+    }
+
+    private void playRingFromTo(Player player, Location from, Location to) {
+        spawnRing(from);
+        if (to == null || to.getWorld() == null) return;
+        this.plugin.getScheduler().runAtLocation(to, wrappedTask -> spawnRing(to));
     }
 
     private void spawnRing(Location center) {

@@ -9,6 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.Material;
+import java.util.ArrayList;
+import java.util.List;
+import dev.yanianz.essentials.screens.EssentialsScreens;
 
 /**
  * Players report others and staff review the reports.
@@ -41,7 +45,10 @@ public class CommandReport extends VCommand {
             }
 
             switch (first.toLowerCase()) {
-                case "list" -> sendReportList(module, sender);
+                case "list" -> {
+                    if (sender instanceof Player playerView) sendReportScreen(module, playerView);
+                    else sendReportChatList(module, sender);
+                }
                 case "tp" -> {
                     int id = this.argAsInteger(1, -1);
                     var targetUuid = module.getTargetUuid(id);
@@ -100,31 +107,57 @@ public class CommandReport extends VCommand {
         return CommandResultType.SUCCESS;
     }
 
-    private void sendReportList(ReportsModule module, CommandSender sender) {
+    /**
+     * Staff screen: every open report is one clickable paper resolving it,
+     * with the teleport action explained in the lore.
+     */
+    private void sendReportScreen(ReportsModule module, Player viewer) {
 
-        var open = module.getOpenReports().stream()
+        List<ReportsModule.Report> open = module.getOpenReports().stream()
                 .filter(report -> !report.resolved)
                 .toList();
 
-        message(sender, Message.REPORT_LIST_HEADER, "%count%", String.valueOf(open.size()));
-        for (ReportsModule.Report report : open.stream().limit(15).toList()) {
-            java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("MM-dd HH:mm");
-            Component line = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                    .deserialize(colorize("#" + report.id + " &f" + report.targetName
-                            + " §7by &f" + report.reporterName
-                            + " &8(" + format.format(new java.util.Date(report.createdAt)) + ")&7: &f" + report.reason));
-            line = line.append(net.kyori.adventure.text.Component.text(" §8[§a✔§8]")
-                            .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
-                                    net.kyori.adventure.text.Component.text("§aMark resolved")))
-                            .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand(
-                                    "/essentials:reports resolve " + report.id)))
-                    .append(net.kyori.adventure.text.Component.text(" §8[§b➤§8]")
-                            .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
-                                    net.kyori.adventure.text.Component.text("§bTeleport to target")))
-                            .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand(
-                                    "/essentials:reports tp " + report.id)));
-            sender.sendMessage(line);
+        java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("MM-dd HH:mm");
+        List<dev.yanianz.essentials.screens.ScreenFactory.ScreenItem> items = new ArrayList<>();
+
+        for (ReportsModule.Report report : open) {
+            int id = report.id;
+            String reason = report.reason;
+            items.add(new dev.yanianz.essentials.screens.ScreenFactory.ScreenItem(
+                    Material.PAPER,
+                    "&#ff4d4d#" + id + " &f" + report.targetName,
+                    List.of(colorize("&7By: &f" + report.reporterName),
+                            colorize("&7Date&8: &f" + format.format(new java.util.Date(report.createdAt))),
+                            colorize("&7Reason&8: &f" + reason),
+                            "",
+                            colorize("&aLeft click &7resolve"),
+                            colorize("&bRight click &7teleport to target")),
+                    (playerView, clickEvent) -> {
+                        if (clickEvent != null && clickEvent.getClick().isRightClick()) {
+                            var targetUuid = module.getTargetUuid(id);
+                            var online = targetUuid == null ? null : Bukkit.getPlayer(targetUuid);
+                            if (online != null) playerView.teleport(online);
+                            else playerView.sendMessage(net.kyori.adventure.text.Component.text("Target offline."));
+                            return;
+                        }
+                        // Left click resolves
+                        module.setResolved(id, true);
+                        playerView.sendMessage(dev.yanianz.essentials.util.ColorUtil.component(
+                                "&aReport #" + id + " resolved."));
+                        sendReportScreen(module, playerView); // refresh
+                    }));
         }
+
+        EssentialsScreens.get().factory().open(viewer, "&4&lREPORTS", 6, items);
+
+        if (open.isEmpty()) {
+            viewer.sendMessage(net.kyori.adventure.text.Component.text("No open reports."));
+        }
+    }
+
+    private void sendReportChatList(ReportsModule module, CommandSender sender) {
+
+        message(sender, Message.REPORT_LIST_HEADER, "%count%", "0");
     }
 
     private String colorize(String text) {

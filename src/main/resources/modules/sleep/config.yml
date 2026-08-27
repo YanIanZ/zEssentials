@@ -1,0 +1,25 @@
+########################################################################################################################
+#
+# zEssentials - Sleep
+# Night skips faster when enough players are in bed instead of instantly.
+#
+########################################################################################################################
+
+enable: true
+
+# Percentage of the world players that must be sleeping to accelerate the night
+percentage: 50
+
+# Always require at least this many sleeping players
+minimum-players: 1
+
+# While accelerating, this many ticks are added every check (20 ticks = 1s)
+accelerate-ticks: 100
+
+# Seconds between each acceleration check while someone is sleeping
+check-interval-seconds: 1
+
+# Broadcast when the night starts moving, empty to disable
+broadcast-start: "&#7fd3ff&lSLEEP &7Players are sleeping, night is moving faster..."
+# Broadcast when dawn arrives, empty to disable
+broadcast-dawn: "&#ffd93d&lDAY &#7Good morning everyone!"

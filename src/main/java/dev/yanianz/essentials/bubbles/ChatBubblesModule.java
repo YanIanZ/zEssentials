@@ -106,7 +106,7 @@ public class ChatBubblesModule extends ZModule {
         if (content.isEmpty()) return;
         final String finalContent = content;
 
-        float seatOffset = (float) (this.yOffset - 1.6 + bubbles.size() * this.stackOffset);
+        float seatOffset = (float) (this.yOffset - 1.6);
 
         TextDisplay display = player.getWorld().spawn(player.getLocation(), TextDisplay.class, textDisplay -> {
             textDisplay.text(ColorUtil.component(finalContent));
@@ -138,8 +138,34 @@ public class ChatBubblesModule extends ZModule {
         ActiveBubble bubble = new ActiveBubble(display);
         bubbles.addLast(bubble);
 
+        // The NEWEST message sits at the head, older ones are pushed upwards
+        restack(bubbles);
+
         this.plugin.getScheduler().runLater(
-                () -> removeBubble(bubbles, bubble), this.durationMillis * 20L + 20L);
+                () -> {
+                    removeBubble(bubbles, bubble);
+                    restack(bubbles);
+                }, this.durationMillis * 20L + 20L);
+    }
+
+    /**
+     * Newest bubble stays at the base height, every older one moves up by the stack offset.
+     */
+    private void restack(Deque<ActiveBubble> bubbles) {
+
+        int size = bubbles.size();
+        int index = 0;
+        for (ActiveBubble bubble : bubbles) {
+            float aboveHead = (float) ((size - 1 - index) * this.stackOffset);
+            float base = (float) (this.yOffset - 1.6);
+            var transformation = bubble.display.getTransformation();
+            bubble.display.setTransformation(new org.bukkit.util.Transformation(
+                    new Vector3f(0, base + aboveHead, 0),
+                    transformation.getLeftRotation(),
+                    transformation.getScale(),
+                    transformation.getRightRotation()));
+            index++;
+        }
     }
 
     /** Removes one expired bubble. */

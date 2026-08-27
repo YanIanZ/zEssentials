@@ -469,6 +469,17 @@ public class ZUser extends ZUtils implements User {
             }
 
             this.teleportNow(location);
+
+            // Guaranteed teleport ring even when the platform skips the event
+            try {
+                var effects = this.plugin.getModuleManager().getModule(
+                        fr.maxlego08.essentials.module.modules.effects.EffectsModule.class);
+                if (effects != null && effects.enabledNow() && effects.teleportEnabled()) {
+                    effects.playDirectTeleport(player, location, location);
+                }
+            } catch (Exception ignored) {
+            }
+
             if (message != null) {
                 message(this, message, args);
             }
