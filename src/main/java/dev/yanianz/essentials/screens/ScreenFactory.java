@@ -31,6 +31,14 @@ public final class ScreenFactory {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private final JavaPlugin plugin;
+    private final Map<PickerKey, Consumer<Player>> pickerActions = new ConcurrentHashMap<>();
+
+    private record PickerKey(Inventory inventory, int slot) {
+    }
+
+    private void pickerAction(Inventory inventory, int slot, Consumer<Player> action) {
+        this.pickerActions.put(new PickerKey(inventory, slot), action);
+    }
 
     public ScreenFactory(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -170,7 +178,18 @@ public final class ScreenFactory {
     private final class ScreenClickListener implements org.bukkit.event.Listener {
 
         @EventHandler
-        public void onClick(org.bukkit.event.inventory.InventoryClickEvent event) {
+        public void onClick(InventoryClickEvent event) {
+
+            // Category picker: cancel blindly and run the stored action
+            if (event.getInventory().getHolder() instanceof PickerHolder) {
+                event.setCancelled(true);
+                if (!(event.getWhoClicked() instanceof Player player)) return;
+
+                Consumer<Player> pickerActionValue = this.pickerActions(event);
+                if (pickerActionValue != null) pickerActionValue.accept(player);
+                return;
+            }
+
             if (!(event.getInventory().getHolder() instanceof Screen screen)) return;
 
             event.setCancelled(true);
@@ -183,7 +202,127 @@ public final class ScreenFactory {
             Consumer<Player> action = screen.actionAt(event.getSlot());
             if (action != null) action.accept(player);
         }
+
+        private Consumer<Player> pickerActions(InventoryClickEvent event) {
+            return ScreenFactory.this.pickerActions
+                    .get(new PickerKey(event.getInventory(), event.getSlot()));
+        }
     }
+
+    /** Holder marker for the category picker inventory. */
+    private static final class PickerHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null; // clicks are cancelled blindly for this holder type
+        }
+    }
+
+    /**
+     * Opens a category picker followed by one paginated screen per category.
+     *
+     * @param categories ordered map of category title to its items
+     */
+    public void openCategorized(Player player, String titleLegacy, int rows,
+                                java.util.LinkedHashMap<String, List<ScreenItem>> categories) {
+
+        if (categories.isEmpty()) {
+            player.sendMessage(LEGACY.deserialize(colorize("&7Nothing to show yet.")));
+            return;
+        }
+
+        UUID uniqueId = player.getUniqueId();
+        int size = Math.max(3, Math.min(6, rows)) * 9;
+
+        PickerHolder pickerHolder = new PickerHolder();
+        Inventory picker = Bukkit.createInventory(pickerHolder, 27,
+                LegacyComponentSerializer.legacySection().deserialize(colorize(titleLegacy)));
+
+        ItemStack filler = button(Material.GRAY_STAINED_GLASS_PANE, " ", null);
+        for (int slot = 0; slot < 27; slot++) picker.setItem(slot, filler);
+
+        int slot = 10;
+        for (Map.Entry<String, List<ScreenItem>> entry : categories.entrySet()) {
+
+            if (slot > 16) break;
+
+            List<Inventory> chain = new ArrayList<>();
+            List<Screen> chainScreens = new ArrayList<>();
+            buildChain(uniqueId, titleLegacy + " §8» " + entry.getKey(), entry.getValue(), size, chain, chainScreens);
+
+            Material icon = entry.getValue().isEmpty()
+                    ? Material.BOOK
+                    : entry.getValue().get(0).material();
+            Inventory firstPage = chain.get(0);
+
+            picker.setItem(slot, button(icon, "&b" + entry.getKey(),
+                    List.of(colorize("&7Open this category"))));
+            final Inventory target = firstPage;
+            pickerAction(picker, slot, viewer -> viewer.openInventory(target));
+
+            // First page of the chain closes back to the categories instead of a dead arrow
+            if (chain.size() == 1) {
+                chainScreens.get(0).action(size - 9, Player::closeInventory);
+                chain.get(0).setItem(size - 9, button(Material.BARRIER, "&cClose", null));
+            }
+
+            slot += 2;
+        }
+
+        picker.setItem(26, button(Material.BARRIER, "&cClose", null));
+        pickerAction(picker, 26, Player::closeInventory);
+
+        player.openInventory(picker);
+    }
+
+    private void buildChain(UUID uniqueId, String titleLegacy, List<ScreenItem> items, int size,
+                            List<Inventory> inventories, List<Screen> screens) {
+
+        int contentSlots = size - 9;
+        List<List<ScreenItem>> chunks = new ArrayList<>();
+        for (int index = 0; index < Math.max(1, items.size()); index += contentSlots) {
+            chunks.add(items.subList(index, Math.min(items.size(), index + contentSlots)));
+        }
+        if (chunks.isEmpty()) chunks.add(List.of());
+
+        for (int pageIndex = 0; pageIndex < chunks.size(); pageIndex++) {
+            Screen screen = new Screen(uniqueId, inventories, pageIndex, size);
+            Inventory inventory = Bukkit.createInventory(screen, size,
+                    LEGACY.deserialize(colorize(titleLegacy)
+                            + (chunks.size() > 1 ? " §8(" + (pageIndex + 1) + "/" + chunks.size() + ")" : "")));
+            screen.inventory = inventory;
+            inventories.add(inventory);
+            screens.add(screen);
+
+            fill(inventory);
+
+            int slot = 0;
+            for (ScreenItem item : chunks.get(pageIndex)) {
+                ItemStack itemStack = item(material(item.material()), item.nameLegacy(), item.loreLegacy());
+                inventory.setItem(slot, itemStack);
+                screen.action(slot, item.clickAction());
+                if (++slot >= contentSlots) break;
+            }
+
+            ItemStack controlFiller = button(Material.GRAY_STAINED_GLASS_PANE, " ", null);
+            for (int controlSlot = size - 9; controlSlot < size; controlSlot++) {
+                if (inventory.getItem(controlSlot) == null) inventory.setItem(controlSlot, controlFiller);
+            }
+
+            final int current = pageIndex;
+            if (pageIndex > 0) {
+                inventory.setItem(size - 9, button(Material.ARROW, "&7« Previous", null));
+                screen.action(size - 9, viewer -> viewer.openInventory(inventories.get(current - 1)));
+            }
+            inventory.setItem(size - 5, button(Material.BARRIER, "&cClose", null));
+            screen.action(size - 5, Player::closeInventory);
+            if (pageIndex < chunks.size() - 1) {
+                inventory.setItem(size - 1, button(Material.ARROW, "&7Next »", null));
+                screen.action(size - 1, viewer -> viewer.openInventory(inventories.get(current + 1)));
+            }
+        }
+    }
+
+    
 
     private String colorize(String text) {
         return text == null ? "" : text.replace("&", "§");

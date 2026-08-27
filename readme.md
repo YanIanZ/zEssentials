@@ -40,7 +40,7 @@ Sorted by priority:
 - [x] Warps as a custom screen (/warpgui, permission filtered)
 - [x] Public API: addons reuse ScreenFactory through EssentialsScreens.get().factory()
 - [/] Homes and kits already ship zMenu inventory layouts, migrate them on top of the factory later
-- [ ] Category support inside the factory pages
+- [x] Category support: openCategorized(player, title, rows, LinkedHashMap<category, items>) with picker page + back navigation
 
 ## Chat module v2
 - [x] Type [inv]/[inventory] to show your inventory (hover items, click copy)
