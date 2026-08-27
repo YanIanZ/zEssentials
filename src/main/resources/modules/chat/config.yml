@@ -264,6 +264,15 @@ emoji-shortcuts:
   ":clap:": "👏"
   ":100:": "💯"
 
+# Detects identical chat spam from several different players at once,
+# cancels the messages and alerts every moderator online.
+raid-protection:
+  enabled: true
+  similar-messages: 3
+  within-seconds: 10
+  # Console commands executed when a raid is detected, %message% available
+  actions: []
+
 custom-rules:
   - regex: "(can|may|would you like if) i (have|be|become|get|has) (op|admin|mod|builder)"
     permission: "essentials.chat.bypass.custom.rules"

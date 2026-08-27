@@ -6,6 +6,11 @@
 
 # 1.0.4.0
 
+- **Raid protection**: identical chat messages from several different players inside a short window cancel the messages, alert every moderator and can run configured console actions (`raid-protection` in `modules/chat/config.yml`)
+- **Warning escalation**: `warning-escalation` thresholds in the sanction configuration run console commands when a player reaches an amount of warnings (3 -> 1 day ban, 5 -> long ban by default)
+- Added `/warnings <player>` listing every stored warning with reason and date
+- Added private **staff notes**: `/note add <player> <text...>`, `/notes <player>` and `/notes clear <player>` persisted in json
+
 - Added **polls** (`/poll create <seconds> <question> | option 1 | option 2 ...`): clickable voting lines broadcast to everyone, one vote per player, live result bars and winner announcement; `/poll vote <index>` and `/poll stop`
 - Added a **reputation** system: `/rep <player>` gives one point with a configurable cooldown per giver (24h default), `/reputation [player]` displays the score, persisted in `reputations.json`
 

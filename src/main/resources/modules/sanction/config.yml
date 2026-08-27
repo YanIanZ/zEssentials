@@ -95,3 +95,9 @@ current-ban-material: DIAMOND_BLOCK
 # always releases every frozen player so nobody can get stuck unable to move.
 freeze:
   persist-across-restarts: false
+
+# Commands executed from the console when a player reaches a warning count,
+# the first matching threshold runs, %player% available.
+warning-escalation:
+  3: "ess ban %player% 1d Too many warnings"
+  5: "ess ban %player% 30d Seriously, stop"

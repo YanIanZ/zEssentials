@@ -3,6 +3,7 @@ package fr.maxlego08.essentials.commands;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandManager;
+import dev.yanianz.essentials.notes.CommandNotes;
 import dev.yanianz.essentials.polls.CommandPoll;
 import dev.yanianz.essentials.reputation.CommandRepGive;
 import dev.yanianz.essentials.reputation.CommandReputationView;
@@ -159,6 +160,9 @@ public class CommandLoader {
 
         register("freeze", CommandFreeze.class);
         register("unfreeze", CommandUnfreeze.class);
+        register("warnings", CommandWarnings.class);
+        register("note", CommandNotes.class);
+        register("notes", CommandNotes.class, "notelist");
         register("ban", CommandBan.class);
         register("mute", CommandMute.class);
         register("unmute", CommandUnMute.class);

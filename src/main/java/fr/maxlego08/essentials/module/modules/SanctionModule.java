@@ -52,6 +52,9 @@ public class SanctionModule extends ZModule implements SanctionManager {
     private final Map<UUID, com.tcoded.folialib.wrapper.task.WrappedTask> particleTasks = new HashMap<>();
 
     @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private final Map<Integer, String> warningEscalation = new java.util.TreeMap<>();
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private boolean persistFreeze;
     // Default messages for kick and ban
     // Do not make those fields final, javac would inline the constant and the configuration would be ignored
@@ -92,7 +95,24 @@ public class SanctionModule extends ZModule implements SanctionManager {
         this.loadInventory("sanction_history");
         this.loadInventory("sanctions");
         this.simpleDateFormat = new SimpleDateFormat(this.dateFormat);
+
+        // Warning escalation thresholds: warnings count -> console command
+        this.warningEscalation.clear();
+        var escalationSection = getConfiguration().getConfigurationSection("warning-escalation");
+        if (escalationSection != null) {
+            for (String key : escalationSection.getKeys(false)) {
+                try {
+                    this.warningEscalation.put(Integer.parseInt(key), escalationSection.getString(key, ""));
+                } catch (NumberFormatException exception) {
+                    this.plugin.getLogger().warning("Invalid warning-escalation threshold: " + key);
+                }
+            }
+        }
         this.persistFreeze = getConfiguration().getBoolean("freeze.persist-across-restarts", false);
+    }
+
+    public String getDateFormatValue() {
+        return this.dateFormat;
     }
 
     public String getDateFormat() {
@@ -181,6 +201,22 @@ public class SanctionModule extends ZModule implements SanctionManager {
 
         // Broadcast a notification message to players with the warn notify permission
         server.broadcastMessage(Permission.ESSENTIALS_WARN_NOTIFY, Message.COMMAND_WARN_NOTIFY, "%player%", sender.getName(), "%target%", playerName, "%reason%", reason, "%sender%", getSanctionBy(sender), "%created_at%", this.simpleDateFormat.format(new Date()));
+
+        // Auto escalation based on the amount of stored warnings
+        this.plugin.getScheduler().runAsync(wrappedTask -> {
+            long warningCount = iStorage.getSanctions(uuid).stream()
+                    .filter(dto -> dto.sanction_type() == SanctionType.WARN)
+                    .count();
+
+            for (Map.Entry<Integer, String> entry : this.warningEscalation.entrySet()) {
+                if (warningCount >= entry.getKey() && !entry.getValue().isEmpty()) {
+                    String command = entry.getValue().replace("%player%", playerName);
+                    this.plugin.getLogger().info("Warning escalation (" + warningCount + " warnings): " + command);
+                    Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+                    break;
+                }
+            }
+        });
     }
 
     @Override

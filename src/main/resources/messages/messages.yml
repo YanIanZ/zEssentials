@@ -795,6 +795,17 @@ reputation-score: "&f%player% &7has &#a7ff33%score% &7reputation point(s)."
 reputation-given: "&#a7ff33+1 &7reputation given to &f%player% &8(&7total: &f%score%&8)"
 reputation-self: "<error>You cannot give reputation to yourself."
 reputation-already: "<error>You already gave reputation to this player recently&7, wait &f%hours%h<error>."
+raid-alert:
+  type: WITHOUT_PREFIX
+  message: "&#ff4d4d&l⚠ RAID ALERT&#ffffff: %amount% similar messages detected &8«&7&o%message%&8»"
+description-warnings: "List the warnings of a player"
+warnings-header: "&8&m--------&#ff4d4d Warnings of &f%player% &8(&f%count%&8) &8&m--------"
+warnings-line: " &#ff9d4d• &7[%date%] &f%reason%"
+description-notes: "View or manage the private staff notes"
+notes-header: "&8&m--------&#00d4ff Notes of &f%player% &8(&f%count%&8) &8&m--------"
+notes-line: " §7[%date% §8| §f%staff%§7] §f%note%"
+note-added: "<success>Note added for &f%player%<success>."
+notes-cleared: "<success>Removed &f%count% <success>note(s) of &f%player%<success>."
 chat-messages-empty: "&f%player% <error>did not write a message."
 chat-messages-line:
   type: WITHOUT_PREFIX

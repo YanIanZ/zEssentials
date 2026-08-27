@@ -60,6 +60,21 @@ public class ChatModule extends ZModule {
 
     @fr.maxlego08.essentials.api.configuration.NonLoadable
     private final java.util.Map<String, String> emojiShortcuts = new java.util.LinkedHashMap<>();
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private final java.util.ArrayDeque<RaidEntry> raidWindow = new java.util.ArrayDeque<>();
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private volatile long lastRaidAlertAt = 0;
+
+    private boolean raidProtectionEnabled;
+    private int raidSimilarMessages;
+    private int raidWithinSeconds;
+    private List<String> raidCommands;
+
+    /** One normalized chat message inside the raid detection window. */
+    private record RaidEntry(java.util.UUID playerId, String normalized, long at) {
+    }
     private final ExpiringCache<UUID, List<ChatMessageDTO>> chatMessagesCache = new ExpiringCache<>(1000 * 60);
     private final Pattern urlPattern = Pattern.compile("(https?://[\\w-\\.]+(\\:[0-9]+)?(/[\\w-./?%&=~+#]*)?)", Pattern.CASE_INSENSITIVE);
     private final List<ChatCooldown> chatCooldowns = new ArrayList<>();
@@ -161,6 +176,13 @@ public class ChatModule extends ZModule {
             }
         }
 
+        // Raid protection configuration
+        var raidConfig = getConfiguration();
+        this.raidProtectionEnabled = raidConfig.getBoolean("raid-protection.enabled", true);
+        this.raidSimilarMessages = raidConfig.getInt("raid-protection.similar-messages", 3);
+        this.raidWithinSeconds = raidConfig.getInt("raid-protection.within-seconds", 10);
+        this.raidCommands = raidConfig.getStringList("raid-protection.actions");
+
         Pattern pattern = Pattern.compile("[!?#]?[a-z0-9_-]*");
         this.chatPlaceholders.forEach(chatPlaceholder -> {
             Matcher matcher = pattern.matcher(chatPlaceholder.name());
@@ -252,6 +274,46 @@ public class ChatModule extends ZModule {
             message = message.replaceAll(entry.getKey(), java.util.regex.Matcher.quoteReplacement(entry.getValue()));
         }
         final String minecraftMessage = message;
+        // Raid protection: identical messages from different players in a short window
+        if (this.raidProtectionEnabled && !hasPermission(player, Permission.ESSENTIALS_CHAT_MODERATOR)) {
+            String normalized = minecraftMessage.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]", "");
+            long now = System.currentTimeMillis();
+
+            synchronized (this.raidWindow) {
+                while (!this.raidWindow.isEmpty() && now - this.raidWindow.peekFirst().at() > this.raidWithinSeconds * 1000L) {
+                    this.raidWindow.removeFirst();
+                }
+                this.raidWindow.addLast(new RaidEntry(player.getUniqueId(), normalized, now));
+
+                long matches = this.raidWindow.stream()
+                        .filter(entry -> entry.normalized().equals(normalized))
+                        .map(RaidEntry::playerId)
+                        .distinct()
+                        .count();
+
+                if (matches >= this.raidSimilarMessages && normalized.length() >= 4) {
+                    event.setCancelled(true);
+
+                    // Alert staff once per window
+                    if (now - this.lastRaidAlertAt > this.raidWithinSeconds * 1000L) {
+                        this.lastRaidAlertAt = now;
+                        String alert = getMessage(Message.RAID_ALERT,
+                                "%amount%", String.valueOf(matches),
+                                "%message%", minecraftMessage.length() > 40 ? minecraftMessage.substring(0, 40) + "..." : minecraftMessage);
+                        for (Player mod : Bukkit.getOnlinePlayers()) {
+                            if (hasPermission(mod, Permission.ESSENTIALS_CHAT_MODERATOR)) {
+                                mod.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(alert.replace('&', '§')));
+                            }
+                        }
+                        for (String command : this.raidCommands) {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%message%", normalized));
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+
 
         Optional<CustomRules> optional = this.customRules.stream().filter(rule -> rule.match(player, minecraftMessage)).findFirst();
         if (optional.isPresent()) {
