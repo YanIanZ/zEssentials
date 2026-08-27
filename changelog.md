@@ -6,6 +6,8 @@
 
 # 1.0.4.0
 
+- Added a **chat games** module (`modules/chatgames/config.yml`): six game types — math race, word scramble, fast typing, reversed words, trivia and hot letter — with automatic random rounds (`auto-interval-minutes`), console reward commands (`%player%`) and `/chatgames <type|stop|reload>` for staff
+
 - Chat slowmode: `/chatslowmode <seconds>` staff command with `essentials.chat.bypass.slowmode` bypass
 - Do not disturb mode: `/dnd [player]` disables mention notification sounds per player
 - Emoji shortcuts: ten defaults like `:heart:` or `:100:` replaced in every chat message (`emoji-shortcuts`)

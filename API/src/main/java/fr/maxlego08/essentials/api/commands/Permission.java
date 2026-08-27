@@ -209,6 +209,7 @@ public enum Permission {
     ESSENTIALS_CHAT_DND_OTHER("Toggle do not disturb for other players"),
     ESSENTIALS_CHAT_SLOWMODE("Manage the chat slowmode"),
     ESSENTIALS_CHAT_BYPASS_SLOWMODE("Bypass the chat slowmode"),
+    ESSENTIALS_CHATGAMES_ADMIN("Manage the chat games"),
     ESSENTIALS_TP_TOGGLE_OTHER("Toggle receiving teleport requests for other players"),
     ESSENTIALS_TPA_HERE_TOGGLE("Toggle receiving tpahere requests"),
     ESSENTIALS_TPA_HERE_TOGGLE_OTHER("Toggle receiving tpahere requests for other players"),

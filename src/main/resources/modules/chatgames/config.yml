@@ -1,0 +1,69 @@
+########################################################################################################################
+#
+# zEssentials - Chat Games
+# Automatic chat mini games with rewards for the fastest correct answer.
+#
+########################################################################################################################
+
+enable: true
+
+# Start a random enabled game every X minutes, 0 disables the automation
+auto-interval-minutes: 30
+
+# Commands executed from the console when a player wins,
+# %player% is replaced with the winner name
+reward-commands:
+  - "ess give %player% money 500"
+  - "tellraw %player% {\"text\":\"You won the chat game!\",\"color\":\"green\"}"
+
+# Message shown when a player wins
+win-message: "&#00d4ff&lCHAT GAME &#ffd93d%player% &#7fffffwon with the answer §f%answer%&#7fff!"
+
+# ── Game types ────────────────────────────────────────────────
+
+math:
+  enabled: true
+  # Two numbers between min and max, and a random operator from the list
+  min-number: 2
+  max-number: 99
+  operators: [ "+", "-", "*" ]
+
+scramble:
+  enabled: true
+  # The words get shuffled, first player to type the original word wins
+  words:
+    - diamond
+    - adventure
+    - enchanting
+    - strongholds
+    - redstone
+
+fast-type:
+  enabled: true
+  # Type exactly this sentence as fast as possible
+  sentences:
+    - "the quick brown fox jumps over the lazy dog"
+    - "minecraft is better without hacks"
+
+reverse:
+  enabled: true
+  # The word is shown reversed, type it correctly
+  words:
+    - creative
+    - survival
+    - netherite
+
+trivia:
+  enabled: true
+  questions:
+    - question: "&eWhich block explodes when triggered by redstone?"
+      answers: [ "tnt", "tnt block" ]
+    - question: "&eWhat do you need to tame a skeleton horse?"
+      answers: [ "nothing", "nothing at all" ]
+    - question: "&eHow many eyes of ender fit in an end portal frame?"
+      answers: [ "12", "twelve" ]
+
+hot-letter:
+  enabled: true
+  minimum-length: 6
+  # Players must type any word starting with this randomly picked letter

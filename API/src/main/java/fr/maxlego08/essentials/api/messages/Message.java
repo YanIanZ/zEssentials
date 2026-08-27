@@ -735,6 +735,8 @@ public enum Message {
     CHAT_DEFAULT_FORMAT("<white>%displayName% <#656665>• &7%message%"),
     DESCRIPTION_CHAT_HISTORY_DELETE_ARG("Internal usage"),
     CHAT_MESSAGE_DELETED("<success>Deleted &f%count% <success>message(s) of &f%player%<success>."),
+    DESCRIPTION_CHAT_GAMES("Manage the chat games"),
+    CHAT_GAME_ALREADY_RUNNING("<error>A chat game is already running or this type is disabled."),
     CHAT_MESSAGES_EMPTY("&f%player% <error>did not write a message."),
     CHAT_MESSAGES_LINE(MessageType.WITHOUT_PREFIX, "&f%date% &7%message%"),
     CHAT_MESSAGES_FOOTER(MessageType.WITHOUT_PREFIX, "<click:run_command:'/chathistory %player% %previousPage%'><hover:show_text:'Previous Page'><white>⬅</hover></click> &7%page%/%maxPage% <click:run_command:'/chathistory %player% %nextPage%'><hover:show_text:'Next Page'><white>➡</hover></click>"),

@@ -54,7 +54,7 @@ Sorted by priority:
 - [ ] Slowmode per player/server with staff bypass
 - [x] Message deletion button for staff (click-to-delete own log/history)
 - [ ] DND mode, quick replies, emoji shortcuts
-- [ ] Chat games (6 types) with rewards
+- [x] Chat games (6 types): math race, scramble, fast-type, reverse, trivia, hot-letter — auto interval or /chatgames <type|stop|reload>
 - [ ] Reputation & polls systems
 - [ ] Chat color selection GUI + tags system
 - [ ] Nicknames with colors (LuckPerms prefix/suffix used by default when present)

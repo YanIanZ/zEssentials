@@ -173,6 +173,7 @@ public class CommandLoader {
         register("broadcast", CommandChatBroadcast.class, "bc");
         register("dnd", CommandChatDnd.class);
         register("chatslowmode", CommandChatSlowmode.class);
+        register("chatgames", CommandChatGames.class);
         register("showitem", CommandShowItem.class);
         register("pingsound", CommandPingSound.class, "pingsounds");
 
