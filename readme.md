@@ -61,7 +61,7 @@ Sorted by priority:
 - [x] Warning system with auto-escalation (configurable thresholds running console commands)
 - [x] Staff notes: /note add <player> <text>, /notes <player>, /notes clear <player> persisted in json
 - [x] Report system: /report <player> <reason> with cooldown, staff alerts with teleport click, /reports list with resolve buttons
-- [ ] Chat bubbles above players (text displays, culling/fade/stack options)
+- [x] Chat bubbles above players: text displays with configurable duration, y offset, stacking, background ARGB and scale
 - [ ] DiscordSRV bridge sync
 - [ ] BungeeCord/Velocity network mode
 

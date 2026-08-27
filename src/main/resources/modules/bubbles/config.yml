@@ -1,0 +1,26 @@
+########################################################################################################################
+#
+# zEssentials - Chat Bubbles
+# Chat messages appear above the speaking player head.
+#
+########################################################################################################################
+
+enable: true
+
+# Seconds a bubble stays visible
+duration-seconds: 6
+
+# Height above the head
+y-offset: 2.0
+
+# Extra height for every bubble already floating when stacking messages
+stack-offset: 0.35
+
+# Background color of the bubble in ARGB hex
+background: "#B0000000"
+
+# Text opacity is handled by the color itself, this scales the whole bubble
+scale: 0.9
+
+# Show the bubbles to viewers further away than this many blocks? no, culling distance
+view-distance: 64

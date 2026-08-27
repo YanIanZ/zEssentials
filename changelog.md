@@ -6,6 +6,8 @@
 
 # 1.0.4.0
 
+- Added **chat bubbles** (`modules/bubbles/config.yml`): every chat message appears as a text display floating above the speaker head, messages stack on top of each other and disappear after a configured time; background color, scale, stack offset and view distance are configurable
+
 - Added a reusable **screen factory** (`dev.yanianz.essentials.screens`) for list style inventories with pagination, control row and slot bound click callbacks; other plugins can reuse it through `EssentialsScreens.get().factory()`
 - Added `/baltopgui [economy]`: the balance top as a paginated player head screen
 - Added `/warpgui`: every permitted warp as a clickable entry teleporting on click
