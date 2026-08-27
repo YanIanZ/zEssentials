@@ -173,7 +173,7 @@ public class NicknamesModule extends ZModule {
     }
 
     private void applyDisplayName(Player player, String legacyName) {
-        Component component = LEGACY.deserialize(colorize(legacyName));
+        Component component = dev.yanianz.essentials.util.ColorUtil.component(colorize(legacyName));
         player.displayName(component);
         player.playerListName(component);
     }

@@ -7,8 +7,8 @@
 
 enable: true
 
-# Seconds a bubble stays visible
-duration-seconds: 6
+# How long a bubble stays visible, accepts 30s / 5m / 1h style values
+duration: 6s
 
 # Height above the head
 y-offset: 2.0

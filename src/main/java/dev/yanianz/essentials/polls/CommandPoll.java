@@ -64,10 +64,21 @@ public class CommandPoll extends VCommand {
                 }
                 pollsModule.finishPoll();
             }
+            case "vote" -> {
+                Player player = getPlayer();
+                if (player == null) return CommandResultType.SYNTAX_ERROR;
+                if (this.args.length < 2) return CommandResultType.SYNTAX_ERROR;
+                try {
+                    pollsModule.vote(player, Integer.parseInt(this.argAsString(1)));
+                } catch (NumberFormatException exception) {
+                    this.syntaxMessage();
+                }
+            }
             default -> {
                 Player player = getPlayer();
                 if (player == null) return CommandResultType.SYNTAX_ERROR;
                 try {
+                    // Bare `/poll 2` also counts as a vote
                     pollsModule.vote(player, Integer.parseInt(action));
                 } catch (NumberFormatException exception) {
                     this.syntaxMessage();

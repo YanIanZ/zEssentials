@@ -48,14 +48,11 @@ public class CommandRepGive extends VCommand {
                 message(sender, Message.REPUTATION_GIVEN, "%player%", target.getName(), "%score%", String.valueOf(score));
 
                 if (!module.broadcastLine().isEmpty()) {
-                    java.util.function.Function<String, net.kyori.adventure.text.Component> legacy =
-                            text -> net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
-                                    .deserialize(text == null ? "" : text.replace("&", "§"));
-                    String line = module.broadcastLine()
+                    String line = dev.yanianz.essentials.util.ColorUtil.sections(module.broadcastLine()
                             .replace("%player%", target.getName())
-                            .replace("%total%", String.valueOf(score));
+                            .replace("%total%", String.valueOf(score)));
                     for (Player online : Bukkit.getOnlinePlayers()) {
-                        online.sendMessage(legacy.apply(line));
+                        online.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(line));
                     }
                 }
             }

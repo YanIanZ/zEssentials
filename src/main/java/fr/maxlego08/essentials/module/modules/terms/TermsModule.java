@@ -3,6 +3,7 @@ package fr.maxlego08.essentials.module.modules.terms;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
+import dev.yanianz.essentials.util.ColorUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -289,12 +290,14 @@ public class TermsModule extends ZModule {
 
     private void kick(Player player, List<String> lines) {
 
-        StringBuilder builder = new StringBuilder();
-        for (String line : lines) {
-            builder.append(colorize(line)).append("\n");
+        Component screen = Component.empty();
+        for (String lineText : lines) {
+            screen = screen.append(ColorUtil.component(lineText)).append(Component.newline());
         }
+        Component finalScreen = screen;
 
-        this.plugin.getScheduler().runAtLocation(player.getLocation(), wrappedTask -> player.kickPlayer(builder.toString()));
+        this.plugin.getScheduler().runAtLocation(player.getLocation(),
+                wrappedTask -> player.kick(finalScreen));
     }
 
     private Component component(String text) {

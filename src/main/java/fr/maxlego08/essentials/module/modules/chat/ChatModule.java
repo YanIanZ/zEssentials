@@ -55,6 +55,9 @@ import java.util.stream.LongStream;
 
 public class ChatModule extends ZModule {
 
+    private static final LegacyComponentSerializer LEGACY =
+            LegacyComponentSerializer.legacySection();
+
     private final List<ShowItem> showItems = new ArrayList<>();
     private final List<ChatDisplay> chatDisplays = new ArrayList<>();
 
@@ -398,13 +401,38 @@ public class ChatModule extends ZModule {
             Tag tag = Tag.inserting(paperComponent.translateText(player,
                     messagePrefix + renderMessage, localBuilder.build()));
             String moderatorAction = (isModerator && viewer instanceof Player playerMod) ? papi(getMessage(this.moderatorAction, "%player%", player.getName()), playerMod) : "";
-            return paperComponent.getComponentMessage(chatFormat, TagResolver.resolver("message", tag), "%displayName%", player.getDisplayName(), "%player%", player.getName(), "%moderator_action%", moderatorAction);
+            String displayName = resolveDisplayName(player);
+            return paperComponent.getComponentMessage(chatFormat, TagResolver.resolver("message", tag), "%displayName%", displayName, "%player%", player.getName(), "%moderator_action%", moderatorAction);
         });
 
         if (this.enableChatMessages) {
             this.plugin.getStorageManager().getStorage().insertChatMessage(player.getUniqueId(), minecraftMessage);
             this.chatMessagesCache.clear(player.getUniqueId());
         }
+    }
+
+    /**
+     * Legacy string of the nickname when the player has one through the
+     * nicknames module, otherwise the plain display name of the player.
+     */
+    private String resolveDisplayName(Player player) {
+        try {
+            var module = this.plugin.getModuleManager()
+                    .getModule(dev.yanianz.essentials.nicknames.NicknamesModule.class);
+            if (module != null) {
+                String nickname = module.getNickname(player.getUniqueId());
+                if (nickname != null && !nickname.isEmpty()) {
+                    return dev.yanianz.essentials.util.ColorUtil.sections(nickname);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return LEGACY.serialize(player.displayName());
+    }
+
+    /** Emoji shortcut patterns from the configuration, reused by other features. */
+    public java.util.Map<String, String> getEmojiShortcuts() {
+        return java.util.Collections.unmodifiableMap(this.emojiShortcuts);
     }
 
     public int getSlowmodeSeconds() {
