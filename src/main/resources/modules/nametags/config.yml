@@ -1,0 +1,44 @@
+########################################################################################################################
+#
+# zEssentials - NameTags & Tab Sorting
+# Prefix/suffix above player heads and tab list ordering through
+# scoreboard teams, the same mechanism the TAB plugin uses.
+#
+########################################################################################################################
+
+enable: true
+
+# Seconds after join before the nametag applies, gives LuckPerms and
+# PlaceholderAPI time to resolve prefixes
+apply-delay-ticks: 20
+
+# Sorting: players are ordered by their team name inside the tab list,
+# so lower priorities appear first. Zero padded automatically.
+
+# First matching rule wins. Every field supports legacy colors, hex
+# &#rrggbb, MiniMessage and PlaceholderAPI with the player context.
+groups:
+
+  - permission: "essentials.groups.admin"
+    priority: 0
+    prefix: "&#ff4d4d&l⚔ ADMIN "
+    suffix: ""
+    tab-name-format: "&#ff4d4d%player%"
+
+  - permission: "essentials.groups.mod"
+    priority: 100
+    prefix: "&#ffd93d&l❈ MOD "
+    suffix: ""
+    tab-name-format: "&#ffd93d%player%"
+
+  - permission: "essentials.groups.vip"
+    priority: 300
+    prefix: "&#a7ff33&l★ VIP "
+    suffix: ""
+    tab-name-format: "&#a7ff33%player%"
+
+  - permission: ""
+    priority: 500
+    prefix: ""
+    suffix: ""
+    tab-name-format: "&7%player%"

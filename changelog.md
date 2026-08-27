@@ -17,6 +17,8 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.1.0.0
 
+- Added a **nametags & tab sorting** module (`modules/nametags/config.yml`): scoreboard teams apply group prefixes/suffixes above the player head and order the tab list by group priority — the same mechanism the TAB plugin uses; every field supports hex, MiniMessage and PlaceholderAPI with the player context, an apply delay gives LuckPerms time to resolve
+
 - Added `/eat` — fills hunger, saturation and stops burning instantly
 - Added `/xyz` — copies your formatted coordinates to the clipboard with a clickable preview
 - Added a **tab list** module (`modules/tablist/config.yml`): per world header and footer with PlaceholderAPI support and a configurable refresh interval, the first TAB-parity feature
