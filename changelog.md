@@ -6,6 +6,9 @@
 
 # 1.0.4.0
 
+- Added a **network chat relay** (`modules/bungeechat/config.yml`, disabled by default): public chat is broadcast across BungeeCord/Velocity networks through the plugin messaging channel with a configurable `%server% %player% %message%` format
+- Polished `/r`: answering without a previous private message now explains it instead of failing silently
+
 - Added **chat bubbles** (`modules/bubbles/config.yml`): every chat message appears as a text display floating above the speaker head, messages stack on top of each other and disappear after a configured time; background color, scale, stack offset and view distance are configurable
 
 - Added a reusable **screen factory** (`dev.yanianz.essentials.screens`) for list style inventories with pagination, control row and slot bound click callbacks; other plugins can reuse it through `EssentialsScreens.get().factory()`

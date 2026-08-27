@@ -28,11 +28,15 @@ public class CommandReply extends VCommand {
         String message = getArgs(0);
 
         if (!user.hasPrivateMessage()) {
-            return CommandResultType.DEFAULT;
+            message(sender, Message.REPLY_NO_TARGET);
+            return CommandResultType.SUCCESS;
         }
 
         PrivateMessage privateMessage = user.getPrivateMessage();
-        isOnline(privateMessage.username(), () -> messageModule.sendMessage(this.user, privateMessage.uuid(), privateMessage.username(), message));
+        isOnline(privateMessage.username(), () -> {
+            messageModule.sendMessage(this.user, privateMessage.uuid(), privateMessage.username(), message);
+            // Refresh the reply chain of the target back to the sender, handled inside sendMessage
+        });
 
         return CommandResultType.SUCCESS;
     }

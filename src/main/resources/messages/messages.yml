@@ -825,6 +825,7 @@ report-reopened: "<success>Report &f#%id% <success>reopened."
 report-list-header: "&8&m--------&#ff4d4d Reports &8(&f%count%&8) &8&m--------"
 description-chatcolor: "Open the chat color selection"
 description-tags: "Open the chat tag selection"
+reply-no-target: "<error>You have nobody to reply to yet."
 chat-messages-empty: "&f%player% <error>did not write a message."
 chat-messages-line:
   type: WITHOUT_PREFIX

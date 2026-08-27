@@ -63,7 +63,7 @@ Sorted by priority:
 - [x] Report system: /report <player> <reason> with cooldown, staff alerts with teleport click, /reports list with resolve buttons
 - [x] Chat bubbles above players: text displays with configurable duration, y offset, stacking, background ARGB and scale
 - [ ] DiscordSRV bridge sync
-- [ ] BungeeCord/Velocity network mode
+- [x] BungeeCord/Velocity chat relay (modules/bungeechat/config.yml): public chat broadcast through the plugin messaging channel, both ends need the module enabled — messages from other servers keep their colors and display the origin server name
 
 - [x] Command /tpaall
 - [x] Command /list

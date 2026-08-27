@@ -774,6 +774,7 @@ public enum Message {
     REPORT_LIST_HEADER("&8&m--------&#ff4d4d Reports &8(&f%count%&8) &8&m--------"),
         DESCRIPTION_CHATCOLOR("Open the chat color selection"),
     DESCRIPTION_TAGS("Open the chat tag selection"),
+        REPLY_NO_TARGET("<error>You have nobody to reply to yet."),
         CHAT_MESSAGES_EMPTY("&f%player% <error>did not write a message."),
     CHAT_MESSAGES_LINE(MessageType.WITHOUT_PREFIX, "&f%date% &7%message%"),
     CHAT_MESSAGES_FOOTER(MessageType.WITHOUT_PREFIX, "<click:run_command:'/chathistory %player% %previousPage%'><hover:show_text:'Previous Page'><white>⬅</hover></click> &7%page%/%maxPage% <click:run_command:'/chathistory %player% %nextPage%'><hover:show_text:'Next Page'><white>➡</hover></click>"),

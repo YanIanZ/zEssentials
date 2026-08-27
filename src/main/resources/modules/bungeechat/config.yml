@@ -1,0 +1,17 @@
+########################################################################################################################
+#
+# zEssentials - Network chat relay
+# Relays public chat between servers behind BungeeCord or Velocity
+# using the plugin messaging channel. Both ends need the plugin with this enabled.
+#
+########################################################################################################################
+
+enable: false
+
+# Name of THIS server shown in relayed messages on other servers.
+# Leave empty to auto detect through server.properties (level-name fallback).
+server-name: ""
+
+# Format of a message received from another server of the network,
+# supports legacy colors and placeholders: %server% %player% %message%
+format: "&#00d4ff[%server%] &f%player% &8» &7%message%"
