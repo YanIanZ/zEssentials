@@ -141,11 +141,13 @@ public class ChatBubblesModule extends ZModule {
         // The NEWEST message sits at the head, older ones are pushed upwards
         restack(bubbles);
 
-        this.plugin.getScheduler().runLater(
-                () -> {
-                    removeBubble(bubbles, bubble);
-                    restack(bubbles);
-                }, this.durationMillis * 20L + 20L);
+        // Removal and restack must run on the region owning the player/display,
+        // global scheduler threads cannot touch entity state
+        this.plugin.getScheduler().runAtLocationLater(player.getLocation(), () -> {
+            if (!player.isOnline() || !bubbles.contains(bubble)) return;
+            restack(bubbles);
+            removeBubble(bubbles, bubble);
+        }, this.durationMillis * 20L + 20L);
     }
 
     /**

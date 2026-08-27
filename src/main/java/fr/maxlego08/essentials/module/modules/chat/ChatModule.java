@@ -402,7 +402,23 @@ public class ChatModule extends ZModule {
                     messagePrefix + renderMessage, localBuilder.build()));
             String moderatorAction = (isModerator && viewer instanceof Player playerMod) ? papi(getMessage(this.moderatorAction, "%player%", player.getName()), playerMod) : "";
             String displayName = resolveDisplayName(player);
-            return paperComponent.getComponentMessage(chatFormat, TagResolver.resolver("message", tag), "%displayName%", displayName, "%player%", player.getName(), "%moderator_action%", moderatorAction);
+
+            // Customization tag renders before ranks and names as a symbol prefix
+            String chatFormatWithTag = chatFormat;
+            try {
+                var customizationModule = this.plugin.getModuleManager()
+                        .getModule(dev.yanianz.essentials.chatcustomization.ChatCustomizationModule.class);
+                if (customizationModule != null) {
+                    String tagText = customizationModule.resolveTagText(player.getUniqueId());
+                    if (!tagText.isEmpty()) {
+                        chatFormatWithTag = fr.maxlego08.essentials.util.ColorUtil.sections(tagText)
+                                + " " + chatFormat;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+
+            return paperComponent.getComponentMessage(chatFormatWithTag, TagResolver.resolver("message", tag), "%displayName%", displayName, "%player%", player.getName(), "%moderator_action%", moderatorAction);
         });
 
         if (this.enableChatMessages) {
