@@ -1,25 +1,21 @@
-# Versioning scheme
+# Versioning
 
-- Last digit (**1.1.1**) — small updates & bug fixes, documented immediately
-- Middle digit (**1.1.0**) — module level updates
-- First digit (**2.0.0**) — significant milestone releases
+Four digit scheme, continuing from release 1.0.4.0:
+
+- **First digit** — significant milestone releases
+- **Second digit** — new feature batch / new modules
+- **Third digit** — small changes & polish
+- **Fourth digit** — bug fixes
+
+Every change lands in this changelog immediately under its bumped heading.
+
+# Idée:
 
 - Ajouter un broadcast de message centré avec le support des \n pour ajouter plusieurs lignes
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
-# 1.1.1
-
-Bug fix patch on top of 1.1.0:
-
-- Color and tags guis rebuilt: dedicated slots, selected glint markers, sounds, reset bucket, none tag first
-- Chat bubbles mounted as player passengers fixing region-thread teleports, older messages rise while the newest stays at head height
-- Poll close task and chat games auto task moved to the folia aware scheduler
-- Discord bridge forward hops with runNextTick
-- Auto restart shutdown falls back to a delayed stopper thread where global tasks are rejected
-- Chat history message keys aligned (chat-message-deleted)
-
-# 1.1.0
+# 1.1.0.0
 
 - **Sleep acceleration** (`modules/sleep/config.yml`): when the configured percentage of a world players are in bed the night moves forward smoothly (`accelerate-ticks` per second) until dawn instead of skipping instantly; dawn and start broadcasts are configurable
 - Reports for staff now open as a **screen** (`/reports`): each entry is clickable paper, left click resolves it and right click teleports to the reported player
@@ -108,6 +104,10 @@ Bug fix patch on top of 1.1.0:
 - Secure chat profile key warning — login checks moved from PlayerLoginEvent to AsyncPlayerPreLoginEvent so Paper keeps
   its configuration api available
 - Duplicate message keys in the default configuration no longer print warnings on start
+- Chat games auto task, poll close task and discord forward hop moved to the folia aware scheduler — region threaded servers no longer throw `UnsupportedOperationException`
+- Notes module ships its missing `config.yml` resource that aborted the enable
+- Login checks moved to AsyncPlayerPreLoginEvent so Paper keeps its profile public key available (secure chat warning fixed)
+- Reports staff alert teleport command aligned with the registered handler
 - Custom screens example layout now extracts from the jar on first launch
 - `/r` answers with a clear message instead of failing silently when nothing was received
 
