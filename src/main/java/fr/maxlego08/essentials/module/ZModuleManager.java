@@ -14,6 +14,7 @@ import fr.maxlego08.essentials.module.modules.customcommands.CustomCommandModule
 import dev.yanianz.essentials.customscreens.CustomScreenModule;
 import dev.yanianz.essentials.polls.PollsModule;
 import dev.yanianz.essentials.sleep.SleepModule;
+import dev.yanianz.essentials.tablist.TabListModule;
 import dev.yanianz.essentials.nicknames.NicknamesModule;
 import dev.yanianz.essentials.bubbles.ChatBubblesModule;
 import dev.yanianz.essentials.discordbridge.DiscordBridgeModule;
@@ -111,6 +112,7 @@ public class ZModuleManager implements ModuleManager {
         this.modules.put(BungeeChatModule.class, new BungeeChatModule(this.plugin));
         this.modules.put(DiscordBridgeModule.class, new DiscordBridgeModule(this.plugin));
         this.modules.put(SleepModule.class, new SleepModule(this.plugin));
+        this.modules.put(TabListModule.class, new TabListModule(this.plugin));
         if (plugin.isPaperVersion()) {
             this.modules.put(DeathMessageModule.class, new DeathMessageModule(this.plugin));
         }

@@ -17,6 +17,11 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.1.0.0
 
+- Added `/eat` — fills hunger, saturation and stops burning instantly
+- Added `/xyz` — copies your formatted coordinates to the clipboard with a clickable preview
+- Added a **tab list** module (`modules/tablist/config.yml`): per world header and footer with PlaceholderAPI support and a configurable refresh interval, the first TAB-parity feature
+- `/near <radius>` now accepts an optional radius argument between 1 and 200 blocks
+
 - **Sleep acceleration** (`modules/sleep/config.yml`): when the configured percentage of a world players are in bed the night moves forward smoothly (`accelerate-ticks` per second) until dawn instead of skipping instantly; dawn and start broadcasts are configurable
 - Reports for staff now open as a **screen** (`/reports`): each entry is clickable paper, left click resolves it and right click teleports to the reported player
 - Chat bubbles: the newest message stays at the head while older ones are pushed upwards; bubbles follow the player exactly (passenger mount)

@@ -825,6 +825,10 @@ report-list-header: "&8&m--------&#ff4d4d Reports &8(&f%count%&8) &8&m--------"
 description-chatcolor: "Open the chat color selection"
 description-tags: "Open the chat tag selection"
 reply-no-target: "<error>You have nobody to reply to yet."
+description-eat: "Fill hunger and saturation instantly"
+command-eat-success: "<success>Hunger restored&7, bon appétit!"
+description-xyz: "Copy your coordinates to the clipboard"
+command-xyz-copied: "<success>Coordinates copied to clipboard&7: &f%coords%"
 chat-messages-empty: "&f%player% <error>did not write a message."
 chat-messages-line:
   type: WITHOUT_PREFIX

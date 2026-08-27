@@ -212,6 +212,8 @@ public class CommandLoader {
         register("repairall", CommandRepairAll.class, "fixall");
         register("ext", CommandExt.class);
         register("near", CommandNear.class);
+        register("eat", CommandEat.class);
+        register("xyz", CommandXyz.class);
         register("list", CommandList.class);
         register("playtime", CommandPlayTime.class);
         register("essversion", CommandVersion.class, "ev");

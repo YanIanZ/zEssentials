@@ -22,12 +22,20 @@ public class CommandNear extends VCommand {
         this.setPermission(Permission.ESSENTIALS_NEAR);
         this.setDescription(Message.DESCRIPTION_NEAR);
         this.onlyPlayers();
+        this.addOptionalArg("radius");
     }
 
     @Override
     protected CommandResultType perform(EssentialsPlugin plugin) {
 
+        // Optional radius argument overrides the configured distance
         double distance = plugin.getConfiguration().getNearDistance(this.player);
+        if (this.args.length > 0) {
+            try {
+                distance = Math.max(1, Math.min(200, Double.parseDouble(this.argAsString(0))));
+            } catch (NumberFormatException ignored) {
+            }
+        }
         Collection<Player> players = this.player.getWorld().getNearbyPlayers(this.player.getLocation(), distance, player ->
                 player != this.player && !isVanishedFor(this.player, player)
         );

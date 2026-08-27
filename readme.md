@@ -51,6 +51,7 @@ Inspired by CMILib (https://github.com/Zrips/CMILib):
 - [ ] `/cmiKit` style kit claim-all button in the preview screen
 
 Inspired by TAB (https://github.com/NEZNAMY/TAB) â€” parity 1:1 long term:
+- [x] Tab list header & footer per world with PlaceholderAPI + refresh interval
 - [ ] Tab-list scoreboard system: per world/group headers, footers and layouts
 - [ ] Nametag rendering control (visibility, prefix/suffix lines above head)
 - [ ] Team based sorting of the tab list (group -> priority ladder)
@@ -63,7 +64,9 @@ Inspired by FancyHolograms (https://github.com/FancyMcPlugins/FancyHolograms) â€
 
 Small quality features:
 - [x] Sleep through night acceleration (percentage based, smooth time speed up)
-- [ ] `/eat` fills hunger instantly
+- [x] `/eat` fills hunger, saturation and stops burning instantly
+- [x] `/near <radius>` optional radius argument (1-200 blocks, clamped)
+- [x] `/xyz` copies coordinates to clipboard with hover preview
 - [ ] `/feed all` alias already exists through `*`
 - [ ] `/near <radius>` optional radius argument
 - [ ] `/xyz` copies coordinates to clipboard with formatted colors

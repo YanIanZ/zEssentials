@@ -1,0 +1,24 @@
+########################################################################################################################
+#
+# zEssentials - Tab List
+# Header and footer of the player list, per world, with animations support
+# through placeholder frames.
+#
+########################################################################################################################
+
+enable: true
+
+# Seconds between tab list refreshes, keeps placeholders like %ping% accurate
+refresh-seconds: 5
+
+# Per world header and footer, each entry supports MiniMessage, legacy colors,
+# hex and PlaceholderAPI. Multiple lines are allowed as list entries.
+# "default" applies to every world without its own section.
+worlds:
+  default:
+    header:
+      - "&#00d4ff&lzEssentials"
+      - "&7Playing on &#ffd93d%player_world%"
+    footer:
+      - "&7Online&8: &f%server_online% &8• &7Ping&8: &f%player_ping%ms"
+      - "&#00d4ffstore.yourserver.com"
