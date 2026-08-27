@@ -23,7 +23,9 @@ import org.bukkit.plugin.messaging.Messenger;
  */
 public class BungeeChatModule extends ZModule {
 
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final String CHANNEL = "BungeeCord";
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final String SUB_CHANNEL = "zessentials:chat";
 
     private String serverName;

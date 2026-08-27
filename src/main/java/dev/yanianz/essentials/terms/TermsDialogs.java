@@ -23,6 +23,7 @@ import java.util.function.Supplier;
  */
 public final class TermsDialogs {
 
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private TermsDialogs() {

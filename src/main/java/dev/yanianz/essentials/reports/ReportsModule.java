@@ -261,6 +261,7 @@ public class ReportsModule extends ZModule {
     }
 
 
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer LEGACY =
             net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection();
 
