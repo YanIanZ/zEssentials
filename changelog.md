@@ -17,6 +17,10 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.1.0.0
 
+- Added **below name objective** (`modules/nametags/config.yml`): shows health or a PAPI placeholder below every player nametag
+- Added **spectator fix**: players in spectator mode get a configurable gray tab name
+- Added **tab list animations**: named frame lists in `modules/tablist/config.yml` cycle on the refresh timer, use `%anim_<name>%` inside header/footer lines
+
 - Added a **nametags & tab sorting** module (`modules/nametags/config.yml`): scoreboard teams apply group prefixes/suffixes above the player head and order the tab list by group priority — the same mechanism the TAB plugin uses; every field supports hex, MiniMessage and PlaceholderAPI with the player context, an apply delay gives LuckPerms time to resolve
 
 - Added `/eat` — fills hunger, saturation and stops burning instantly

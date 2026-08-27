@@ -56,7 +56,7 @@ Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
 - [x] Nametag prefix/suffix above head via scoreboard teams (per group rules with priority)
 - [x] Team based sorting of the tab list (zero padded priority team names, lower priority first)
 - [ ] Team based sorting of the tab list (group -> priority ladder)
-- [ ] Header/footer animation frames with per tick swap
+- [x] Header/footer animation frames cycled on the refresh timer with named `%anim_<name>%` tokens
 
 Inspired by FancyHolograms (https://github.com/FancyMcPlugins/FancyHolograms) — migration of the hologram module:
 - [ ] Text/item holograms built on display entities (background, shadow, billboard modes)

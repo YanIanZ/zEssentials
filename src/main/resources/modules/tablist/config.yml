@@ -22,3 +22,27 @@ worlds:
     footer:
       - "&7Online&8: &f%server_online% &8• &7Ping&8: &f%player_ping%ms"
       - "&#00d4ffstore.yourserver.com"
+
+# ── Animations ───────────────────────────────────────────────
+# Named frame lists cycled on every refresh tick.
+# Use %anim_<name>% inside header/footer lines to display the current frame.
+# Speed is controlled by the refresh-seconds setting.
+animations:
+  gradient-title:
+    interval-seconds: 1
+    frames:
+      - "&#00d4ff&lz"
+      - "&#10b4ff&le"
+      - "&#209aff&ls"
+      - "&#3080ff&ls"
+      - "&#4066ff&le"
+      - "&#504cff&ln"
+      - "&#6032ff&lt"
+      - "&#7018ff&li"
+      - "&#7b2fff&la"
+      - "&#7b2fff&ll"
+      - "&#7b2fff&ls"
+
+# Example usage inside header:
+#   header:
+#     - "%anim_gradient-title% &7» &f%player_world%"

@@ -16,6 +16,7 @@ import org.bukkit.scoreboard.Team;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,6 +29,14 @@ public class NameTagModule extends ZModule {
 
     private long applyDelayTicks = 20;
     private String fallbackTabFormat = "&7%player%";
+
+    private boolean belowNameEnabled;
+    private String belowNameMode;
+    private Component belowNameDisplay;
+    private String belowNamePlaceholder;
+
+    private boolean spectatorEnabled;
+    private Component spectatorTabName;
 
     @NonLoadable
     private final List<GroupRule> rules = new ArrayList<>();
@@ -47,6 +56,16 @@ public class NameTagModule extends ZModule {
 
         var config = getConfiguration();
         this.applyDelayTicks = Math.max(0, config.getInt("apply-delay-ticks", 20));
+
+        this.belowNameEnabled = config.getBoolean("belowname.enabled", false);
+        this.belowNameMode = config.getString("belowname.mode", "HEALTH").toUpperCase(Locale.ROOT);
+        this.belowNameDisplay = dev.yanianz.essentials.util.ColorUtil.component(
+                config.getString("belowname.display-name", "&#ff4d4d♥ Health"));
+        this.belowNamePlaceholder = config.getString("belowname.placeholder", "%player_health%");
+
+        this.spectatorEnabled = config.getBoolean("spectator.enabled", false);
+        this.spectatorTabName = dev.yanianz.essentials.util.ColorUtil.component(
+                config.getString("spectator.tab-name-format", "&8&oSpectator"));
 
         this.rules.clear();
         for (Object obj : config.getMapList("groups")) {
@@ -79,6 +98,45 @@ public class NameTagModule extends ZModule {
         Player player = event.getPlayer();
         this.plugin.getScheduler().runAtLocationLater(player.getLocation(),
                 () -> apply(player), this.applyDelayTicks);
+    }
+
+    /**
+     * Applies the spectator tab name override when the gamemode changes.
+     */
+    @EventHandler
+    public void onGameModeChange(org.bukkit.event.player.PlayerGameModeChangeEvent event) {
+        if (!this.isEnable || !this.spectatorEnabled) return;
+        applySpectatorFix(event.getPlayer(), event.getNewGameMode());
+    }
+
+    private void applySpectatorFix(Player player, org.bukkit.GameMode gameMode) {
+        if (gameMode == org.bukkit.GameMode.SPECTATOR) {
+            player.playerListName(this.spectatorTabName);
+        } else {
+            this.plugin.getScheduler().runAtLocationLater(player.getLocation(),
+                    () -> apply(player), 2L);
+        }
+    }
+
+    /**
+     * Ensures the below name objective exists on the main scoreboard.
+     */
+    private org.bukkit.scoreboard.Objective belowNameObjective() {
+        try {
+            Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+            org.bukkit.scoreboard.Objective objective = scoreboard.getObjective("zessentials_bn");
+            if (objective == null) {
+                org.bukkit.scoreboard.Criteria criteria = "HEALTH".equals(this.belowNameMode)
+                        ? org.bukkit.scoreboard.Criteria.HEALTH
+                        : org.bukkit.scoreboard.Criteria.DUMMY;
+                objective = scoreboard.registerNewObjective("zessentials_bn", criteria,
+                        this.belowNameDisplay, org.bukkit.scoreboard.RenderType.INTEGER);
+            }
+            objective.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.BELOW_NAME);
+            return objective;
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     /**
@@ -135,6 +193,23 @@ public class NameTagModule extends ZModule {
             }
         } catch (Throwable ignored) {
             // Scoreboard manager unavailable during early joins
+        }
+
+        // Below name objective
+        if (this.belowNameEnabled) {
+            org.bukkit.scoreboard.Objective objective = belowNameObjective();
+            if (objective != null && "PLACEHOLDER".equals(this.belowNameMode)) {
+                String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
+                try {
+                    objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        // Spectator tab name override
+        if (this.spectatorEnabled && player.getGameMode() == org.bukkit.GameMode.SPECTATOR) {
+            player.playerListName(this.spectatorTabName);
         }
     }
 

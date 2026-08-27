@@ -42,3 +42,19 @@ groups:
     prefix: ""
     suffix: ""
     tab-name-format: "&7%player%"
+
+# ── Below name objective ──────────────────────────────────────
+# Shows a number below every player nametag.
+# mode: HEALTH (auto sync, no task needed) or PLACEHOLDER (refreshed on timer)
+belowname:
+  enabled: true
+  mode: HEALTH
+  display-name: "&#ff4d4d♥ Health"
+  # Only used when mode is PLACEHOLDER, PAPI placeholders with player context
+  placeholder: "%player_health%"
+
+# ── Spectator fix ─────────────────────────────────────────────
+# Players in spectator mode get a gray tab name instead of their normal one.
+spectator:
+  enabled: true
+  tab-name-format: "&8&oSpectator"
