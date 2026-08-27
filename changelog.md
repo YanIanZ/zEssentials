@@ -6,6 +6,8 @@
 
 # 1.0.4.0
 
+- Added a **Discord bridge** (`modules/discordbridge/config.yml`, disabled by default): forwards every public chat message to the main discord text channel through a soft reflection hook into DiscordSRV, without any compile time dependency; stays idle with clear logs when DiscordSRV is missing
+
 - Added a **network chat relay** (`modules/bungeechat/config.yml`, disabled by default): public chat is broadcast across BungeeCord/Velocity networks through the plugin messaging channel with a configurable `%server% %player% %message%` format
 - Polished `/r`: answering without a previous private message now explains it instead of failing silently
 

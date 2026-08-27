@@ -1,0 +1,16 @@
+########################################################################################################################
+#
+# zEssentials - Discord bridge
+# Sends every public chat message of this server to the main Discord
+# text channel through the DiscordSRV plugin when it is installed.
+#
+########################################################################################################################
+
+enable: false
+
+# Format of the line forwarded to Discord,
+# %server% %player% and %message% are available.
+format: "**%player%** (on %server%): %message%"
+
+# Min length of a message to be forwarded
+min-length: 1

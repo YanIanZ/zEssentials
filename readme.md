@@ -62,7 +62,7 @@ Sorted by priority:
 - [x] Staff notes: /note add <player> <text>, /notes <player>, /notes clear <player> persisted in json
 - [x] Report system: /report <player> <reason> with cooldown, staff alerts with teleport click, /reports list with resolve buttons
 - [x] Chat bubbles above players: text displays with configurable duration, y offset, stacking, background ARGB and scale
-- [ ] DiscordSRV bridge sync
+- [x] DiscordSRV outbound bridge (chat forwarded to the main discord channel via reflection, zero hard dependency)
 - [x] BungeeCord/Velocity chat relay (modules/bungeechat/config.yml): public chat broadcast through the plugin messaging channel, both ends need the module enabled — messages from other servers keep their colors and display the origin server name
 
 - [x] Command /tpaall
