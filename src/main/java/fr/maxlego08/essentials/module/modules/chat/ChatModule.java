@@ -411,8 +411,7 @@ public class ChatModule extends ZModule {
                 if (customizationModule != null) {
                     String tagText = customizationModule.resolveTagText(player.getUniqueId());
                     if (!tagText.isEmpty()) {
-                        chatFormatWithTag = dev.yanianz.essentials.util.ColorUtil.sections(tagText)
-                                + " " + chatFormat;
+                        chatFormatWithTag = tagText + " " + chatFormat;
                     }
                 }
             } catch (Exception ignored) {
@@ -438,7 +437,7 @@ public class ChatModule extends ZModule {
             if (module != null) {
                 String nickname = module.getNickname(player.getUniqueId());
                 if (nickname != null && !nickname.isEmpty()) {
-                    return dev.yanianz.essentials.util.ColorUtil.sections(nickname);
+                    return nickname;
                 }
             }
         } catch (Exception ignored) {
@@ -565,7 +564,7 @@ public class ChatModule extends ZModule {
                         plain(getMessage(Message.CHAT_MESSAGES_LINE, "%date%", format(dto.created_at()), "%message%", dto.content())));
                 line = line.append(Component.text(" §8[§c✖§8]")
                         .hoverEvent(HoverEvent.showText(Component.text("§cDelete this message")))
-                        .clickEvent(ClickEvent.runCommand("/essentials:chathistory " + targetName + " delete " + globalIndex + " " + page)));
+                        .clickEvent(ClickEvent.runCommand("/chathistory " + targetName + " delete " + globalIndex + " " + page)));
                 sender.sendMessage(line);
             }
 

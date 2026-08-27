@@ -468,17 +468,17 @@ public class ZUser extends ZUtils implements User {
                 location.setPitch(toLocation.getPitch());
             }
 
-            this.teleportNow(location);
-
-            // Guaranteed teleport ring even when the platform skips the event
+            // Play the "from" ring at the current location before teleporting
             try {
-                var effects = this.plugin.getModuleManager().getModule(
+                var effectsModule = this.plugin.getModuleManager().getModule(
                         fr.maxlego08.essentials.module.modules.effects.EffectsModule.class);
-                if (effects != null && effects.enabledNow() && effects.teleportEnabled()) {
-                    effects.playDirectTeleport(player, location, location);
+                if (effectsModule != null && effectsModule.enabledNow() && effectsModule.teleportEnabled()) {
+                    effectsModule.playDirectTeleport(player, player.getLocation(), location);
                 }
             } catch (Exception ignored) {
             }
+
+            this.teleportNow(location);
 
             if (message != null) {
                 message(this, message, args);

@@ -140,7 +140,7 @@ public class ReportsModule extends ZModule {
         Component clickable = alert
                 .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
                         legacy("&7Report &f#" + id + " &8• &7Click to teleport to the target")))
-                .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/essentials:reports tp " + id));
+                .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/reports tp " + id));
 
         for (Player moderator : Bukkit.getOnlinePlayers()) {
             if (moderator.hasPermission("essentials.report.view")) {

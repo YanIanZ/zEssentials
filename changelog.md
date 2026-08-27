@@ -17,6 +17,13 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.1.0.0
 
+- **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly
+- **Fixed** tags not showing correctly in chat — tag text is no longer pre-converted to § format, the MiniMessage renderer handles the conversion
+- **Fixed** chat history delete button using a namespaced command path that was not recognized — now uses the direct command path
+- **Fixed** report alert teleport command using a namespaced path that was not recognized
+- Added `/warn <player> <reason...>` command that was missing from the command registry
+- **Fixed** teleport effects: the from/to ring now fires before the teleport executes instead of after
+
 - Belowname PLACEHOLDER mode now updates scores on a configurable timer (`belowname.refresh-seconds`)
 
 - Added **below name objective** (`modules/nametags/config.yml`): shows health or a PAPI placeholder below every player nametag

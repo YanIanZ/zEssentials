@@ -162,6 +162,7 @@ public class CommandLoader {
 
         register("freeze", CommandFreeze.class);
         register("unfreeze", CommandUnfreeze.class);
+        register("warn", CommandWarn.class);
         register("warnings", CommandWarnings.class);
         register("note", CommandNotes.class);
         register("notes", CommandNotes.class, "notelist");

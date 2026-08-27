@@ -797,6 +797,7 @@ reputation-already: "<error>You already gave reputation to this player recently&
 raid-alert:
   type: WITHOUT_PREFIX
   message: "&#ff4d4d&l⚠ RAID ALERT&#ffffff: %amount% similar messages detected &8«&7&o%message%&8»"
+description-warn: "Issue a warning to a player"
 description-warnings: "List the warnings of a player"
 warnings-header: "&8&m--------&#ff4d4d Warnings of &f%player% &8(&f%count%&8) &8&m--------"
 warnings-line: " &#ff9d4d• &7[%date%] &f%reason%"
