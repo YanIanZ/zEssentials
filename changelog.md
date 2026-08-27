@@ -6,6 +6,10 @@
 
 # 1.0.4.0
 
+- Added a reusable **screen factory** (`dev.yanianz.essentials.screens`) for list style inventories with pagination, control row and slot bound click callbacks; other plugins can reuse it through `EssentialsScreens.get().factory()`
+- Added `/baltopgui [economy]`: the balance top as a paginated player head screen
+- Added `/warpgui`: every permitted warp as a clickable entry teleporting on click
+
 - Added a **chat customization** module (`/chatcolor` and `/tags`): guis to pick a chat color (16 colors, bold and italic with a permission), decorations are toggleable and every choice is saved in json and applied live in the rendered chat; configurable prefix **tags** with per tag permissions (`modules/chatcustomization/config.yml`)
 
 - Added a **nickname** module (`/nick`): colored display names with length/character validation, impersonation protection, a change cooldown (`essentials.nicknames.bypass.cooldown`) and json persistence re-applied on join; staff target others with `/nick <player> <name|off>`

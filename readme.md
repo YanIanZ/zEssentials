@@ -35,13 +35,12 @@ Sorted by priority:
 - [x] Accepted players remembered (storage + `/terms reset` admin command)
 
 ## Screens integration (custom screen everywhere)
-- [ ] Framework: reusable `ScreenFactory` so every list GUI is a zMenu custom screen with configurable layout
-- [ ] `/warp` and `/warps` open a custom screen (per-warp icon, category pages)
-- [ ] Homes overview as a custom screen (icon per home, favorite pinning)
-- [ ] Kits overview as a custom screen
-- [ ] Baltop as a custom screen (paginated heads)
-- [ ] Public API: addons can register their own screens from code
-- [ ] `/terms` GUI variant reusing the custom screens framework
+- [x] Framework: reusable `ScreenFactory` with pagination and slot-bound clicks (dev.yanianz.essentials.screens)
+- [x] Baltop as a custom screen (/baltopgui [economy], paginated heads)
+- [x] Warps as a custom screen (/warpgui, permission filtered)
+- [x] Public API: addons reuse ScreenFactory through EssentialsScreens.get().factory()
+- [/] Homes and kits already ship zMenu inventory layouts, migrate them on top of the factory later
+- [ ] Category support inside the factory pages
 
 ## Chat module v2
 - [x] Type [inv]/[inventory] to show your inventory (hover items, click copy)

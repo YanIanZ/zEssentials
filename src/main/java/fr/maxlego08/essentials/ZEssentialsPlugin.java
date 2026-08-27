@@ -256,6 +256,8 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
             new FlyTask(this);
         }
 
+        dev.yanianz.essentials.screens.EssentialsScreens.register(this);
+
         this.printEnableBanner();
     }
 

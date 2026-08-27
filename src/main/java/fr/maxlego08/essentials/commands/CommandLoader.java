@@ -190,6 +190,9 @@ public class CommandLoader {
         register("chatslowmode", CommandChatSlowmode.class);
         register("chatgames", CommandChatGames.class);
         register("poll", CommandPoll.class);
+
+        register("baltopgui", dev.yanianz.essentials.screens.CommandBaltopGui.class);
+        register("warpgui", dev.yanianz.essentials.screens.CommandWarpsGui.class);
         register("rep", CommandRepGive.class);
         register("reputation", CommandReputationView.class);
         register("showitem", CommandShowItem.class);
