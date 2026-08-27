@@ -1,4 +1,4 @@
-# zEssentials 1.0.4.0 — Checklist Pengujian Lengkap
+# zEssentials 1.1.1 — Checklist Pengujian Lengkap
 
 > Server: Paper / fork berbasis 26.2 • Java 21+ (test bench memakai Java 25)
 > Tandai ✔ setelah setiap item lolos. Laporkan deviasi console ke developer.
