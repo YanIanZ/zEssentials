@@ -31,6 +31,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,6 +53,9 @@ public class ChatModule extends ZModule {
 
     private final List<ShowItem> showItems = new ArrayList<>();
     private final List<ChatDisplay> chatDisplays = new ArrayList<>();
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private final java.util.Map<String, String> emojiShortcuts = new java.util.LinkedHashMap<>();
     private final ExpiringCache<UUID, List<ChatMessageDTO>> chatMessagesCache = new ExpiringCache<>(1000 * 60);
     private final Pattern urlPattern = Pattern.compile("(https?://[\\w-\\.]+(\\:[0-9]+)?(/[\\w-./?%&=~+#]*)?)", Pattern.CASE_INSENSITIVE);
     private final List<ChatCooldown> chatCooldowns = new ArrayList<>();
@@ -77,6 +81,12 @@ public class ChatModule extends ZModule {
     private boolean enableAlphanumericRegex;
     private boolean enableLinkRegex;
     private boolean enableChatDynamicCooldown;
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private int slowmodeSeconds;
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private final java.util.Map<java.util.UUID, Long> slowmodeTimestamps = new java.util.HashMap<>();
     private boolean enableSameMessageCancel;
     private boolean enableChatFormat;
     private boolean enablePing;
@@ -132,6 +142,19 @@ public class ChatModule extends ZModule {
                     mentionConfig.getString("mention-placeholder.hover-self", "&6Someone mentioned you!"),
                     mentionConfig.getString("mention-placeholder.hover-other", "&7Click to message them")
             );
+            this.mentionDisplay.setDndCheck(viewer -> {
+                var dndUser = this.plugin.getUser(viewer.getUniqueId());
+                return dndUser != null && dndUser.getOption(fr.maxlego08.essentials.api.user.Option.CHAT_DND);
+            });
+        }
+
+        // Emoji shortcuts like :heart: replaced with their symbol
+        this.emojiShortcuts.clear();
+        ConfigurationSection emojiSection = getConfiguration().getConfigurationSection("emoji-shortcuts");
+        if (emojiSection != null) {
+            for (String key : emojiSection.getKeys(false)) {
+                this.emojiShortcuts.put(java.util.regex.Pattern.quote(key), emojiSection.getString(key, key));
+            }
         }
 
         Pattern pattern = Pattern.compile("[!?#]?[a-z0-9_-]*");
@@ -221,6 +244,9 @@ public class ChatModule extends ZModule {
             isGlobalChat = true;
             message = message.substring(1).stripLeading();
         }
+        for (java.util.Map.Entry<String, String> entry : this.emojiShortcuts.entrySet()) {
+            message = message.replaceAll(entry.getKey(), java.util.regex.Matcher.quoteReplacement(entry.getValue()));
+        }
         final String minecraftMessage = message;
 
         Optional<CustomRules> optional = this.customRules.stream().filter(rule -> rule.match(player, minecraftMessage)).findFirst();
@@ -293,6 +319,15 @@ public class ChatModule extends ZModule {
         }
     }
 
+    public int getSlowmodeSeconds() {
+        return this.slowmodeSeconds;
+    }
+
+    public void setSlowmodeSeconds(int seconds) {
+        this.slowmodeSeconds = Math.max(0, seconds);
+        this.slowmodeTimestamps.clear();
+    }
+
     public ChatResult analyzeMessage(User user, String message) {
         Player player = user.getPlayer();
 
@@ -307,6 +342,18 @@ public class ChatModule extends ZModule {
         double cooldown = handleCooldown(user);
         if (this.enableChatDynamicCooldown && cooldown > 0 && !hasPermission(player, Permission.ESSENTIALS_CHAT_BYPASS_DYNAMIC_COOLDOWN)) {
             return new ChatResult(false, Message.CHAT_COOLDOWN, "%cooldown%", TimerBuilder.getStringTime(cooldown));
+        }
+
+        // Flat slowmode set by staff with /chatslowmode
+        if (this.slowmodeSeconds > 0 && !hasPermission(player, Permission.ESSENTIALS_CHAT_BYPASS_SLOWMODE)) {
+            long now = System.currentTimeMillis();
+            long last = this.slowmodeTimestamps.getOrDefault(player.getUniqueId(), 0L);
+            long wait = this.slowmodeSeconds * 1000L - (now - last);
+            if (wait > 0) {
+                return new ChatResult(false, Message.COMMAND_CHAT_SLOWMODE_WAIT,
+                        "%cooldown%", TimerBuilder.getStringTime(wait));
+            }
+            this.slowmodeTimestamps.put(player.getUniqueId(), now);
         }
 
         String lastMessage = user.getLastMessage();

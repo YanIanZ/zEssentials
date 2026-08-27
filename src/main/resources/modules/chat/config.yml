@@ -251,6 +251,19 @@ command-placeholder: # ./<command>. placeholder
   enable-replace-all-message: false
 
 # Allows to define custom rules with regex
+# Emoji shortcuts replaced inside every chat message
+emoji-shortcuts:
+  ":heart:": "❤"
+  ":star:": "★"
+  ":check:": "✔"
+  ":x:": "✘"
+  ":warn:": "⚠"
+  ":fire:": "🔥"
+  ":skull:": "💀"
+  ":sparkles:": "✨"
+  ":clap:": "👏"
+  ":100:": "💯"
+
 custom-rules:
   - regex: "(can|may|would you like if) i (have|be|become|get|has) (op|admin|mod|builder)"
     permission: "essentials.chat.bypass.custom.rules"

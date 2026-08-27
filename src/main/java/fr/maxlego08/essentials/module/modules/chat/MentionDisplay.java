@@ -28,11 +28,17 @@ public class MentionDisplay implements ChatDisplay {
     private final String hoverSelf;
     private final String hoverOther;
 
+    private java.util.function.Predicate<Player> dndCheck = p -> false;
+
     public MentionDisplay(boolean notify, String soundName, String hoverSelf, String hoverOther) {
         this.notify = notify;
         this.soundName = soundName;
         this.hoverSelf = hoverSelf;
         this.hoverOther = hoverOther;
+    }
+
+    public void setDndCheck(java.util.function.Predicate<Player> dndCheck) {
+        this.dndCheck = dndCheck;
     }
 
     /**
@@ -84,8 +90,11 @@ public class MentionDisplay implements ChatDisplay {
         rewritten.setLength(0);
         rewritten.append(foundAny ? buffer : message);
 
-        if (foundAny && this.notify && viewer != null
-                && buffer.toString().toLowerCase(Locale.ROOT).contains("<mention_" + viewer.getName().toLowerCase(Locale.ROOT) + ">")) {
+        boolean mentioned = foundAny && viewer != null
+                && buffer.toString().toLowerCase(Locale.ROOT)
+                        .contains("<mention_" + viewer.getName().toLowerCase(Locale.ROOT) + ">");
+
+        if (mentioned && this.notify && !this.dndCheck.test(viewer)) {
             viewer.playSound(viewer.getLocation(), resolveSound(), 1f, 1.4f);
         }
 

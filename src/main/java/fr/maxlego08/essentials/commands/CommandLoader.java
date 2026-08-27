@@ -171,6 +171,8 @@ public class CommandLoader {
         register("chatenable", CommandChatEnable.class, "ce");
         register("chatdisable", CommandChatDisable.class, "cd");
         register("broadcast", CommandChatBroadcast.class, "bc");
+        register("dnd", CommandChatDnd.class);
+        register("chatslowmode", CommandChatSlowmode.class);
         register("showitem", CommandShowItem.class);
         register("pingsound", CommandPingSound.class, "pingsounds");
 
