@@ -42,6 +42,33 @@ Sorted by priority:
 - [/] Homes and kits already ship zMenu inventory layouts, migrate them on top of the factory later
 - [x] Category support: openCategorized(player, title, rows, LinkedHashMap<category, items>) with picker page + back navigation
 
+## Next release candidates (parity inspirations)
+
+Inspired by CMILib (https://github.com/Zrips/CMILib):
+- [ ] `/cmi itemname` style advanced item editing (glow, unbreakable, custom model data)
+- [ ] Anvil text input reuse for more prompts (home rename, note title)
+- [ ] More player placeholders (statistics deep dive, timed commands)
+- [ ] `/cmiKit` style kit claim-all button in the preview screen
+
+Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
+- [ ] Tab-list scoreboard system: per world/group headers, footers and layouts
+- [ ] Nametag rendering control (visibility, prefix/suffix lines above head)
+- [ ] Team based sorting of the tab list (group -> priority ladder)
+- [ ] Header/footer animation frames with per tick swap
+
+Inspired by FancyHolograms (https://github.com/FancyMcPlugins/FancyHolograms) — migration of the hologram module:
+- [ ] Text/item holograms built on display entities (background, shadow, billboard modes)
+- [ ] Per line editing, rotation, scale, brightness controls
+- [ ] Autosave + reload without flicker
+
+Small quality features:
+- [ ] `/eat` fills hunger instantly
+- [ ] `/feed all` alias already exists through `*`
+- [ ] `/ping` shortcut into the ping placeholder output
+- [ ] `/near <radius>` optional radius argument
+- [ ] `/xyz` copies coordinates to clipboard with formatted colors
+- [ ] `/rules` alias into terms screen after acceptance flow
+
 ## Chat module v2
 - [x] Type [inv]/[inventory] to show your inventory (hover items, click copy)
 - [x] Type [ender]/[ec] to show your ender chest

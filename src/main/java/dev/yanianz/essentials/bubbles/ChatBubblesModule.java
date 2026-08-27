@@ -46,14 +46,16 @@ public class ChatBubblesModule extends ZModule {
         super(plugin, "bubbles");
     }
 
-    /** One floating bubble with its follow task. */
+    /** One floating bubble mounted on the player. */
     private static final class ActiveBubble {
         final TextDisplay display;
-        final com.tcoded.folialib.wrapper.task.WrappedTask followTask;
 
-        ActiveBubble(TextDisplay display, com.tcoded.folialib.wrapper.task.WrappedTask followTask) {
+        ActiveBubble(TextDisplay display) {
             this.display = display;
-            this.followTask = followTask;
+        }
+
+        boolean dead() {
+            return !this.display.isValid();
         }
     }
 
@@ -96,29 +98,17 @@ public class ChatBubblesModule extends ZModule {
                 .computeIfAbsent(player.getUniqueId(), k -> new ArrayDeque<>());
 
         // Purge dead displays so stacking stays correct
-        bubbles.removeIf(bubble -> !bubble.display.isValid());
+        bubbles.removeIf(ActiveBubble::dead);
 
-        // Replaced display keywords have no meaning inside a bubble
+        // Display keywords like [inv] have no meaning inside a bubble
         String content = plainContent.replaceAll("(?i)\\[(item|i|inv|inventory|ender|ec|pos|position)]", " ");
         content = applyEmojis(content).trim();
         if (content.isEmpty()) return;
         final String finalContent = content;
 
-        try {
-            var chatModule = this.plugin.getModuleManager().getModule(fr.maxlego08.essentials.module.modules.chat.ChatModule.class);
-            if (chatModule != null) {
-                for (Map.Entry<String, String> entry : chatModule.getEmojiShortcuts().entrySet()) {
-                    content = content.replaceAll(entry.getKey(), java.util.regex.Matcher.quoteReplacement(entry.getValue()));
-                }
-            }
-        } catch (Exception ignored) {
-        }
-        if (content.isEmpty()) return;
+        float seatOffset = (float) (this.yOffset - 1.6 + bubbles.size() * this.stackOffset);
 
-        float height = (float) (this.yOffset + bubbles.size() * this.stackOffset);
-        Location startLocation = headLocation(player);
-
-        TextDisplay display = player.getWorld().spawn(startLocation, TextDisplay.class, textDisplay -> {
+        TextDisplay display = player.getWorld().spawn(player.getLocation(), TextDisplay.class, textDisplay -> {
             textDisplay.text(ColorUtil.component(finalContent));
             textDisplay.setBillboard(Billboard.CENTER);
             textDisplay.setBackgroundColor(parseColor(this.backgroundHex));
@@ -128,33 +118,34 @@ public class ChatBubblesModule extends ZModule {
             textDisplay.setPersistent(false);
             textDisplay.setViewRange(1.0f);
 
+            // Passenger anchor sits around the chest, raise the bubble to the head
             textDisplay.setTransformation(new org.bukkit.util.Transformation(
-                    new Vector3f(-(float)(finalContent.length() * 0.15f / 2), 0, 0),
+                    new Vector3f(0, seatOffset, 0),
                     new Quaternionf(new AxisAngle4f()),
                     new Vector3f(this.scale, this.scale, this.scale),
                     new Quaternionf(new AxisAngle4f())));
+            textDisplay.setInterpolationDelay(0);
+            textDisplay.setInterpolationDuration(4);
         });
 
-        // Follow task: glue the bubble to the player head until it expires
-        final float finalHeight = height;
-        var followTask = this.plugin.getScheduler().runAtLocationTimer(player.getLocation(), new Runnable() {
-            @Override
-            public void run() {
-                if (!display.isValid() || !player.isOnline()) return;
-                Location target = headLocation(player).add(0, finalHeight, 0);
-                display.teleport(target);
-            }
-        }, 2L, 2L);
+        try {
+            player.addPassenger(display);
+        } catch (Throwable throwable) {
+            display.remove();
+            return;
+        }
 
-        bubbles.addLast(new ActiveBubble(display, followTask));
+        ActiveBubble bubble = new ActiveBubble(display);
+        bubbles.addLast(bubble);
 
-        this.plugin.getScheduler().runLater(() -> removeBubble(player.getUniqueId(), bubbles, bubbles.peekLast()), this.durationMillis * 20L);
+        this.plugin.getScheduler().runLater(
+                () -> removeBubble(bubbles, bubble), this.durationMillis * 20L + 20L);
     }
 
-    private void removeBubble(UUID uniqueId, Deque<ActiveBubble> bubbles, ActiveBubble bubble) {
+    /** Removes one expired bubble. */
+    private void removeBubble(Deque<ActiveBubble> bubbles, ActiveBubble bubble) {
         if (bubble == null) return;
         bubbles.remove(bubble);
-        bubble.followTask.cancel();
         removeEntity(bubble.display);
     }
 
@@ -171,7 +162,6 @@ public class ChatBubblesModule extends ZModule {
         if (bubbles == null) return;
 
         for (ActiveBubble bubble : bubbles) {
-            bubble.followTask.cancel();
             removeEntity(bubble.display);
         }
     }
@@ -184,10 +174,7 @@ public class ChatBubblesModule extends ZModule {
     }
 
     private void clearAll() {
-        this.activeBubbles.values().forEach(bubbles -> bubbles.forEach(bubble -> {
-            bubble.followTask.cancel();
-            removeEntity(bubble.display);
-        }));
+        this.activeBubbles.values().forEach(bubbles -> bubbles.forEach(bubble -> removeEntity(bubble.display)));
         this.activeBubbles.clear();
     }
 

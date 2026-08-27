@@ -74,6 +74,11 @@ public class EffectsModule extends ZModule {
         this.blessingEnabled = configuration.getBoolean("blessing.enabled", true);
         this.blessingParticle = particle(configuration.getString("blessing.particle", "TOTEM_OF_UNDYING"));
         this.blessingSound = sound(configuration.getString("blessing.sound", "ENTITY_PLAYER_LEVELUP"));
+
+        this.plugin.getLogger().info("Effects loaded: teleport=" + this.teleportParticle
+                + " gamemode=" + this.gamemodeParticle
+                + " fly=" + this.flyParticle
+                + " blessing=" + this.blessingParticle);
     }
 
     /**

@@ -23,7 +23,7 @@ public class CommandFlyAdd extends VCommand {
     protected CommandResultType perform(EssentialsPlugin plugin) {
 
         String userName = this.argAsString(0);
-        long seconds = this.argAsLong(1);
+        long seconds = stringToDuration(this.argAsString(1)).getSeconds();
 
         fetchUniqueId(userName, uniqueId -> {
             var storage = plugin.getStorageManager().getStorage();
