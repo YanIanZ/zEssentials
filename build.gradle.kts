@@ -139,8 +139,11 @@ tasks {
 
     processResources {
         from("resources")
+        // Force re-expansion whenever the release version changes,
+        // otherwise up-to-date caches can ship a stale plugin.yml
+        inputs.property("pluginVersion", project.version.toString())
         filesMatching("plugin.yml") {
-            expand("version" to project.version)
+            expand("version" to project.version.toString())
         }
     }
 }
