@@ -84,7 +84,7 @@ allprojects {
 
 dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.2.build.119-stable")
 
     implementation("dev.faststats.metrics:bukkit:0.29.4") {
         exclude(group = "com.google.code.gson", module = "gson")

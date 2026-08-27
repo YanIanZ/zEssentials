@@ -265,16 +265,28 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
     private void printEnableBanner() {
 
         long ms = System.currentTimeMillis() - this.serverStartUptime;
-        String line = "§8§m                                                                            ";
+        String line = "§8" + "━".repeat(62);
 
-        this.getLogger().info(line);
-        this.getLogger().info("   " + hexGradient("zESSENTIALS", "#00d4ff", "#7b2fff") + " §f" + this.getDescription().getVersion()
-                + " §8» §aenabled §7in §f" + ms + "ms");
-        this.getLogger().info("   §7" + this.commandManager.countCommands() + " commands §8• §7"
-                + this.moduleManager.getModules().size() + " modules §8• §7java §f"
-                + System.getProperty("java.version") + " §8• §7" + Bukkit.getBukkitVersion());
-        this.getLogger().info("   §7author §fYanIanZ §8• §7docs §fdocs.zessentials.groupez.dev");
-        this.getLogger().info(line);
+        console(line);
+        console("");
+        console("   " + hexGradient("zEssentials", "#00d4ff", "#7b2fff") + "§l " + hexGradient("◆", "#00d4ff", "#7b2fff")
+                + " §f" + this.getDescription().getVersion() + " §8» §a✔ enabled §7in §f" + ms + "ms");
+        console("   §7" + this.commandManager.countCommands() + " §fcommands " + hexGradient("•", "#00d4ff", "#7b2fff")
+                + " §7" + this.moduleManager.getModules().size() + " §fmodules " + hexGradient("•", "#00d4ff", "#7b2fff")
+                + " §7java §f" + System.getProperty("java.version") + hexGradient(" •", "#00d4ff", "#7b2fff")
+                + " §f" + Bukkit.getBukkitVersion());
+        console("   §7author §fYanIanZ" + hexGradient(" •", "#00d4ff", "#7b2fff")
+                + " §7docs §fdocs.zessentials.groupez.dev");
+        console(line);
+    }
+
+    /**
+     * Sends a line to the console as a component, so legacy and §x rgb codes
+     * are rendered as real colors instead of being printed raw.
+     */
+    private void console(String legacy) {
+        this.getComponentLogger().info(
+                net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(legacy));
     }
 
     /**
@@ -347,10 +359,11 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
         if (this.context != null) context.shutdown();
 
-        String line = "§8§m                                                                          ";
-        this.getLogger().info(line);
-        this.getLogger().info("  §b§lzEssentials §7has been §cdisabled§7, see you soon!");
-        this.getLogger().info(line);
+        String line = "§8" + "━".repeat(62);
+        console(line);
+        console("   " + hexGradient("zEssentials", "#00d4ff", "#7b2fff") + "§l " + hexGradient("◆", "#00d4ff", "#7b2fff")
+                + " §f" + this.getDescription().getVersion() + " §8» §c✘ disabled§7, see you soon!");
+        console(line);
     }
 
     private void registerButtons() {
@@ -463,7 +476,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
         try {
             commandMarkdownGenerator.generateMarkdownFile(this.commandManager.getSortCommands(), fileCommand.toPath());
-            getLogger().info("Markdown 'commands.md' file successfully generated!");
+            getLogger().fine("Generated commands.md");
         } catch (IOException exception) {
             getLogger().severe("Error while writing the file commands: " + exception.getMessage());
             exception.printStackTrace();
@@ -471,7 +484,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
         try {
             placeholderMarkdownGenerator.generateMarkdownFile(((LocalPlaceholder) this.placeholder).getAutoPlaceholders(), filePlaceholder.toPath());
-            getLogger().info("Markdown 'placeholders.md' file successfully generated!");
+            getLogger().fine("Generated placeholders.md");
         } catch (IOException exception) {
             getLogger().severe("Error while writing the file placeholders: " + exception.getMessage());
             exception.printStackTrace();
@@ -497,7 +510,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
             }
 
             permissionMarkdownGenerator.generateMarkdownFile(permissions, filePermissions.toPath());
-            getLogger().info("Markdown 'permissions.md' file successfully generated!");
+            getLogger().fine("Generated permissions.md");
         } catch (IOException exception) {
             getLogger().severe("Error while writing the file permissions: " + exception.getMessage());
             exception.printStackTrace();
@@ -865,6 +878,6 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         }
 
         this.permissionCheckers.add(new fr.maxlego08.essentials.hooks.BukkitEventPermissionChecker());
-        this.getLogger().info("Register Bukkit Event Permission Checker.");
+        this.getLogger().fine("Registered Bukkit event permission checker.");
     }
 }

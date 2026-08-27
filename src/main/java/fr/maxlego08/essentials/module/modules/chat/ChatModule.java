@@ -59,6 +59,7 @@ public class ChatModule extends ZModule {
     private final List<ChatPlaceholder> chatPlaceholders = new ArrayList<>();
     private final List<CustomRules> customRules = new ArrayList<>();
     private ChatDisplay pingDisplay;
+    private fr.maxlego08.essentials.module.modules.chat.MentionDisplay mentionDisplay;
     private String alphanumericRegex;
     private String linkRegex;
     private String pubRegex;
@@ -123,6 +124,16 @@ public class ChatModule extends ZModule {
             this.pingDisplay = new PlayerPingDisplay(this.plugin, this.playerPingColor, this.playerPingColorOther, pingSoundOption);
         }
 
+        YamlConfiguration mentionConfig = getConfiguration();
+        if (mentionConfig.getBoolean("mention-placeholder.enable", true)) {
+            this.mentionDisplay = new fr.maxlego08.essentials.module.modules.chat.MentionDisplay(
+                    mentionConfig.getBoolean("mention-placeholder.sound-enabled", true),
+                    mentionConfig.getString("mention-placeholder.sound", "ENTITY_EXPERIENCE_ORB_PICKUP"),
+                    mentionConfig.getString("mention-placeholder.hover-self", "&6Someone mentioned you!"),
+                    mentionConfig.getString("mention-placeholder.hover-other", "&7Click to message them")
+            );
+        }
+
         Pattern pattern = Pattern.compile("[!?#]?[a-z0-9_-]*");
         this.chatPlaceholders.forEach(chatPlaceholder -> {
             Matcher matcher = pattern.matcher(chatPlaceholder.name());
@@ -141,6 +152,34 @@ public class ChatModule extends ZModule {
                     configuration.getString("item-placeholder.result"),
                     configuration.getString("item-placeholder.permission"),
                     configuration.getString("item-placeholder.item-name-regex", configuration.getString("alphanumeric-regex"))
+            ));
+        }
+
+        if (configuration.getBoolean("inventory-placeholder.enable", true)) {
+            this.chatDisplays.add(new ItemListDisplay(
+                    configuration.getString("inventory-placeholder.regex", "(?i)\\[inv\\]|\\[inventory\\]"),
+                    "inventory_display",
+                    "INVENTORY",
+                    configuration.getString("inventory-placeholder.permission", "zessentials.chat.placeholder.inventory"),
+                    player -> player.getInventory().getStorageContents()
+            ));
+        }
+
+        if (configuration.getBoolean("enderchest-placeholder.enable", true)) {
+            this.chatDisplays.add(new ItemListDisplay(
+                    configuration.getString("enderchest-placeholder.regex", "(?i)\\[ender\\]|\\[ec\\]"),
+                    "ender_display",
+                    "ENDER CHEST",
+                    configuration.getString("enderchest-placeholder.permission", "zessentials.chat.placeholder.enderchest"),
+                    player -> player.getEnderChest().getContents()
+            ));
+        }
+
+        if (configuration.getBoolean("position-placeholder.enable", true)) {
+            this.chatDisplays.add(new PositionDisplay(
+                    configuration.getString("position-placeholder.regex", "(?i)\\[pos\\]|\\[position\\]"),
+                    configuration.getString("position-placeholder.label", "[<coords>]"),
+                    configuration.getString("position-placeholder.permission", "zessentials.chat.placeholder.position")
             ));
         }
 
@@ -228,13 +267,22 @@ public class ChatModule extends ZModule {
             String localMessage = finalMessage;
 
             boolean isModerator = viewer instanceof Player playerViewer && hasPermission(playerViewer, Permission.ESSENTIALS_CHAT_MODERATOR);
+
+            TagResolver.Builder localBuilder = TagResolver.builder().resolver(builder.build());
+            String renderMessage = localMessage;
+
             if (viewer instanceof Player playerViewer) {
                 if (this.pingDisplay != null) {
-                    localMessage = this.pingDisplay.display(paperComponent, builder, player, playerViewer, localMessage);
+                    renderMessage = this.pingDisplay.display(paperComponent, localBuilder, player, playerViewer, renderMessage);
+                }
+                if (this.mentionDisplay != null && this.mentionDisplay.hasPermission(playerViewer)) {
+                    StringBuilder rewritten = new StringBuilder(renderMessage);
+                    this.mentionDisplay.process(player, playerViewer, renderMessage, rewritten, localBuilder);
+                    renderMessage = rewritten.toString();
                 }
             }
 
-            Tag tag = Tag.inserting(paperComponent.translateText(player, localMessage, builder.build()));
+            Tag tag = Tag.inserting(paperComponent.translateText(player, renderMessage, localBuilder.build()));
             String moderatorAction = (isModerator && viewer instanceof Player playerMod) ? papi(getMessage(this.moderatorAction, "%player%", player.getName()), playerMod) : "";
             return paperComponent.getComponentMessage(chatFormat, TagResolver.resolver("message", tag), "%displayName%", player.getDisplayName(), "%player%", player.getName(), "%moderator_action%", moderatorAction);
         });

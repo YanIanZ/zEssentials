@@ -133,7 +133,7 @@ public abstract class Arguments extends ZUtils {
      */
     protected double argAsDouble(int index, double defaultValue) {
         try {
-            return Double.valueOf(argAsString(index).replace(",", "."));
+            return parseCompactNumber(argAsString(index));
         } catch (Exception ignored) {
             return defaultValue;
         }
@@ -141,12 +141,13 @@ public abstract class Arguments extends ZUtils {
 
     /**
      * Converts and returns the argument at the specified index as a double.
+     * Supports magnitude suffixes: 1k, 1.5m, 2b, 3t.
      *
      * @param index The index of the argument to convert, adjusted by parent command count.
      * @return The argument converted to a double.
      */
     protected double argAsDouble(int index) {
-        return Double.valueOf(argAsString(index).replace(",", "."));
+        return parseCompactNumber(argAsString(index));
     }
 
     /**

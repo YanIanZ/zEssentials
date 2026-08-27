@@ -6,6 +6,12 @@
 
 # 1.0.4.0
 
+- Raised the build to **paper-api 26.2** with full **adventure 5** compatibility
+- Duration arguments now accept every unit with combinations: `30s`, `15m`, `12h`, `7d`, `2w`, `6mo`, `3y`, `1d12h30m` — used by `/fly add|set|remove`, bans and mutes; a plain number stays seconds
+- Economy amounts accept compact magnitudes everywhere: `1k`, `1.5m`, `2b`, `3t`
+- The terms of service screen uses the **native minecraft dialog ui** on 1.21.7+ servers (chest interface kept as fallback for older versions)
+- Added `freeze.persist-across-restarts` (default false): restarts always release frozen players, stale freeze flags from previous sessions are cleaned up automatically on join
+
 - **Reworked the freeze system**: `/freeze <player>` now freezes (idempotent) and a new `/unfreeze <player>` releases; a frozen player cannot move at all, glows blue and is surrounded by a continuous circle of snowflake particles; walk/fly speeds are correctly restored on unfreeze (fixing players stuck unable to move); the sanction GUI freeze button keeps its toggle behavior
 - The main command is now `/essentials` (`/zessentials` kept as alias)
 - The custom screens module moved to the `dev.yanianz.essentials.customscreens` package — all new features now live under `dev.yanianz.essentials`

@@ -45,10 +45,14 @@ public class SanctionModule extends ZModule implements SanctionManager {
 
     private final ExpiringCache<UUID, User> expiringCache = new ExpiringCache<>(1000 * 60 * 60); // 1 hour cache
 
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private static final String FROZEN_TEAM_NAME = "zessentials_frozen";
 
     @fr.maxlego08.essentials.api.configuration.NonLoadable
     private final Map<UUID, com.tcoded.folialib.wrapper.task.WrappedTask> particleTasks = new HashMap<>();
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private boolean persistFreeze;
     // Default messages for kick and ban
     // Do not make those fields final, javac would inline the constant and the configuration would be ignored
     private String kickDefaultReason = "";
@@ -88,6 +92,7 @@ public class SanctionModule extends ZModule implements SanctionManager {
         this.loadInventory("sanction_history");
         this.loadInventory("sanctions");
         this.simpleDateFormat = new SimpleDateFormat(this.dateFormat);
+        this.persistFreeze = getConfiguration().getBoolean("freeze.persist-across-restarts", false);
     }
 
     public String getDateFormat() {
@@ -601,6 +606,14 @@ public class SanctionModule extends ZModule implements SanctionManager {
     public void onJoin(PlayerJoinEvent event) {
         User user = this.getUser(event.getPlayer());
         if (user == null || !user.isFrozen()) return;
+
+        // Freezes are session-only by default, stale flags from a previous
+        // run are cleaned up so nobody stays stuck unable to move
+        if (!this.persistFreeze) {
+            user.setFrozen(false);
+            this.plugin.getStorageManager().getStorage().updateUserFrozen(user.getUniqueId(), false);
+            return;
+        }
 
         Player player = user.getPlayer();
         if (player != null) {

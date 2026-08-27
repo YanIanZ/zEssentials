@@ -26,8 +26,10 @@ public class ClickEvent {
      * @param event The Adventure ClickEvent.
      */
     public ClickEvent(net.kyori.adventure.text.event.ClickEvent event) {
-        this.action = event.action().toString();
-        this.value = event.value();
+        this.action = event.action().name();
+        // Adventure 5 stores the payload as an object, text payloads keep their string value
+        this.value = event.payload() instanceof net.kyori.adventure.text.event.ClickEvent.Payload.Text text
+                ? text.value() : "";
     }
 
     /**

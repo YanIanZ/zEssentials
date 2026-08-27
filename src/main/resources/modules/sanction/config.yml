@@ -89,3 +89,9 @@ current-mute-material: EMERALD_BLOCK
 
 # Material used for ban if it is active
 current-ban-material: DIAMOND_BLOCK
+
+# Freeze:
+# Keep players frozen after a server restart. When false (default), a restart
+# always releases every frozen player so nobody can get stuck unable to move.
+freeze:
+  persist-across-restarts: false

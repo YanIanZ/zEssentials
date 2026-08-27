@@ -180,6 +180,31 @@ chat-placeholders:
     regex: "(?i)\\[pos\\]" # [pos] placeholder
     result: "&bWorld: &f%player_world% &eX: &f%player_x% &eY: &f%player_y% &eZ: &f%player_z%"
     permission: "zessentials.chat.placeholder.pos" # You must define a permission
+  - name: "health" # [health] placeholder
+    regex: "(?i)\\[health\\]"
+    result: "&c❤ &f%player_health%&7/&f%player_max_health%"
+    permission: "zessentials.chat.placeholder.health"
+  - name: "food" # [food] placeholder
+    regex: "(?i)\\[food\\]"
+    result: "&6🍖 &f%player_food_level%&7/20"
+    permission: "zessentials.chat.placeholder.food"
+  - name: "ip" # [ip] placeholder
+    regex: "(?i)\\[ip\\]"
+    result: "&7Join us on &bplay.yourserver.com"
+    permission: "zessentials.chat.placeholder.ip"
+  - name: "store" # [store] placeholder
+    regex: "(?i)\\[store\\]|\\[shop\\]"
+    result: "<hover:show_text:'<yellow>Click to open the store'><click:open_url:'https://store.yourserver.com'>&a&lSTORE</hover></click>"
+    permission: "zessentials.chat.placeholder.store"
+
+# Type @PlayerName in chat to mention them!
+# The mentioned player receives a notification sound and a highlighted name.
+mention-placeholder:
+  enable: true
+  sound-enabled: true
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  hover-self: "&6Someone mentioned you!"
+  hover-other: "&7Click to message them"
 
 # Displays the item in your hand
 item-placeholder:
@@ -189,6 +214,27 @@ item-placeholder:
   permission: "zessentials.chat.placeholder.item" # You must define a permission
   # Regex used to ensure item names do not contain forbidden characters when displayed in chat
   item-name-regex: "^[a-zA-Z0-9_.?!^¨%ù*&é\"#'{(\\[-|èêë`\\\\çà)\\]=}ûî+<>:²€$/\\-\\,-â@;ô ]+$"
+
+# Type [inv] or [inventory] in chat to show off your inventory!
+# Hovering lists every item, clicking copies the content as text.
+inventory-placeholder:
+  enable: true
+  regex: "(?i)\\[inv\\]|\\[inventory\\]"
+  permission: "zessentials.chat.placeholder.inventory"
+
+# Type [ender] or [ec] in chat to show off your ender chest!
+enderchest-placeholder:
+  enable: true
+  regex: "(?i)\\[ender\\]|\\[ec\\]"
+  permission: "zessentials.chat.placeholder.enderchest"
+
+# Type [pos] or [position] in chat to share your location,
+# clicking suggests the /tp command with your coordinates.
+position-placeholder:
+  enable: true
+  regex: "(?i)\\[pos\\]|\\[position\\]"
+  label: "[<coords>]"
+  permission: "zessentials.chat.placeholder.position"
 
 # Allows to replace a text to transform it into clickable text to suggest a command
 # Message: "Please open the auction house with the ./zah" will be transformed into "Please open the auction house with the /zah" with /zah that will be clickable

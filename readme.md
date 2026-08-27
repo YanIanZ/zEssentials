@@ -14,6 +14,10 @@
 Sorted by priority:
 
 ## Fixes
+- [x] Compile against paper-api 26.2 with adventure 5 compatibility (ClickEvent payload/action)
+- [x] Duration parser: 1s/15m/12h/7d/2w/6mo/3y and combinations like 1d12h30m (/fly add, bans...)
+- [x] Economy commands accept compact numbers: 1k, 1.5m, 2b, 3t
+- [x] Terms of service shown as a native mojang dialog screen on 1.21.7+ servers
 - [x] Rework freeze system: separate /freeze and /unfreeze, total immobility, continuous blue particle circle and blue glow
 - [x] Fix fly speed stuck at 0 after unfreeze
 - [x] Fix effects module silently disabled (yaml loader overwriting runtime fields)
@@ -30,7 +34,19 @@ Sorted by priority:
 - [x] Kick players who refuse or ignore the terms (configurable timeout)
 - [x] Accepted players remembered (storage + `/terms reset` admin command)
 
+## Screens integration (custom screen everywhere)
+- [ ] Framework: reusable `ScreenFactory` so every list GUI is a zMenu custom screen with configurable layout
+- [ ] `/warp` and `/warps` open a custom screen (per-warp icon, category pages)
+- [ ] Homes overview as a custom screen (icon per home, favorite pinning)
+- [ ] Kits overview as a custom screen
+- [ ] Baltop as a custom screen (paginated heads)
+- [ ] Public API: addons can register their own screens from code
+- [ ] `/terms` GUI variant reusing the custom screens framework
+
 ## Chat module v2
+- [x] Type [inv]/[inventory] to show your inventory (hover items, click copy)
+- [x] Type [ender]/[ec] to show your ender chest
+- [x] Type [pos]/[position] to share coordinates (click suggests /tp)
 - [ ] Polish `[item]` display, add `[inv]`, `[ender]`, `[pos]` built-in display keywords
 - [ ] Custom interactive keywords: config-driven placeholder/hover/click keywords (10 defaults shipped)
 - [ ] Interactive player names: hover + click actions on every player name in chat

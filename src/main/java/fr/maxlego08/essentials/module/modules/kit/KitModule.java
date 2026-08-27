@@ -154,7 +154,7 @@ public class KitModule extends ZModule {
         loadKitEquipment(kit, configuration, this.plugin.getInventoryManager(), "boots.", EquipmentSlot.FEET);
 
         this.kits.add(kit);
-        this.plugin.getLogger().info("Register kit: " + name);
+        this.plugin.getLogger().fine("Register kit: " + name);
     }
 
     private void loadKitEquipment(ZKit kit, YamlConfiguration configuration, InventoryManager inventoryManager, String path, EquipmentSlot equipmentSlot) {

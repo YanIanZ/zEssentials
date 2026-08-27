@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.concurrent.ConcurrentHashMap;
@@ -376,30 +377,74 @@ public abstract class ZUtils extends MessageUtils {
         return value;
     }
 
+    /**
+     * Parses a duration supporting multiple units and decimals, examples:
+     * 30s, 15m, 12h, 7d, 2w, 6mo, 3y and combinations like 1d12h30m.
+     * A plain number without unit is treated as seconds.
+     */
     public Duration stringToDuration(String duration) {
-        Pattern regex = Pattern.compile("(\\d+)([^0-9 ])");
-        Matcher result = regex.matcher(duration);
 
-        if (result.find()) {
-            String amountStr = result.group(1);
-            String unit = result.group(2);
-            long amount = Long.parseLong(amountStr);
+        if (duration == null || duration.isBlank()) return Duration.ZERO;
 
-            return switch (unit) {
-                case "s" -> Duration.of(amount, ChronoUnit.SECONDS);
-                case "m" -> Duration.of(amount, ChronoUnit.MINUTES);
-                case "h" -> Duration.of(amount, ChronoUnit.HOURS);
-                case "d", "j" -> Duration.of(amount, ChronoUnit.DAYS);
-                case "w" -> Duration.of(amount * 7, ChronoUnit.DAYS);
-                case "M" -> Duration.of(amount * 30, ChronoUnit.DAYS);
-                case "y" -> Duration.of(amount * 365, ChronoUnit.DAYS);
-                case "D" -> Duration.of(amount * 10, ChronoUnit.YEARS);
-                case "c" -> Duration.of(amount * 100, ChronoUnit.YEARS);
-                default -> Duration.ZERO;
+        Matcher matcher = Pattern.compile("(\\d+(?:\\.\\d+)?)([a-zA-Z]+)").matcher(duration);
+        Duration total = Duration.ZERO;
+        boolean found = false;
+
+        while (matcher.find()) {
+            double amount;
+            try {
+                amount = Double.parseDouble(matcher.group(1));
+            } catch (NumberFormatException exception) {
+                continue;
+            }
+            String unit = matcher.group(2).toLowerCase(Locale.ROOT);
+            long seconds = switch (unit) {
+                case "s", "sec", "secs", "second", "seconds" -> 1L;
+                case "m", "min", "mins", "minute", "minutes" -> 60L;
+                case "h", "hr", "hrs", "hour", "hours" -> 3600L;
+                case "d", "day", "days" -> 86400L;
+                case "w", "week", "weeks" -> 604800L;
+                case "mo", "month", "months" -> 2592000L;
+                case "y", "yr", "year", "years" -> 31536000L;
+                default -> -1L;
             };
-        } else {
+            if (seconds <= 0) continue;
+
+            found = true;
+            total = total.plus(Duration.of((long) (amount * seconds), ChronoUnit.SECONDS));
+        }
+
+        if (found) return total;
+
+        // Plain number without unit, treated as seconds
+        try {
+            return Duration.of((long) Double.parseDouble(duration.trim()), ChronoUnit.SECONDS);
+        } catch (NumberFormatException exception) {
             return Duration.ZERO;
         }
+    }
+
+    /**
+     * Parses a number with a magnitude suffix, examples: 1k = 1 000,
+     * 1.5m = 1 500 000, 2b, 3t. Also accepts plain and comma decimals.
+     */
+    public double parseCompactNumber(String input) {
+
+        String cleaned = input == null ? "" : input.trim().replace(",", ".");
+        Matcher matcher = Pattern.compile("^(-?\\d+(?:\\.\\d+)?)([a-zA-Z])$").matcher(cleaned);
+
+        if (!matcher.matches()) {
+            return Double.parseDouble(cleaned);
+        }
+
+        double value = Double.parseDouble(matcher.group(1));
+        return switch (matcher.group(2).toLowerCase(Locale.ROOT)) {
+            case "k" -> value * 1_000D;
+            case "m" -> value * 1_000_000D;
+            case "b" -> value * 1_000_000_000D;
+            case "t" -> value * 1_000_000_000_000D;
+            default -> Double.parseDouble(cleaned);
+        };
     }
 
     protected int getMaxPage(Collection<?> items, int pageSize) {

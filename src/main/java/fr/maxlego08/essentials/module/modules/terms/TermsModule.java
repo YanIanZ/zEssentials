@@ -92,7 +92,14 @@ public class TermsModule extends ZModule {
         if (this.bypassPermission != null && player.hasPermission(this.bypassPermission)) return;
 
         this.pending.add(player.getUniqueId());
-        openScreen(player);
+
+        // Small delay so the whole spawn sequence finished before showing the dialog,
+        // opening it during the join itself can get stomped by login packets
+        this.plugin.getScheduler().runAtLocationLater(player.getLocation(), () -> {
+            if (this.pending.contains(player.getUniqueId()) && player.isOnline()) {
+                openScreen(player);
+            }
+        }, 3L);
 
         // When the timeout expires without an answer, kick the player
         this.plugin.getScheduler().runLater(() -> {
@@ -166,7 +173,9 @@ public class TermsModule extends ZModule {
         return this.isEnable && this.pending.contains(uniqueId);
     }
 
+    @NonLoadable
     private static final int SLOT_ACCEPT = 20;
+    @NonLoadable
     private static final int SLOT_DENY = 24;
 
     private final class TermsHolder implements InventoryHolder {
@@ -181,8 +190,27 @@ public class TermsModule extends ZModule {
 
     /**
      * Builds and opens the terms screen for the player.
+     * Uses the native minecraft dialog screen when supported,
+     * falling back to the chest interface otherwise.
      */
     public void openScreen(Player player) {
+
+        boolean shown;
+        try {
+            // Dialogs only exist on paper 1.21.7+, older runtimes use the chest interface
+            shown = dev.yanianz.essentials.terms.TermsDialogs.show(player, this.title, this.rules, this.question,
+                    this.acceptButton, this.denyButton, this.acceptHover, this.denyHover,
+                    () -> {
+                        accept(player);
+                        return true;
+                    },
+                    () -> deny(player));
+        } catch (Throwable throwable) {
+            this.plugin.getLogger().warning("Unable to show the terms dialog: " + throwable);
+            shown = false;
+        }
+
+        if (shown) return;
 
         TermsHolder holder = new TermsHolder();
         Inventory inventory = Bukkit.createInventory(holder, 45, component(this.title));
