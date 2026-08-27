@@ -6,6 +6,9 @@
 
 # 1.0.4.0
 
+- Added **polls** (`/poll create <seconds> <question> | option 1 | option 2 ...`): clickable voting lines broadcast to everyone, one vote per player, live result bars and winner announcement; `/poll vote <index>` and `/poll stop`
+- Added a **reputation** system: `/rep <player>` gives one point with a configurable cooldown per giver (24h default), `/reputation [player]` displays the score, persisted in `reputations.json`
+
 - Added a **chat games** module (`modules/chatgames/config.yml`): six game types — math race, word scramble, fast typing, reversed words, trivia and hot letter — with automatic random rounds (`auto-interval-minutes`), console reward commands (`%player%`) and `/chatgames <type|stop|reload>` for staff
 
 - Chat slowmode: `/chatslowmode <seconds>` staff command with `essentials.chat.bypass.slowmode` bypass

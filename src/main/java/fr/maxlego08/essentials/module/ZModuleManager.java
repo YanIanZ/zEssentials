@@ -12,6 +12,8 @@ import fr.maxlego08.essentials.module.modules.kit.KitModule;
 import fr.maxlego08.essentials.module.modules.chat.ChatModule;
 import fr.maxlego08.essentials.module.modules.customcommands.CustomCommandModule;
 import dev.yanianz.essentials.customscreens.CustomScreenModule;
+import dev.yanianz.essentials.polls.PollsModule;
+import dev.yanianz.essentials.reputation.ReputationModule;
 import fr.maxlego08.essentials.module.modules.effects.EffectsModule;
 import fr.maxlego08.essentials.module.modules.chatgames.ChatGamesModule;
 import fr.maxlego08.essentials.module.modules.terms.TermsModule;
@@ -91,6 +93,8 @@ public class ZModuleManager implements ModuleManager {
         this.modules.put(EffectsModule.class, new EffectsModule(this.plugin));
         this.modules.put(TermsModule.class, new TermsModule(this.plugin));
         this.modules.put(ChatGamesModule.class, new ChatGamesModule(this.plugin));
+        this.modules.put(PollsModule.class, new PollsModule(this.plugin));
+        this.modules.put(ReputationModule.class, new ReputationModule(this.plugin));
         if (plugin.isPaperVersion()) {
             this.modules.put(DeathMessageModule.class, new DeathMessageModule(this.plugin));
         }

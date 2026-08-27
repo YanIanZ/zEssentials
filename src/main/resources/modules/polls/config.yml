@@ -1,0 +1,31 @@
+########################################################################################################################
+#
+# zEssentials - Polls
+# Staff created chat polls with clickable options and live results.
+#
+########################################################################################################################
+
+enable: true
+
+# Maximum poll duration in seconds
+max-duration: 600
+# Default duration when the staff member forgets it
+default-duration: 60
+
+# Permission needed to answer a poll, empty means everyone
+vote-permission: ""
+
+style:
+  header: "&8&m                                                            &#00d4ff&l POLL"
+  question: " &#ffd93d&l%question%"
+  option-line: "  &#00d4ff[%index%] &f%option% &8(&7%votes% votes&8)"
+  voted-mark: " &#a7ff33✔"
+  footer: " §7Ends in §f%seconds%s §7• click an option to vote!"
+  result-bar: "  &#00d4ff[%index%] &f%option% &8«&#00d4ff%bar%&8» &f%percent%% %votes%"
+  winner: "&#a7ff33&lPOLL RESULT &8» &eWinning option: &f%option% &8(%percent%%)"
+  no-votes: "&#ffd93dThe poll ended without any vote."
+
+colors:
+  bar-filled: "|"
+  bar-empty: "¦"
+  bar-length: 20

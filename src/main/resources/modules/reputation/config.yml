@@ -1,0 +1,17 @@
+########################################################################################################################
+#
+# zEssentials - Reputation
+# Players give +1 reputation points to each other with a cooldown.
+#
+########################################################################################################################
+
+enable: true
+
+# Hours between two reputations given to the same player
+cooldown-hours: 24
+
+# Permission needed to give a reputation, empty means everyone
+give-permission: ""
+
+# Broadcast when someone receives reputation, empty to disable
+broadcast: "&#a7ff33&lREPUTATION &#7fff%player% &#7ffffjust received a reputation point! Total: &f%total%"

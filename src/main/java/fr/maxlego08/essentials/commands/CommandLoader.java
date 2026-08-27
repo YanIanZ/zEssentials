@@ -3,6 +3,9 @@ package fr.maxlego08.essentials.commands;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandManager;
+import dev.yanianz.essentials.polls.CommandPoll;
+import dev.yanianz.essentials.reputation.CommandRepGive;
+import dev.yanianz.essentials.reputation.CommandReputationView;
 import fr.maxlego08.essentials.commands.commands.chat.*;
 import fr.maxlego08.essentials.commands.commands.clearinventory.ClearInventoryCommand;
 import fr.maxlego08.essentials.commands.commands.cooldown.CommandCooldown;
@@ -174,6 +177,9 @@ public class CommandLoader {
         register("dnd", CommandChatDnd.class);
         register("chatslowmode", CommandChatSlowmode.class);
         register("chatgames", CommandChatGames.class);
+        register("poll", CommandPoll.class);
+        register("rep", CommandRepGive.class);
+        register("reputation", CommandReputationView.class);
         register("showitem", CommandShowItem.class);
         register("pingsound", CommandPingSound.class, "pingsounds");
 
