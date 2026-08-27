@@ -823,6 +823,8 @@ report-teleported: "<success>Teleported to &f%player%<success>."
 report-resolved: "<success>Report &f#%id% <success>marked as resolved."
 report-reopened: "<success>Report &f#%id% <success>reopened."
 report-list-header: "&8&m--------&#ff4d4d Reports &8(&f%count%&8) &8&m--------"
+description-chatcolor: "Open the chat color selection"
+description-tags: "Open the chat tag selection"
 chat-messages-empty: "&f%player% <error>did not write a message."
 chat-messages-line:
   type: WITHOUT_PREFIX

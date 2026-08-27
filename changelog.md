@@ -6,6 +6,8 @@
 
 # 1.0.4.0
 
+- Added a **chat customization** module (`/chatcolor` and `/tags`): guis to pick a chat color (16 colors, bold and italic with a permission), decorations are toggleable and every choice is saved in json and applied live in the rendered chat; configurable prefix **tags** with per tag permissions (`modules/chatcustomization/config.yml`)
+
 - Added a **nickname** module (`/nick`): colored display names with length/character validation, impersonation protection, a change cooldown (`essentials.nicknames.bypass.cooldown`) and json persistence re-applied on join; staff target others with `/nick <player> <name|off>`
 - Added a **report** system (`/report <player> <reason>`): staff online receive a clickable alert with sound, `/reports` lists the open reports with resolve and teleport buttons, everything is persisted in `reports.json`
 

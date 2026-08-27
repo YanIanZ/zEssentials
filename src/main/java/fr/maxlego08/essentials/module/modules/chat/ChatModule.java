@@ -374,7 +374,29 @@ public class ChatModule extends ZModule {
                 }
             }
 
-            Tag tag = Tag.inserting(paperComponent.translateText(player, renderMessage, localBuilder.build()));
+            // Per player color, decorations and tag from the customization module
+            String messagePrefix = "";
+            try {
+                var customizationModule = this.plugin.getModuleManager()
+                        .getModule(dev.yanianz.essentials.chatcustomization.ChatCustomizationModule.class);
+                if (customizationModule != null) {
+                    var preference = customizationModule.getPreference(player.getUniqueId());
+                    String colorPrefix = preference.colorCode();
+                    for (String decoration : preference.decorations()) {
+                        colorPrefix += "§" + decoration;
+                    }
+                    if (!colorPrefix.isEmpty()) {
+                        renderMessage = colorPrefix + renderMessage + "§r";
+                    }
+                    if (!preference.tagText().isEmpty()) {
+                        messagePrefix = preference.tagText();
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+
+            Tag tag = Tag.inserting(paperComponent.translateText(player,
+                    messagePrefix + renderMessage, localBuilder.build()));
             String moderatorAction = (isModerator && viewer instanceof Player playerMod) ? papi(getMessage(this.moderatorAction, "%player%", player.getName()), playerMod) : "";
             return paperComponent.getComponentMessage(chatFormat, TagResolver.resolver("message", tag), "%displayName%", player.getDisplayName(), "%player%", player.getName(), "%moderator_action%", moderatorAction);
         });

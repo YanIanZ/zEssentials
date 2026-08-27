@@ -1,0 +1,33 @@
+########################################################################################################################
+#
+# zEssentials - Chat Customization
+# Per player chat color, decorations and prefix tags through guis.
+#
+########################################################################################################################
+
+enable: true
+
+# Permission needed to open both guis
+use-permission: "essentials.chatcustomization.use"
+
+# Players with this permission can pick decorations like bold and italic
+decorations-permission: "essentials.chatcustomization.decorations"
+
+# Prefix tags a player can choose from, permission empty means everyone.
+# The tag text is inserted before the message in the chat format.
+tags:
+  - name: "&7None"
+    text: ""
+    permission: ""
+  - name: "&#00d4ff&lPRO"
+    text: "&#00d4ff&l[PRO] "
+    permission: "essentials.tags.pro"
+  - name: "&#a7ff33&lVIP"
+    text: "&#a7ff33&l[VIP] "
+    permission: "essentials.tags.vip"
+  - name: "&#ffd93d&lYT"
+    text: "&#ffd93d&l[YT] "
+    permission: "essentials.tags.yt"
+  - name: "&#ff4d4d&lSTAFF"
+    text: "&#ff4d4d&l[STAFF] "
+    permission: "essentials.tags.staff"

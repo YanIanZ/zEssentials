@@ -168,6 +168,9 @@ public class CommandLoader {
         register("nick", CommandNick.class);
         register("report", CommandReport.class);
         register("reports", CommandReport.class);
+
+        register("chatcolor", dev.yanianz.essentials.chatcustomization.CommandChatColor.class);
+        register("tags", dev.yanianz.essentials.chatcustomization.CommandTags.class);
         register("ban", CommandBan.class);
         register("mute", CommandMute.class);
         register("unmute", CommandUnMute.class);
