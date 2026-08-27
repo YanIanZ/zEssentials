@@ -17,6 +17,8 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.1.0.0
 
+- Belowname PLACEHOLDER mode now updates scores on a configurable timer (`belowname.refresh-seconds`)
+
 - Added **below name objective** (`modules/nametags/config.yml`): shows health or a PAPI placeholder below every player nametag
 - Added **spectator fix**: players in spectator mode get a configurable gray tab name
 - Added **tab list animations**: named frame lists in `modules/tablist/config.yml` cycle on the refresh timer, use `%anim_<name>%` inside header/footer lines

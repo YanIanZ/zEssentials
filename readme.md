@@ -59,9 +59,9 @@ Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
 - [x] Header/footer animation frames cycled on the refresh timer with named `%anim_<name>%` tokens
 
 Inspired by FancyHolograms (https://github.com/FancyMcPlugins/FancyHolograms) — migration of the hologram module:
-- [ ] Text/item holograms built on display entities (background, shadow, billboard modes)
-- [ ] Per line editing, rotation, scale, brightness controls
-- [ ] Autosave + reload without flicker
+- [x] Text/item holograms built on display entities (background, shadow, billboard, scale, translation, brightness, visibility)
+- [x] Per line editing, rotation, scale, brightness controls
+- [x] Autosave + reload without flicker
 
 Small quality features:
 - [x] Sleep through night acceleration (percentage based, smooth time speed up)

@@ -37,6 +37,10 @@ public class NameTagModule extends ZModule {
 
     private boolean spectatorEnabled;
     private Component spectatorTabName;
+    private long belowNameRefreshSeconds = 3;
+
+    @NonLoadable
+    private Object belowNameRefreshTask;
 
     @NonLoadable
     private final List<GroupRule> rules = new ArrayList<>();
@@ -66,6 +70,17 @@ public class NameTagModule extends ZModule {
         this.spectatorEnabled = config.getBoolean("spectator.enabled", false);
         this.spectatorTabName = dev.yanianz.essentials.util.ColorUtil.component(
                 config.getString("spectator.tab-name-format", "&8&oSpectator"));
+        this.belowNameRefreshSeconds = config.getLong("belowname.refresh-seconds", 3);
+
+        // Belowname placeholder mode needs periodic score updates
+        if (this.belowNameRefreshTask != null) {
+            ((com.tcoded.folialib.wrapper.task.WrappedTask) this.belowNameRefreshTask).cancel();
+            this.belowNameRefreshTask = null;
+        }
+        if (this.belowNameEnabled && "PLACEHOLDER".equals(this.belowNameMode)) {
+            this.belowNameRefreshTask = this.plugin.getScheduler().runTimer(
+                    this::updateBelowNameScores, 20L, this.belowNameRefreshSeconds * 20L);
+        }
 
         this.rules.clear();
         for (Object obj : config.getMapList("groups")) {
@@ -210,6 +225,25 @@ public class NameTagModule extends ZModule {
         // Spectator tab name override
         if (this.spectatorEnabled && player.getGameMode() == org.bukkit.GameMode.SPECTATOR) {
             player.playerListName(this.spectatorTabName);
+        }
+    }
+
+    /**
+     * Updates below name scores for all online players when using PLACEHOLDER mode.
+     */
+    private void updateBelowNameScores() {
+
+        if (!this.belowNameEnabled || !"PLACEHOLDER".equals(this.belowNameMode)) return;
+
+        org.bukkit.scoreboard.Objective objective = belowNameObjective();
+        if (objective == null) return;
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            try {
+                String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
+                objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
+            } catch (NumberFormatException | NullPointerException ignored) {
+            }
         }
     }
 

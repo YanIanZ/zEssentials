@@ -52,6 +52,8 @@ belowname:
   display-name: "&#ff4d4d♥ Health"
   # Only used when mode is PLACEHOLDER, PAPI placeholders with player context
   placeholder: "%player_health%"
+  # Seconds between below name score updates in PLACEHOLDER mode
+  refresh-seconds: 3
 
 # ── Spectator fix ─────────────────────────────────────────────
 # Players in spectator mode get a gray tab name instead of their normal one.
