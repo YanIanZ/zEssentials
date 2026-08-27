@@ -46,7 +46,7 @@ public class ChatGamesModule extends ZModule {
     @NonLoadable
     private ActiveGame activeGame;
     @NonLoadable
-    private Object autoTask;
+    private com.tcoded.folialib.wrapper.task.WrappedTask autoTask;
     @NonLoadable
     private final Random random = ThreadLocalRandom.current();
 
@@ -119,22 +119,20 @@ public class ChatGamesModule extends ZModule {
      */
     private void restartAutoTask() {
 
-        if (this.autoTask instanceof org.bukkit.scheduler.BukkitTask bukkitTask) {
-            bukkitTask.cancel();
+        if (this.autoTask != null) {
+            this.autoTask.cancel();
             this.autoTask = null;
         }
 
         if (this.autoIntervalMinutes <= 0 || this.enabledTypes.isEmpty()) return;
 
         long periodTicks = this.autoIntervalMinutes * 60L * 20L;
-        Object firstDelayOnly = Bukkit.getScheduler().runTaskTimer(this.plugin,
-                () -> {
-                    if (this.activeGame == null && !Bukkit.getOnlinePlayers().isEmpty()) {
-                        startRandom(null);
-                    }
-                }, periodTicks, periodTicks);
-
-        this.autoTask = firstDelayOnly;
+        // Region aware scheduler, plain bukkit timers are unsupported on folia based servers
+        this.autoTask = this.plugin.getScheduler().runTimer(() -> {
+            if (this.activeGame == null && !Bukkit.getOnlinePlayers().isEmpty()) {
+                startRandom(null);
+            }
+        }, periodTicks, periodTicks);
     }
 
     /**
@@ -219,7 +217,9 @@ public class ChatGamesModule extends ZModule {
                 .replace("%answer%", answer)));
 
         for (String command : this.rewardCommands) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+            String finalCommand = command.replace("%player%", player.getName());
+            this.plugin.getScheduler().runNextTick(wrappedTask ->
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand));
         }
     }
 

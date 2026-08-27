@@ -733,7 +733,6 @@ public enum Message {
     CHAT_DISABLE("<error>The chat is currently unavailable."),
 
     CHAT_DEFAULT_FORMAT("<white>%displayName% <#656665>• &7%message%"),
-    DESCRIPTION_CHAT_HISTORY_DELETE_ARG("Internal usage"),
     CHAT_MESSAGE_DELETED("<success>Deleted &f%count% <success>message(s) of &f%player%<success>."),
     DESCRIPTION_CHAT_GAMES("Manage the chat games"),
     CHAT_GAME_ALREADY_RUNNING("<error>A chat game is already running or this type is disabled."),

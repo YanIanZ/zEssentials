@@ -47,7 +47,7 @@ public class PollsModule extends ZModule {
     @NonLoadable
     private ActivePoll activePoll;
     @NonLoadable
-    private BukkitTask closeTask;
+    private com.tcoded.folialib.wrapper.task.WrappedTask closeTask;
 
     public PollsModule(ZEssentialsPlugin plugin) {
         super(plugin, "polls");
@@ -117,7 +117,7 @@ public class PollsModule extends ZModule {
     }
 
     private void scheduleClose(long seconds) {
-        this.closeTask = Bukkit.getScheduler().runTaskLater(this.plugin, this::finishPoll, seconds * 20L + 10L);
+        this.closeTask = this.plugin.getScheduler().runLater(this::finishPoll, seconds * 20L + 10L);
     }
 
     private void cancelCloseTask() {

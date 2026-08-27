@@ -87,7 +87,7 @@ public class DiscordBridgeModule extends ZModule {
                 .replace("%message%", plain);
 
         // Everything on the main thread, matching how DiscordSRV expects its api usage
-        Bukkit.getScheduler().runTask(this.plugin, () -> {
+        this.plugin.getScheduler().runNextTick(wrappedTask -> {
             try {
                 Class<?> mainClass = Class.forName("github.scarsz.discordsrv.DiscordSRV");
                 Object pluginInstance = mainClass.getMethod("getPlugin").invoke(null);

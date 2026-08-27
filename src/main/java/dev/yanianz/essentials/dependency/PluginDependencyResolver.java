@@ -107,7 +107,18 @@ public final class PluginDependencyResolver {
         if (autoRestart) {
             plugin.getLogger().info("Auto-restart is enabled in the configuration, shutting down the server in 10 seconds...");
             Bukkit.broadcastMessage("§6[zEssentials] §eFinishing the installation of " + stillMissing + ", §cserver restarting in 10 seconds§e...");
-            Bukkit.getScheduler().runTaskLater(plugin, Bukkit::shutdown, 20L * 10);
+
+            // Some region threaded platforms reject the global task, fall back to a delayed stop
+            try {
+                Bukkit.getScheduler().runTaskLater(plugin, Bukkit::shutdown, 20L * 10);
+            } catch (Throwable throwable) {
+                Thread stopper = new Thread(() -> {
+                    try { Thread.sleep(10_000L); } catch (InterruptedException ignored) {}
+                    Bukkit.shutdown();
+                }, "zessentials-auto-stop");
+                stopper.setDaemon(true);
+                stopper.start();
+            }
         } else {
             Bukkit.getPluginManager().disablePlugin(plugin);
         }
