@@ -52,7 +52,7 @@ Inspired by CMILib (https://github.com/Zrips/CMILib):
 
 Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
 - [x] Tab list header & footer per world with PlaceholderAPI + refresh interval
-- [ ] Tab-list scoreboard system: per world/group headers, footers and layouts
+- [/] Tab-list scoreboard system: per world/group headers, footers and layouts
 - [x] Nametag prefix/suffix above head via scoreboard teams (per group rules with priority)
 - [x] Team based sorting of the tab list (zero padded priority team names, lower priority first)
 - [ ] Team based sorting of the tab list (group -> priority ladder)

@@ -23,6 +23,22 @@ worlds:
       - "&7Online&8: &f%server_online% &8• &7Ping&8: &f%player_ping%ms"
       - "&#00d4ffstore.yourserver.com"
 
+# Per group header and footer, checked by permission before world entries.
+# The first matching group wins. Remove or comment out if not needed.
+# groups:
+#   admin:
+#     permission: "essentials.tablist.admin"
+#     header:
+#       - "&#ff4d4d&lADMIN"
+#     footer:
+#       - "&7Staff mode active"
+#   vip:
+#     permission: "essentials.tablist.vip"
+#     header:
+#       - "&#ffd93d&lVIP"
+#     footer:
+#       - "&7Thanks for supporting!"
+
 # ── Animations ───────────────────────────────────────────────
 # Named frame lists cycled on every refresh tick.
 # Use %anim_<name>% inside header/footer lines to display the current frame.

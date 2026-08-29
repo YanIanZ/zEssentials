@@ -28,6 +28,7 @@ public class TabListModule extends ZModule {
 
     private long refreshSeconds;
     private Map<String, HeaderFooter> worldEntries = new HashMap<>();
+    private List<GroupHeaderFooter> groupEntries = new ArrayList<>();
 
     @NonLoadable
     private Object refreshTask;
@@ -42,6 +43,9 @@ public class TabListModule extends ZModule {
     }
 
     private record HeaderFooter(Component header, Component footer) {
+    }
+
+    private record GroupHeaderFooter(String permission, Component header, Component footer) {
     }
 
     @Override
@@ -61,6 +65,20 @@ public class TabListModule extends ZModule {
                 Component header = joinLines(section.getStringList("header"));
                 Component footer = joinLines(section.getStringList("footer"));
                 this.worldEntries.put(key.toLowerCase(Locale.ROOT), new HeaderFooter(header, footer));
+            }
+        }
+
+        this.groupEntries.clear();
+        var groupsSection = config.getConfigurationSection("groups");
+        if (groupsSection != null) {
+            for (String key : groupsSection.getKeys(false)) {
+                var section = groupsSection.getConfigurationSection(key);
+                if (section == null) continue;
+                String permission = section.getString("permission", "");
+                if (permission.isEmpty()) continue;
+                Component header = joinLines(section.getStringList("header"));
+                Component footer = joinLines(section.getStringList("footer"));
+                this.groupEntries.add(new GroupHeaderFooter(permission, header, footer));
             }
         }
 
@@ -123,17 +141,26 @@ public class TabListModule extends ZModule {
 
         if (!this.isEnable) return;
 
-        World world = player.getWorld();
-        HeaderFooter entry = this.worldEntries.get(world.getName().toLowerCase(Locale.ROOT));
-        if (entry == null) entry = this.worldEntries.get("default");
-        if (entry == null) return;
+        Component header = null;
+        Component footer = null;
 
-        // Animation tokens are resolved per refresh tick with the current frame
-        Component header = entry.header();
-        Component footer = entry.footer();
+        for (GroupHeaderFooter group : this.groupEntries) {
+            if (player.hasPermission(group.permission())) {
+                header = group.header();
+                footer = group.footer();
+                break;
+            }
+        }
 
-        // The header/footer components are static, animations need per-refresh re-render.
-        // Store the raw legacy strings and rebuild with the current frame.
+        if (header == null) {
+            World world = player.getWorld();
+            HeaderFooter entry = this.worldEntries.get(world.getName().toLowerCase(Locale.ROOT));
+            if (entry == null) entry = this.worldEntries.get("default");
+            if (entry == null) return;
+            header = entry.header();
+            footer = entry.footer();
+        }
+
         player.sendPlayerListHeader(resolveAnimations(header));
         player.sendPlayerListFooter(resolveAnimations(footer));
     }
