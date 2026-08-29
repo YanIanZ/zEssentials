@@ -36,12 +36,13 @@ public class CommandXyz extends VCommand {
         String shortForm = String.format(Locale.US, "%d %d %d",
                 location.getBlockX(), location.getBlockY(), location.getBlockZ());
         String coords = worldName + " " + shortForm;
+        String coloredCoords = colorize("&b" + worldName + " &8» &f" + shortForm.replace(" ", "&7, &f"));
 
         Component message = LEGACY.deserialize(colorize(
                 "&#00d4ff&lXYZ &8» &f" + shortForm + " &7in &f" + worldName))
                 .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
-                        LEGACY.deserialize(colorize("&7Click to copy"))))
-                .clickEvent(ClickEvent.copyToClipboard(coords));
+                        LEGACY.deserialize(colorize("&7Click to copy formatted coords"))))
+                .clickEvent(ClickEvent.copyToClipboard(coloredCoords));
 
         this.player.sendMessage(message);
         message(sender, Message.COMMAND_XYZ_COPIED, "%coords%", coords);

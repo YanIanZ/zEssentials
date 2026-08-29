@@ -68,9 +68,8 @@ Small quality features:
 - [x] `/eat` fills hunger, saturation and stops burning instantly
 - [x] `/near <radius>` optional radius argument (1-200 blocks, clamped)
 - [x] `/xyz` copies coordinates to clipboard with hover preview
-- [ ] `/feed all` alias already exists through `*`
-- [ ] `/near <radius>` optional radius argument
-- [ ] `/xyz` copies coordinates to clipboard with formatted colors
+- [x] `/feed all` alias already exists through `*`
+- [x] `/xyz` copies coordinates to clipboard with formatted colors
 - [x] `/rules` alias into terms screen after acceptance flow
 
 ## Chat module v2

@@ -27,7 +27,7 @@ public class TabListModule extends ZModule {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
     private long refreshSeconds;
-    private Map<String, HeaderFooter> worldEntries = new HashMap<>();
+    private Map<String, List<String>> worldEntries = new HashMap<>();
     private List<GroupHeaderFooter> groupEntries = new ArrayList<>();
 
     @NonLoadable
@@ -42,10 +42,7 @@ public class TabListModule extends ZModule {
         super(plugin, "tablist");
     }
 
-    private record HeaderFooter(Component header, Component footer) {
-    }
-
-    private record GroupHeaderFooter(String permission, Component header, Component footer) {
+    private record GroupHeaderFooter(String permission, List<String> header, List<String> footer) {
     }
 
     @Override
@@ -61,10 +58,8 @@ public class TabListModule extends ZModule {
             for (String key : worldsSection.getKeys(false)) {
                 var section = worldsSection.getConfigurationSection(key);
                 if (section == null) continue;
-
-                Component header = joinLines(section.getStringList("header"));
-                Component footer = joinLines(section.getStringList("footer"));
-                this.worldEntries.put(key.toLowerCase(Locale.ROOT), new HeaderFooter(header, footer));
+                this.worldEntries.put(key.toLowerCase(Locale.ROOT), section.getStringList("header"));
+                this.worldEntries.put(key.toLowerCase(Locale.ROOT) + "_footer", section.getStringList("footer"));
             }
         }
 
@@ -76,9 +71,8 @@ public class TabListModule extends ZModule {
                 if (section == null) continue;
                 String permission = section.getString("permission", "");
                 if (permission.isEmpty()) continue;
-                Component header = joinLines(section.getStringList("header"));
-                Component footer = joinLines(section.getStringList("footer"));
-                this.groupEntries.add(new GroupHeaderFooter(permission, header, footer));
+                this.groupEntries.add(new GroupHeaderFooter(permission,
+                        section.getStringList("header"), section.getStringList("footer")));
             }
         }
 
@@ -141,54 +135,62 @@ public class TabListModule extends ZModule {
 
         if (!this.isEnable) return;
 
-        Component header = null;
-        Component footer = null;
+        List<String> headerLines = null;
+        List<String> footerLines = null;
 
         for (GroupHeaderFooter group : this.groupEntries) {
             if (player.hasPermission(group.permission())) {
-                header = group.header();
-                footer = group.footer();
+                headerLines = group.header();
+                footerLines = group.footer();
                 break;
             }
         }
 
-        if (header == null) {
-            World world = player.getWorld();
-            HeaderFooter entry = this.worldEntries.get(world.getName().toLowerCase(Locale.ROOT));
-            if (entry == null) entry = this.worldEntries.get("default");
-            if (entry == null) return;
-            header = entry.header();
-            footer = entry.footer();
+        if (headerLines == null) {
+            String worldKey = player.getWorld().getName().toLowerCase(Locale.ROOT);
+            if (this.worldEntries.containsKey(worldKey)) {
+                headerLines = this.worldEntries.get(worldKey);
+                footerLines = this.worldEntries.get(worldKey + "_footer");
+            } else {
+                headerLines = this.worldEntries.get("default");
+                footerLines = this.worldEntries.get("default_footer");
+            }
         }
 
-        player.sendPlayerListHeader(resolveAnimations(header));
-        player.sendPlayerListFooter(resolveAnimations(footer));
+        if (headerLines == null) return;
+
+        player.sendPlayerListHeader(buildComponent(headerLines));
+        if (footerLines != null) player.sendPlayerListFooter(buildComponent(footerLines));
     }
 
-    /**
-     * Animation frames cycle through a counter that advances on each refresh,
-     * so changing the refresh-seconds config controls the animation speed.
-     */
-    private int animationFrame(String name) {
-        List<Component> frames = this.animations.get(name);
-        if (frames == null || frames.isEmpty()) return 0;
-        int counter = this.animationCounters.getOrDefault(name, 0);
-        return counter % frames.size();
-    }
-
-    private Component resolveAnimations(Component input) {
-        // Animations are stored per token name, the counter selects the frame
-        return input;
-    }
-
-    private Component joinLines(List<String> lines) {
-
+    private Component buildComponent(List<String> lines) {
         StringBuilder builder = new StringBuilder();
         for (int index = 0; index < lines.size(); index++) {
-            builder.append(colorize(lines.get(index)));
+            String line = colorize(lines.get(index));
+            builder.append(resolveAnimTokens(line));
             if (index < lines.size() - 1) builder.append("\n");
         }
         return LEGACY.deserialize(builder.toString());
+    }
+
+    private String resolveAnimTokens(String text) {
+        if (!text.contains("%anim_") || this.animations.isEmpty()) return text;
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("%anim_([a-zA-Z0-9_-]+)%").matcher(text);
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String name = matcher.group(1);
+            List<Component> frames = this.animations.get(name);
+            if (frames == null || frames.isEmpty()) {
+                matcher.appendReplacement(sb, matcher.group());
+                continue;
+            }
+            int counter = this.animationCounters.getOrDefault(name, 0);
+            Component frame = frames.get(counter % frames.size());
+            String frameText = LEGACY.serialize(frame);
+            matcher.appendReplacement(sb, java.util.regex.Matcher.quoteReplacement(frameText));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     private String colorize(String text) {
