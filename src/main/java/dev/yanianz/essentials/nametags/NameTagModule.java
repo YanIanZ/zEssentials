@@ -28,6 +28,7 @@ import java.util.UUID;
 public class NameTagModule extends ZModule {
 
     private long applyDelayTicks = 20;
+    private boolean ladderSort;
     private String fallbackTabFormat = "&7%player%";
 
     private boolean belowNameEnabled;
@@ -60,6 +61,7 @@ public class NameTagModule extends ZModule {
 
         var config = getConfiguration();
         this.applyDelayTicks = Math.max(0, config.getInt("apply-delay-ticks", 20));
+        this.ladderSort = config.getBoolean("ladder-sort", false);
 
         this.belowNameEnabled = config.getBoolean("belowname.enabled", false);
         this.belowNameMode = config.getString("belowname.mode", "HEALTH").toUpperCase(Locale.ROOT);
@@ -209,7 +211,9 @@ public class NameTagModule extends ZModule {
         this.plugin.getScheduler().runNextTick(wrappedTask -> {
             try {
                 Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-                String teamName = teamName(rule);
+                String teamName = this.ladderSort
+                        ? teamName(rule, player.getName())
+                        : teamName(rule);
 
                 Team team = scoreboard.getTeam(teamName);
                 if (team == null) {
@@ -269,6 +273,10 @@ public class NameTagModule extends ZModule {
      */
     private String teamName(GroupRule rule) {
         return String.format("%05d_nt%d", rule.priority(), rule.orderIndex());
+    }
+
+    private String teamName(GroupRule rule, String playerName) {
+        return String.format("%05d_%s", rule.priority(), playerName);
     }
 
     private String toLegacy(Component component) {

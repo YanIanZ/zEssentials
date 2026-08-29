@@ -47,7 +47,7 @@ Sorted by priority:
 Inspired by CMILib (https://github.com/Zrips/CMILib):
 - [x] `/cmi itemname` style advanced item editing (glow, unbreakable, custom model data)
 - [x] Anvil text input reuse for more prompts (home rename, note title)
-- [ ] More player placeholders (statistics deep dive, timed commands)
+- [x] More player placeholders (statistics deep dive, timed commands)
 - [x] `/cmiKit` style kit claim-all button in the preview screen
 
 Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
@@ -55,7 +55,7 @@ Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
 - [/] Tab-list scoreboard system: per world/group headers, footers and layouts
 - [x] Nametag prefix/suffix above head via scoreboard teams (per group rules with priority)
 - [x] Team based sorting of the tab list (zero padded priority team names, lower priority first)
-- [ ] Team based sorting of the tab list (group -> priority ladder)
+- [x] Team based sorting of the tab list (group -> priority ladder)
 - [x] Header/footer animation frames cycled on the refresh timer with named `%anim_<name>%` tokens
 
 Inspired by FancyHolograms (https://github.com/FancyMcPlugins/FancyHolograms) — migration of the hologram module:

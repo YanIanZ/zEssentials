@@ -232,6 +232,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         this.registerPlaceholder(ArmorPlaceholders.class);
         this.registerPlaceholder(NearPlaceholders.class);
         this.registerPlaceholder(PlayerPlaceholders.class);
+        this.registerPlaceholder(StatisticPlaceholders.class);
         this.registerPlaceholder(PlayerListPlaceholders.class);
         this.randomWord = this.registerPlaceholder(RandomWordPlaceholders.class);
 

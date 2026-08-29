@@ -15,6 +15,12 @@ apply-delay-ticks: 20
 # Sorting: players are ordered by their team name inside the tab list,
 # so lower priorities appear first. Zero padded automatically.
 
+# When ladder-sort is true, each player gets a unique team combining
+# the group priority with the player name, producing a fully ordered
+# ladder where every slot has a distinct sort position.
+# When false (default), all players in the same group share one team.
+ladder-sort: false
+
 # First matching rule wins. Every field supports legacy colors, hex
 # &#rrggbb, MiniMessage and PlaceholderAPI with the player context.
 groups:
