@@ -652,10 +652,13 @@ public class EnderChestModule extends ZModule {
     }
 
     public void openEnderChest(Player player) {
-        int pages = getAllowedPages(player);
+        int allowed = getAllowedPages(player);
         EnderChestData data = getData(player.getUniqueId());
-        data.resize(pages);
-        EnderChestGui.open(this.plugin, player, data, pages, 0, false);
+        if (data.getPages() < allowed) {
+            data.resize(allowed);
+        }
+        int visiblePages = Math.min(data.getPages(), allowed);
+        EnderChestGui.open(this.plugin, player, data, visiblePages, 0, false);
     }
 
     public void openEnderChestFor(Player viewer, OfflinePlayer target) {
