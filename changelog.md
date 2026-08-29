@@ -15,6 +15,64 @@ Every change lands in this changelog immediately under its bumped heading.
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
+# 1.2.0.0
+
+## Bug fixes
+
+- **Fixed** TP effects not appearing for tpa/tp/tphere — the direct trigger was only in the countdown `teleport()` path; `teleportNow()` (the universal funnel) now calls `playDirectTeleport` so ALL teleport paths trigger the particle ring
+- **Fixed** from/to ring spawning on the wrong region thread on Folia — both rings now scheduled via `runAtLocation` for correct region ownership
+- **Fixed** DND not suppressing the ping sound — `PlayerPingDisplay` now also checks `CHAT_DND` (previously only `MentionDisplay` respected DND)
+- **Fixed** belowname objective not showing on Folia — `belowNameObjective()` in `apply()` was not wrapped in `runNextTick`, silently failing on region threads
+- **Fixed** `/reports` screen GUI not opening — `addRequirePlayerNameArg()` caused a `SYNTAX_ERROR` before `perform()` ran; changed to `addOptionalArg` so 0-arg `/reports` reaches the staff screen
+- **Fixed** tab completion missing on 7 commands (`/notes`, `/poll`, `/reputation`, `/nick`, `/baltopgui`, `/warpgui`, `/reports`) — all now use `addOptionalArg(String, TabCompletion)` with meaningful suggestions
+- **Fixed** tablist animations not working — `resolveAnimations` was a stub returning input unchanged; now resolves `%anim_<name>%` tokens to the current frame on each refresh tick
+- **Fixed** `[pos]` chat keyword shadowed by a duplicate `CustomDisplay` entry that used unavailable PAPI placeholders — removed the duplicate, native `PositionDisplay` now handles `[pos]`
+- **Fixed** `/xyz` clipboard copying plain text — now copies formatted colored coordinates
+- **Fixed** `directStamps` in EffectsModule was a plain `HashMap` accessed from multiple threads — changed to `ConcurrentHashMap`
+- **Fixed** `@NonLoadable` missing on static finals in `ChatCustomizationModule`, `NicknamesModule`, `ChatBubblesModule`, `TabListModule`, `ReportsModule` — eliminated "An error with loading field" console errors
+- **Fixed** chat history delete and report tp/resolve click commands using `/essentials:` namespaced prefix that didn't resolve — now use direct paths
+- **Fixed** freeze/unfreeze `Cannot register new team async` on Folia — scoreboard ops wrapped in `runNextTick`
+
+## Chat v2
+
+- **Mention system** with configurable title, action bar and boss bar notifications — each toggle independently in `mention-placeholder` config (title-enabled, actionbar-enabled, bossbar-enabled); DND suppresses all notification types; `%player%` placeholder in all texts
+- **Quick replies** — typed shortcuts expand to full phrases (`:brb:` → "Be right back!", 6 defaults shipped)
+- **Interactive player names** — when enabled, the sender name in chat gets hover text and click action (suggest `/msg` by default), fully config-driven
+- **`[item]` display polish** — amount hidden when 1, `itemName()` fallback for 1.21+ custom item names, format updated
+
+## TAB parity
+
+- **Per-group header/footer** — permission-based group entries checked before world entries, first match wins
+- **Team priority ladder** — `ladder-sort` config option: when true, each player gets a unique team combining group priority + player name for a fully ordered tab list
+- **TAB slot layouts** — `layout.enable` + `layout.fixed-slots` config; `PacketTabLayoutListener` intercepts `PLAYER_INFO` packets and injects fake `PlayerInfoData` entries via ProtocolLib for custom slot arrangements
+
+## CMILib parity
+
+- **Advanced item editing** — `/itemglow` (toggle enchantment glint override), `/itemunbreakable` (toggle unbreakable), `/itemmodeldata <id|clear>` (set custom model data)
+- **Kit claim button** in the preview screen — new `ZESSENTIALS_KIT_CLAIM` button type at slot 53
+- **Anvil text input** — reusable `AnvilTextInput` utility opens a native anvil GUI, captures `getRenameText()`, calls a consumer callback
+
+## Placeholders
+
+- **Statistics placeholders** — 50+ placeholders for all Bukkit `Statistic` enum values (`%statistic_<name>%` and `%statistic_<name>_formatted%`), plus convenience aliases for playtime, jumps, deaths, kills, damage, distances
+
+## Infrastructure
+
+- **ProtocolLib auto-install** — added to `PluginDependencyResolver.REQUIRED`; auto-downloaded from Hangar (external URL fallback fix)
+- **ProtocolLib hook activated** — `loadHooks()` now instantiates `PacketListener` and registers chat + tab layout packet listeners
+- **JUnit 5 + Mockito test suite** — 18 API test classes + 3 root test classes, 856 tests; CI test workflows (build.yml test job, standalone test.yml, nightly test + artifact upload)
+- **Gson test classpath fix** — `DiscordWebhookTest` no longer fails with `NoClassDefFoundError`
+
+## Screens
+
+- **`/homesgui`** — paginated ScreenFactory screen listing all homes with left-click teleport, right-click delete, per-home material, public/favorite indicators
+- **`/kitsgui`** — paginated ScreenFactory screen listing all kits with cooldown status, left-click claim, right-click preview
+
+## Small features
+
+- `/rules` now opens the terms dialog screen when the terms module is enabled
+- `/chatslowmode` tab completion suggests common values (0/3/5/10/30)
+
 # 1.1.0.0
 
 - **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly
