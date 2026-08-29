@@ -159,10 +159,19 @@ public class ChatModule extends ZModule {
         YamlConfiguration mentionConfig = getConfiguration();
         if (mentionConfig.getBoolean("mention-placeholder.enable", true)) {
             this.mentionDisplay = new fr.maxlego08.essentials.module.modules.chat.MentionDisplay(
+                    this.plugin,
                     mentionConfig.getBoolean("mention-placeholder.sound-enabled", true),
                     mentionConfig.getString("mention-placeholder.sound", "ENTITY_EXPERIENCE_ORB_PICKUP"),
                     mentionConfig.getString("mention-placeholder.hover-self", "&6Someone mentioned you!"),
-                    mentionConfig.getString("mention-placeholder.hover-other", "&7Click to message them")
+                    mentionConfig.getString("mention-placeholder.hover-other", "&7Click to message them"),
+                    mentionConfig.getBoolean("mention-placeholder.title-enabled", false),
+                    mentionConfig.getString("mention-placeholder.title", "&6&lYou were mentioned!"),
+                    mentionConfig.getString("mention-placeholder.subtitle", "&7by &f%player%"),
+                    mentionConfig.getBoolean("mention-placeholder.actionbar-enabled", false),
+                    mentionConfig.getString("mention-placeholder.actionbar", "&6&l@%player% &7mentioned you!"),
+                    mentionConfig.getBoolean("mention-placeholder.bossbar-enabled", false),
+                    mentionConfig.getString("mention-placeholder.bossbar", "&6&l%player% mentioned you!"),
+                    mentionConfig.getInt("mention-placeholder.bossbar-seconds", 3)
             );
             this.mentionDisplay.setDndCheck(viewer -> {
                 var dndUser = this.plugin.getUser(viewer.getUniqueId());

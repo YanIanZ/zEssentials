@@ -205,6 +205,17 @@ mention-placeholder:
   sound: ENTITY_EXPERIENCE_ORB_PICKUP
   hover-self: "&6Someone mentioned you!"
   hover-other: "&7Click to message them"
+  # Title notification shown to the mentioned player (supports %player%)
+  title-enabled: false
+  title: "&6&lYou were mentioned!"
+  subtitle: "&7by &f%player%"
+  # Action bar notification shown to the mentioned player (supports %player%)
+  actionbar-enabled: false
+  actionbar: "&6&l@%player% &7mentioned you!"
+  # Boss bar notification shown to the mentioned player (supports %player%)
+  bossbar-enabled: false
+  bossbar: "&6&l%player% mentioned you!"
+  bossbar-seconds: 3
 
 # Displays the item in your hand
 item-placeholder:

@@ -1,5 +1,6 @@
 package fr.maxlego08.essentials.module.modules.chat;
 
+import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.chat.ChatDisplay;
 import fr.maxlego08.essentials.api.utils.component.AdventureComponent;
 import net.kyori.adventure.text.Component;
@@ -19,22 +20,48 @@ import java.util.regex.Pattern;
 /**
  * Highlights @player mentions inside the chat message. The highlighted name
  * is per viewer: hovering explains the mention and clicking suggests a /msg,
- * the mentioned player additionally receives a notification sound.
+ * the mentioned player additionally receives a notification sound, title,
+ * action bar or boss bar depending on configuration.
  */
 public class MentionDisplay implements ChatDisplay {
 
+    private final EssentialsPlugin plugin;
     private final boolean notify;
     private final String soundName;
     private final String hoverSelf;
     private final String hoverOther;
+    private final boolean titleEnabled;
+    private final String titleText;
+    private final String subtitleText;
+    private final boolean actionbarEnabled;
+    private final String actionbarText;
+    private final boolean bossbarEnabled;
+    private final String bossbarText;
+    private final int bossbarSeconds;
 
     private java.util.function.Predicate<Player> dndCheck = p -> false;
 
     public MentionDisplay(boolean notify, String soundName, String hoverSelf, String hoverOther) {
+        this(null, notify, soundName, hoverSelf, hoverOther, false, "", "", false, "", false, "", 3);
+    }
+
+    public MentionDisplay(EssentialsPlugin plugin, boolean notify, String soundName, String hoverSelf, String hoverOther,
+                          boolean titleEnabled, String titleText, String subtitleText,
+                          boolean actionbarEnabled, String actionbarText,
+                          boolean bossbarEnabled, String bossbarText, int bossbarSeconds) {
+        this.plugin = plugin;
         this.notify = notify;
         this.soundName = soundName;
         this.hoverSelf = hoverSelf;
         this.hoverOther = hoverOther;
+        this.titleEnabled = titleEnabled;
+        this.titleText = titleText;
+        this.subtitleText = subtitleText;
+        this.actionbarEnabled = actionbarEnabled;
+        this.actionbarText = actionbarText;
+        this.bossbarEnabled = bossbarEnabled;
+        this.bossbarText = bossbarText;
+        this.bossbarSeconds = bossbarSeconds;
     }
 
     public void setDndCheck(java.util.function.Predicate<Player> dndCheck) {
@@ -96,6 +123,34 @@ public class MentionDisplay implements ChatDisplay {
 
         if (mentioned && this.notify && !this.dndCheck.test(viewer)) {
             viewer.playSound(viewer.getLocation(), resolveSound(), 1f, 1.4f);
+
+            if (this.titleEnabled && !this.titleText.isEmpty()) {
+                Component title = Component.text(colorize(this.titleText.replace("%player%", sender.getName())));
+                Component subtitle = this.subtitleText.isEmpty()
+                        ? Component.empty()
+                        : Component.text(colorize(this.subtitleText.replace("%player%", sender.getName())));
+                viewer.showTitle(net.kyori.adventure.title.Title.title(title, subtitle,
+                        net.kyori.adventure.title.Title.Times.times(
+                                java.time.Duration.ofMillis(300),
+                                java.time.Duration.ofMillis(2000),
+                                java.time.Duration.ofMillis(500))));
+            }
+
+            if (this.actionbarEnabled && !this.actionbarText.isEmpty()) {
+                viewer.sendActionBar(Component.text(colorize(
+                        this.actionbarText.replace("%player%", sender.getName()))));
+            }
+
+            if (this.bossbarEnabled && !this.bossbarText.isEmpty() && this.plugin != null) {
+                var bossBar = net.kyori.adventure.bossbar.BossBar.bossBar(
+                        Component.text(colorize(this.bossbarText.replace("%player%", sender.getName()))),
+                        1f,
+                        net.kyori.adventure.bossbar.BossBar.Color.YELLOW,
+                        net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_10);
+                viewer.showBossBar(bossBar);
+                this.plugin.getScheduler().runAtEntityLater(viewer, () -> viewer.hideBossBar(bossBar),
+                        this.bossbarSeconds * 20L);
+            }
         }
 
         return true;

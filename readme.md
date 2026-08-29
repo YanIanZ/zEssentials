@@ -80,7 +80,7 @@ Small quality features:
 - [ ] Polish `[item]` display, add `[inv]`, `[ender]`, `[pos]` built-in display keywords
 - [ ] Custom interactive keywords: config-driven placeholder/hover/click keywords (10 defaults shipped)
 - [ ] Interactive player names: hover + click actions on every player name in chat
-- [ ] Player mention system: highlight @name, notify target with sound/title/actionbar/bossbar (togglable)
+- [x] Player mention system: highlight @name, notify target with sound/title/actionbar/bossbar (togglable)
 - [ ] Slowmode per player/server with staff bypass
 - [x] Message deletion button for staff (click-to-delete own log/history)
 - [ ] DND mode, quick replies, emoji shortcuts
