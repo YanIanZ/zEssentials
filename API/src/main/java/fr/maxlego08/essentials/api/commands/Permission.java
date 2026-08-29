@@ -48,6 +48,7 @@ public enum Permission {
     ESSENTIALS_TP_WORLD,
     ESSENTIALS_TP_WORLD_OTHER("Allows to teleport another player into a world"),
     ESSENTIALS_TRASH,
+    ESSENTIALS_CONDENSE,
     ESSENTIALS_FEED,
     ESSENTIALS_FEED_OTHER("Allows to feed another player"),
     ESSENTIALS_FEED_ALL("Allows to feed all players on the server"),

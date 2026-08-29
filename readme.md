@@ -49,6 +49,10 @@ Inspired by CMILib (https://github.com/Zrips/CMILib):
 - [x] Anvil text input reuse for more prompts (home rename, note title)
 - [x] More player placeholders (statistics deep dive, timed commands)
 - [x] `/cmiKit` style kit claim-all button in the preview screen
+- [x] `/condense` — compact loose items into blocks (19 recipes)
+- [x] `/vanish` upgraded — fake join/quit messages, pickup + collision suppression, particle burst
+- [x] Hypixel-style nick — tab-complete shows nickname instead of real name
+- [x] `/reports` staff screen GUI separate from `/report` player command
 
 Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
 - [x] Tab list header & footer per world with PlaceholderAPI + refresh interval

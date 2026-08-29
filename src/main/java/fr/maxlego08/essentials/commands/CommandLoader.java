@@ -95,6 +95,7 @@ public class CommandLoader {
         register("more", CommandMore.class);
         register("worldtp", CommandTeleportWorld.class, "wtp");
         register("trash", CommandTrash.class, "poubelle");
+        register("condense", CommandCondense.class);
         register("feed", CommandFeed.class, "eat");
         register("craft", CommandCraft.class);
         register("enchanting", CommandEnchanting.class);
