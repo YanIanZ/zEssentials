@@ -85,6 +85,16 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Config self-healing** — `config-version` key added to all 40+ module configs; `ConfigHealer` detects schema version mismatch and appends missing keys/sections while preserving user comments and existing values
 - **Test coverage** — 5 new test classes: `ConfigHealerEdgeCaseTest` (8 tests), `ConfigVersionCoverageTest` (2 tests), `MessageCompletenessTest` (3 tests), `EconomyEdgeCaseTest` (5 tests), `ChatDisplayKeywordTest` (7 tests)
 
+## Enderchest custom GUI
+
+- **Custom paginated enderchest** (`/ec`, `/enderchest`) — Hypixel SkyBlock-style 54-slot GUI with bottom navigation row, replacing the vanilla 27-slot enderchest
+- **Permission-based page count** — `essentials.enderchest.pages.2` and `.pages.3` grant 2/3 pages (90/135 usable slots); `default-pages` and `max-pages` config control defaults and caps
+- **Vanilla migration** — first open copies existing vanilla enderchest contents into the new backing store and clears the vanilla chest to prevent duplication
+- **Immediate sync** — every click syncs the affected slot back to the backing array; close saves to JSON; no item loss on crash/disconnect
+- **Read-only `/endersee`** — viewing another player's enderchest cancels all clicks
+- **Config-driven nav row** — filler material/color, prev/next/close buttons, page indicator text all configurable in `modules/enderchest/config.yml`
+- **Self-healing config** — `config-version: 1` key included; `ConfigHealer` appends missing keys on load
+
 # 1.1.0.0
 
 - **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly
