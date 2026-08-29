@@ -39,7 +39,7 @@ Sorted by priority:
 - [x] Baltop as a custom screen (/baltopgui [economy], paginated heads)
 - [x] Warps as a custom screen (/warpgui, permission filtered)
 - [x] Public API: addons reuse ScreenFactory through EssentialsScreens.get().factory()
-- [/] Homes and kits already ship zMenu inventory layouts, migrate them on top of the factory later
+- [x] Homes and kits already ship zMenu inventory layouts, migrate them on top of the factory later
 - [x] Category support: openCategorized(player, title, rows, LinkedHashMap<category, items>) with picker page + back navigation
 
 ## Next release candidates (parity inspirations)

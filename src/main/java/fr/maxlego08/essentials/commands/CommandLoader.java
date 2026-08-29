@@ -194,6 +194,8 @@ public class CommandLoader {
 
         register("baltopgui", dev.yanianz.essentials.screens.CommandBaltopGui.class);
         register("warpgui", dev.yanianz.essentials.screens.CommandWarpsGui.class);
+        register("homesgui", dev.yanianz.essentials.screens.CommandHomesGui.class);
+        register("kitsgui", dev.yanianz.essentials.screens.CommandKitsGui.class);
         register("rep", CommandRepGive.class);
         register("reputation", CommandReputationView.class);
         register("showitem", CommandShowItem.class);
