@@ -20,6 +20,8 @@ import java.util.UUID;
 
 public class EnderChestModule extends ZModule {
 
+    private static boolean listenerRegistered = false;
+
     @NonLoadable
     private final Map<UUID, EnderChestData> dataCache = new HashMap<>();
     private int defaultPages = 1;
@@ -38,6 +40,10 @@ public class EnderChestModule extends ZModule {
 
     public EnderChestModule(ZEssentialsPlugin plugin) {
         super(plugin, "enderchest");
+        if (!listenerRegistered) {
+            Bukkit.getPluginManager().registerEvents(new EnderChestListener(plugin), plugin);
+            listenerRegistered = true;
+        }
     }
 
     @Override
