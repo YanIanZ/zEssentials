@@ -24,7 +24,7 @@ public final class EnderChestGui {
         EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
         int currentPage = Math.max(0, Math.min(startPage, pages - 1));
 
-        EnderChestHolder holder = new EnderChestHolder(player.getUniqueId(), data, currentPage, pages, readOnly);
+        EnderChestHolder holder = new EnderChestHolder(data.getPlayerId(), data, currentPage, pages, readOnly);
         String title = module.getTitle()
                 .replace("%page%", String.valueOf(currentPage + 1))
                 .replace("%total%", String.valueOf(pages));

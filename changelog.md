@@ -95,6 +95,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Config-driven nav row** — filler material/color, prev/next/close buttons, page indicator text all configurable in `modules/enderchest/config.yml`
 - **Self-healing config** — `config-version: 1` key included; `ConfigHealer` appends missing keys on load
 
+### Post-review hardening
+
+- **Fixed** migrated items lost on crash/reload between first open and first close — `getData` now persists to JSON immediately after vanilla migration (before the GUI opens), closing the data-loss window
+- **Fixed** `dataCache` `HashMap` corruption on Folia — switched to `ConcurrentHashMap` (per-player region threads mutate the cache concurrently)
+- **Fixed** `/endersee` silently migrating and clearing the target's vanilla enderchest — migration now only runs on the owner's own `/ec` path (`getData` takes a `migrate` flag; `/endersee` passes `false`)
+- **Fixed** `EnderChestHolder.playerId` holding the viewer's UUID on `/endersee` — now set to the data owner's UUID so `onClose` always saves to the correct file
+- **Switched** ItemStack persistence to lossless `serializeAsBytes()`/`deserializeBytes()` Base64 (was `serialize()`+Gson, version-shape-coupled); added `EnderChestSerializerTest` round-trip coverage (5 tests)
+- **Fixed** `default-pages` not clamped to `max-pages` — misconfig could bypass the hard cap; now `Math.min(defaultPages, maxPages)` in `loadConfiguration`
+
 # 1.1.0.0
 
 - **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly

@@ -14,16 +14,16 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EnderChestModule extends ZModule {
 
     private static boolean listenerRegistered = false;
 
     @NonLoadable
-    private final Map<UUID, EnderChestData> dataCache = new HashMap<>();
+    private final Map<UUID, EnderChestData> dataCache = new ConcurrentHashMap<>();
     private int defaultPages = 1;
     private int maxPages = 3;
     private String title = "&5&lEnder Chest &8(&f%page%&8/&f%total%&8)";
@@ -53,6 +53,7 @@ public class EnderChestModule extends ZModule {
         YamlConfiguration config = getConfiguration();
         this.defaultPages = Math.max(1, config.getInt("default-pages", 1));
         this.maxPages = Math.max(1, config.getInt("max-pages", 3));
+        this.defaultPages = Math.min(this.defaultPages, this.maxPages);
         this.title = config.getString("title", "&5&lEnder Chest &8(&f%page%&8/&f%total%&8)");
 
         ConfigurationSection nav = config.getConfigurationSection("nav-row");
@@ -81,7 +82,7 @@ public class EnderChestModule extends ZModule {
         return Math.max(1, best);
     }
 
-    public EnderChestData getData(UUID playerId) {
+    public EnderChestData getData(UUID playerId, boolean migrate) {
         EnderChestData data = dataCache.get(playerId);
         if (data != null) return data;
 
@@ -91,9 +92,12 @@ public class EnderChestModule extends ZModule {
         }
         if (data == null) {
             data = new EnderChestData(playerId, maxPages);
-            Player online = Bukkit.getPlayer(playerId);
-            if (online != null) {
-                migrateFromVanilla(data, online);
+            if (migrate) {
+                Player online = Bukkit.getPlayer(playerId);
+                if (online != null) {
+                    migrateFromVanilla(data, online);
+                    saveToFile(data);
+                }
             }
         }
         dataCache.put(playerId, data);
@@ -143,7 +147,7 @@ public class EnderChestModule extends ZModule {
 
     public void openEnderChest(Player player) {
         int allowed = getAllowedPages(player);
-        EnderChestData data = getData(player.getUniqueId());
+        EnderChestData data = getData(player.getUniqueId(), true);
         if (data.getPages() < allowed) {
             data.resize(allowed);
         }
@@ -152,7 +156,7 @@ public class EnderChestModule extends ZModule {
     }
 
     public void openEnderChestFor(Player viewer, OfflinePlayer target) {
-        EnderChestData data = getData(target.getUniqueId());
+        EnderChestData data = getData(target.getUniqueId(), false);
         int pages = data.getPages();
         EnderChestGui.open(this.plugin, viewer, data, pages, 0, true);
     }

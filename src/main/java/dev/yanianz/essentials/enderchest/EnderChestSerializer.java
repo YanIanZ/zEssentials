@@ -4,30 +4,47 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
+import java.util.Base64;
 import java.util.UUID;
 
-public final class EnderChestSerializer {
+public class EnderChestSerializer {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final EnderChestSerializer INSTANCE = new EnderChestSerializer();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private EnderChestSerializer() {
+    EnderChestSerializer() {
     }
 
     public static String serialize(EnderChestData data) {
+        return INSTANCE.serializeData(data);
+    }
+
+    public static EnderChestData deserialize(String json, UUID playerId) {
+        return INSTANCE.deserializeData(json, playerId);
+    }
+
+    protected byte[] encodeItem(ItemStack item) {
+        return item.serializeAsBytes();
+    }
+
+    protected ItemStack decodeItem(byte[] bytes) {
+        return ItemStack.deserializeBytes(bytes);
+    }
+
+    String serializeData(EnderChestData data) {
         SerializedData raw = new SerializedData();
         raw.player_uuid = data.getPlayerId().toString();
         raw.pages = data.getPages();
         ItemStack[] contents = data.rawContents();
-        raw.contents = new Object[contents.length];
+        raw.contents = new String[contents.length];
         for (int i = 0; i < contents.length; i++) {
-            raw.contents[i] = contents[i] == null ? null : contents[i].serialize();
+            raw.contents[i] = contents[i] == null ? null
+                    : Base64.getEncoder().encodeToString(encodeItem(contents[i]));
         }
         return GSON.toJson(raw);
     }
 
-    @SuppressWarnings("unchecked")
-    public static EnderChestData deserialize(String json, UUID playerId) {
+    EnderChestData deserializeData(String json, UUID playerId) {
         SerializedData raw = GSON.fromJson(json, SerializedData.class);
         if (raw == null) return null;
         int pages = Math.max(1, raw.pages);
@@ -35,7 +52,7 @@ public final class EnderChestSerializer {
         if (raw.contents != null) {
             for (int i = 0; i < Math.min(raw.contents.length, contents.length); i++) {
                 if (raw.contents[i] != null) {
-                    contents[i] = ItemStack.deserialize((Map<String, Object>) raw.contents[i]);
+                    contents[i] = decodeItem(Base64.getDecoder().decode(raw.contents[i]));
                 }
             }
         }
@@ -47,6 +64,6 @@ public final class EnderChestSerializer {
     private static final class SerializedData {
         String player_uuid;
         int pages;
-        Object[] contents;
+        String[] contents;
     }
 }
