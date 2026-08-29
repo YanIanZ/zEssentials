@@ -116,6 +116,7 @@ import java.util.function.Consumer;
 public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin {
 
     private final UUID consoleUniqueId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private dev.yanianz.essentials.anvil.AnvilTextInput anvilTextInput;
     private final List<Material> materials = Arrays.stream(Material.values()).filter(e -> !e.name().startsWith("LEGACY_")).toList();
     private final Enchantments enchantments = new ZEnchantments();
     private final List<PermissionChecker> permissionCheckers = new ArrayList<>();
@@ -257,6 +258,7 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         }
 
         dev.yanianz.essentials.screens.EssentialsScreens.register(this);
+        this.anvilTextInput = new dev.yanianz.essentials.anvil.AnvilTextInput(this);
 
         this.printEnableBanner();
     }
@@ -407,6 +409,10 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
     @Override
     public InventoryManager getInventoryManager() {
         return this.inventoryManager;
+    }
+
+    public dev.yanianz.essentials.anvil.AnvilTextInput getAnvilTextInput() {
+        return this.anvilTextInput;
     }
 
     @Override

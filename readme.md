@@ -46,7 +46,7 @@ Sorted by priority:
 
 Inspired by CMILib (https://github.com/Zrips/CMILib):
 - [x] `/cmi itemname` style advanced item editing (glow, unbreakable, custom model data)
-- [ ] Anvil text input reuse for more prompts (home rename, note title)
+- [x] Anvil text input reuse for more prompts (home rename, note title)
 - [ ] More player placeholders (statistics deep dive, timed commands)
 - [x] `/cmiKit` style kit claim-all button in the preview screen
 
