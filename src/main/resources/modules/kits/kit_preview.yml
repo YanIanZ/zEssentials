@@ -5,6 +5,14 @@ items:
     type: ZESSENTIALS_KIT_PREVIEW
     slots:
       - 0-44
+  claim:
+    slot: 53
+    type: ZESSENTIALS_KIT_CLAIM
+    item:
+      material: NETHER_STAR
+      name: '&a&lClaim Kit'
+      lore:
+        - '&7Click to claim this kit'
   back:
     slot: 49
     type: INVENTORY

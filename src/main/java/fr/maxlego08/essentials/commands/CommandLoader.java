@@ -236,6 +236,9 @@ public class CommandLoader {
 
         register("cooldown", CommandCooldown.class);
         register("itemname", CommandItemName.class, "iname", "itemrename", "irename");
+        register("itemglow", CommandItemGlow.class, "iglow");
+        register("itemunbreakable", CommandItemUnbreakable.class, "iunbreakable");
+        register("itemmodeldata", CommandItemModelData.class, "imodeldata", "imodel");
         register("itemdb", CommandItemDb.class);
         register("itemlore", CommandItemLore.class, "ilore", "itemlore", "lore");
         register("mail", CommandMail.class, "mailbox", "mb");

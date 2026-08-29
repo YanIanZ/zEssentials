@@ -45,10 +45,10 @@ Sorted by priority:
 ## Next release candidates (parity inspirations)
 
 Inspired by CMILib (https://github.com/Zrips/CMILib):
-- [ ] `/cmi itemname` style advanced item editing (glow, unbreakable, custom model data)
+- [x] `/cmi itemname` style advanced item editing (glow, unbreakable, custom model data)
 - [ ] Anvil text input reuse for more prompts (home rename, note title)
 - [ ] More player placeholders (statistics deep dive, timed commands)
-- [ ] `/cmiKit` style kit claim-all button in the preview screen
+- [x] `/cmiKit` style kit claim-all button in the preview screen
 
 Inspired by TAB (https://github.com/NEZNAMY/TAB) — parity 1:1 long term:
 - [x] Tab list header & footer per world with PlaceholderAPI + refresh interval

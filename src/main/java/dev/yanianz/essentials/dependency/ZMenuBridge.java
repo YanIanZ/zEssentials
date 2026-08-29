@@ -5,6 +5,7 @@ import fr.maxlego08.menu.api.loader.NoneLoader;
 import fr.maxlego08.menu.api.utils.version.MinecraftVersion;
 import fr.maxlego08.essentials.buttons.*;
 import fr.maxlego08.essentials.buttons.kit.ButtonKitPreview;
+import fr.maxlego08.essentials.buttons.kit.ButtonKitClaim;
 import fr.maxlego08.essentials.buttons.mail.ButtonMailBox;
 import fr.maxlego08.essentials.buttons.mail.ButtonMailBoxAdmin;
 import fr.maxlego08.essentials.buttons.sanction.ButtonSanctionInformation;
@@ -39,6 +40,7 @@ public final class ZMenuBridge {
         plugin.getButtonManager().register(new NoneLoader(plugin, ButtonSanctionInformation.class, "ZESSENTIALS_SANCTION_INFORMATION"));
         plugin.getButtonManager().register(new NoneLoader(plugin, ButtonSanctions.class, "ZESSENTIALS_SANCTIONS"));
         plugin.getButtonManager().register(new NoneLoader(plugin, ButtonKitPreview.class, "ZESSENTIALS_KIT_PREVIEW"));
+        plugin.getButtonManager().register(new NoneLoader(plugin, ButtonKitClaim.class, "ZESSENTIALS_KIT_CLAIM"));
         plugin.getButtonManager().register(new NoneLoader(plugin, ButtonMailBox.class, "ZESSENTIALS_MAILBOX"));
         plugin.getButtonManager().register(new NoneLoader(plugin, ButtonMailBoxAdmin.class, "ZESSENTIALS_MAILBOX_ADMIN"));
         plugin.getButtonManager().register(new NoneLoader(plugin, ButtonVaultSlotDisable.class, "ZESSENTIALS_VAULT_SLOTS_DISABLE"));
