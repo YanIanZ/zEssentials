@@ -9,6 +9,7 @@ import fr.maxlego08.essentials.api.user.Option;
 import fr.maxlego08.essentials.api.user.PrivateMessage;
 import fr.maxlego08.essentials.api.user.User;
 import fr.maxlego08.essentials.storage.ConfigStorage;
+import dev.yanianz.essentials.nicknames.NicknamesModule;
 import fr.maxlego08.essentials.zutils.utils.ZUtils;
 import fr.maxlego08.essentials.zutils.utils.paper.PaperComponent;
 import net.kyori.adventure.text.Component;
@@ -43,13 +44,33 @@ public class PaperServer extends ZUtils implements EssentialsServer {
 
     @Override
     public List<String> getPlayersNames() {
-        return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+        return Bukkit.getOnlinePlayers().stream().map(this::tabName).toList();
     }
 
     @Override
     public List<String> getVisiblePlayerNames(@NotNull CommandSender sender) {
         if (!(sender instanceof Player player)) return getPlayersNames();
-        return Bukkit.getOnlinePlayers().stream().filter(target -> !isVanishedFor(target, player)).map(Player::getName).toList();
+        return Bukkit.getOnlinePlayers().stream().filter(target -> !isVanishedFor(target, player)).map(this::tabName).toList();
+    }
+
+    /**
+     * Returns the name tab completion should suggest for a player: the
+     * stripped nickname when one is set, otherwise the real name.
+     */
+    private String tabName(Player player) {
+        NicknamesModule nicknamesModule = this.plugin.getModuleManager().getModule(NicknamesModule.class);
+        if (nicknamesModule != null && nicknamesModule.isEnable()) {
+            String nickname = nicknamesModule.getNickname(player.getUniqueId());
+            if (nickname != null && !nickname.isBlank()) {
+                return stripColors(nickname);
+            }
+        }
+        return player.getName();
+    }
+
+    private String stripColors(String text) {
+        if (text == null) return "";
+        return text.replace("§x", "").replaceAll("[&§][0-9a-fk-orA-FK-OR]", "");
     }
 
     @Override

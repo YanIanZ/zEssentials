@@ -21,7 +21,7 @@ public class CommandTeleportDeny extends VCommand {
         this.setModule(TeleportationModule.class);
         this.setPermission(Permission.ESSENTIALS_TPA_DENY);
         this.setDescription(Message.DESCRIPTION_TPA_DENY);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
         this.onlyPlayers();
     }
 

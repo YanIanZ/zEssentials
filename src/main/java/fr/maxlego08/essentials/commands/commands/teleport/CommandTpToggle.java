@@ -22,7 +22,7 @@ public class CommandTpToggle extends VCommand {
         this.setModule(MessageModule.class);
         this.setPermission(Permission.ESSENTIALS_TP_TOGGLE);
         this.setDescription(Message.DESCRIPTION_TP_TOGGLE);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

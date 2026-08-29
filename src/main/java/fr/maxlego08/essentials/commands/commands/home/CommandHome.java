@@ -31,7 +31,7 @@ public class CommandHome extends VCommand {
             }
             return new ArrayList<>();
         });
-        this.addOptionalArg("confirm");
+        this.addOptionalArg("confirm", (s,a) -> java.util.List.of("confirm"));
     }
 
     @Override

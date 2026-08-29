@@ -19,7 +19,7 @@ public class CommandPhantoms extends VCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_PHANTOMS);
         this.setDescription(Message.DESCRIPTION_PHANTOMS);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

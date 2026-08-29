@@ -13,7 +13,7 @@ public class CommandGameModeCreative extends GameModeCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_GAMEMODE_CREATIVE);
         this.setDescription(Message.DESCRIPTION_GAMEMODE_CREATIVE);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

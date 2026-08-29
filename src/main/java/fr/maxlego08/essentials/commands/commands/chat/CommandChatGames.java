@@ -18,7 +18,7 @@ public class CommandChatGames extends VCommand {
         this.setModule(ChatGamesModule.class);
         this.setPermission(Permission.ESSENTIALS_CHATGAMES_ADMIN);
         this.setDescription(Message.DESCRIPTION_CHAT_GAMES);
-        this.addOptionalArg("type");
+        this.addOptionalArg("type", (s,a) -> java.util.List.of("math", "scramble", "fast-type", "reverse", "trivia", "hot-letter", "stop", "reload"));
     }
 
     @Override

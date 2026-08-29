@@ -18,7 +18,7 @@ public class CommandSpawn extends VCommand {
         this.setModule(SpawnModule.class);
         this.setPermission(Permission.ESSENTIALS_SPAWN);
         this.setDescription(Message.DESCRIPTION_SPAWN);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

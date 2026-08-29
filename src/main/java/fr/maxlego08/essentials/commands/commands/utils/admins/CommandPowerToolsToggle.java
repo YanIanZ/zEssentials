@@ -17,7 +17,7 @@ public class CommandPowerToolsToggle extends VCommand {
         this.setModule(MessageModule.class);
         this.setPermission(Permission.ESSENTIALS_POWER_TOOLS_TOGGLE);
         this.setDescription(Message.DESCRIPTION_POWER_TOOLS_TOGGLE);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

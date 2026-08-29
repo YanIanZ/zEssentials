@@ -18,7 +18,7 @@ public class CommandTpaHereToggle extends VCommand {
         this.setModule(TeleportationModule.class);
         this.setPermission(Permission.ESSENTIALS_TPA_HERE_TOGGLE);
         this.setDescription(Message.DESCRIPTION_TPA_HERE_TOGGLE);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

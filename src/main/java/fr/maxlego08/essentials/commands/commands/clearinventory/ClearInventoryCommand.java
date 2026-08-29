@@ -12,7 +12,7 @@ public class ClearInventoryCommand extends VCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_CLEARINVENTORY);
         this.setDescription(Message.DESCRIPTION_CLEARINVENTORY);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

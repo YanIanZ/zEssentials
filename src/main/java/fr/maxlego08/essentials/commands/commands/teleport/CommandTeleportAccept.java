@@ -21,7 +21,7 @@ public class CommandTeleportAccept extends VCommand {
         this.setModule(TeleportationModule.class);
         this.setPermission(Permission.ESSENTIALS_TPA_ACCEPT);
         this.setDescription(Message.DESCRIPTION_TPA_ACCEPT);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
         this.onlyPlayers();
     }
 

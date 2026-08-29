@@ -19,7 +19,7 @@ public class CommandTeleportWorld extends VCommand {
         this.setPermission(Permission.ESSENTIALS_TP_WORLD);
         this.setDescription(Message.DESCRIPTION_TP_WORLD);
         this.addRequireArg("world", (a, b) -> Bukkit.getWorlds().stream().map(WorldInfo::getName).toList());
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

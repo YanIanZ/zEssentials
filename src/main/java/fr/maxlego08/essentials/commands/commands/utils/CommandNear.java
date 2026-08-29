@@ -22,7 +22,7 @@ public class CommandNear extends VCommand {
         this.setPermission(Permission.ESSENTIALS_NEAR);
         this.setDescription(Message.DESCRIPTION_NEAR);
         this.onlyPlayers();
-        this.addOptionalArg("radius");
+        this.addOptionalArg("radius", (s,a) -> java.util.List.of("10", "50", "100", "200"));
     }
 
     @Override

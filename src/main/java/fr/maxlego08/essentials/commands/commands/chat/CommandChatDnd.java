@@ -22,7 +22,7 @@ public class CommandChatDnd extends VCommand {
         this.setModule(ChatModule.class);
         this.setPermission(Permission.ESSENTIALS_CHAT_DND);
         this.setDescription(Message.DESCRIPTION_CHAT_DND);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

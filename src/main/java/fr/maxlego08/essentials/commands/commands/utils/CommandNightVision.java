@@ -17,7 +17,7 @@ public class CommandNightVision extends VCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_NIGHTVISION);
         this.setDescription(Message.DESCRIPTION_NIGHT_VISION);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

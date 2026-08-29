@@ -18,7 +18,7 @@ public class CommandGameMode extends GameModeCommand {
         this.setPermission(Permission.ESSENTIALS_GAMEMODE);
         this.setDescription(Message.DESCRIPTION_GAMEMODE);
         this.addRequireArg("gamemode", (a, b) -> Arrays.stream(GameMode.values()).map(e -> e.name().toLowerCase()).collect(Collectors.toList()));
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

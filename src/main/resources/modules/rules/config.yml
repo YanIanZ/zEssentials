@@ -16,4 +16,5 @@ enable: true
 # Defines how to display server rules
 # INVENTORY
 # MESSAGE
+# SCREEN
 rule-type: INVENTORY

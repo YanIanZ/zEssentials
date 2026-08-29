@@ -18,7 +18,7 @@ public class CommandPayToggle extends VCommand {
         this.setPermission(Permission.ESSENTIALS_PAY_TOGGLE);
         this.setDescription(Message.DESCRIPTION_PAY_TOGGLE);
         this.onlyPlayers();
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

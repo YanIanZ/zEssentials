@@ -17,7 +17,7 @@ public class CommandMessageToggle extends VCommand {
         this.setModule(MessageModule.class);
         this.setPermission(Permission.ESSENTIALS_MESSAGE_TOGGLE);
         this.setDescription(Message.DESCRIPTION_MESSAGE_TOGGLE);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

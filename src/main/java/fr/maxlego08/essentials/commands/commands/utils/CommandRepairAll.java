@@ -16,7 +16,7 @@ public class CommandRepairAll extends VCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_REPAIR_ALL);
         this.setDescription(Message.DESCRIPTION_REPAIR_ALL);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

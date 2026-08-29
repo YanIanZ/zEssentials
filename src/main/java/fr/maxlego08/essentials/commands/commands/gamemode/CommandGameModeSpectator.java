@@ -13,7 +13,7 @@ public class CommandGameModeSpectator extends GameModeCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_GAMEMODE_SPECTATOR);
         this.setDescription(Message.DESCRIPTION_GAMEMODE_SPECTATOR);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

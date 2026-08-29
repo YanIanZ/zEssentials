@@ -3,10 +3,14 @@ package fr.maxlego08.essentials.zutils.utils;
 import com.google.common.base.Strings;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.Permission;
+import fr.maxlego08.essentials.api.messages.Message;
+import fr.maxlego08.essentials.module.modules.JoinQuitModule;
+import fr.maxlego08.essentials.module.modules.effects.EffectsModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -93,12 +97,44 @@ public abstract class ZUtils extends MessageUtils {
 
     protected void updateVanishState(EssentialsPlugin plugin, Player player, boolean vanish) {
 
+        boolean wasVanished = isVanished(player);
+
         if (vanish) {
             player.setMetadata("vanished", new FixedMetadataValue(plugin, true));
             VANISHED_PLAYERS.add(player.getUniqueId());
         } else {
             player.removeMetadata("vanished", plugin);
             VANISHED_PLAYERS.remove(player.getUniqueId());
+        }
+
+        // Suppress pickups and physical interactions while vanished
+        player.setCanPickupItems(!vanish);
+        player.setCollidable(!vanish);
+
+        // Fake join/quit broadcast so other players think the player left/joined
+        JoinQuitModule joinQuitModule = plugin.getModuleManager().getModule(JoinQuitModule.class);
+        if (joinQuitModule != null && joinQuitModule.isEnable()) {
+            if (vanish && !wasVanished) {
+                Bukkit.getOnlinePlayers().forEach(online -> {
+                    if (!online.equals(player)) message(online, Message.QUIT_MESSAGE, "%player%", player.getName());
+                });
+            } else if (!vanish && wasVanished) {
+                Bukkit.getOnlinePlayers().forEach(online -> {
+                    if (!online.equals(player)) message(online, Message.JOIN_MESSAGE, "%player%", player.getName());
+                });
+            }
+        }
+
+        // Vanish particle burst when the player actually disappears
+        if (vanish && !wasVanished) {
+            EffectsModule effectsModule = plugin.getModuleManager().getModule(EffectsModule.class);
+            if (effectsModule != null && effectsModule.isEnable()) {
+                Location location = player.getLocation().add(0, 1, 0);
+                World world = location.getWorld();
+                if (world != null) {
+                    world.spawnParticle(Particle.SQUID_INK, location, 25, 0.4, 0.5, 0.4, 0.05);
+                }
+            }
         }
 
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {

@@ -22,7 +22,7 @@ public class CommandPublicHomes extends VCommand {
         this.setPermission(Permission.ESSENTIALS_HOME_VISIT);
         this.setDescription(Message.DESCRIPTION_PUBLIC_HOMES);
         this.onlyPlayers();
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

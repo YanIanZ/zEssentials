@@ -18,7 +18,7 @@ public class CommandDeathMessageToggle extends VCommand {
         this.setModule(DeathMessageModule.class);
         this.setPermission(Permission.ESSENTIALS_DEATH_MESSAGE_TOGGLE);
         this.setDescription(Message.DESCRIPTION_DEATH_MESSAGE_TOGGLE);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

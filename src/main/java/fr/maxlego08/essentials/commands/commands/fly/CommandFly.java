@@ -19,7 +19,7 @@ public class CommandFly extends VCommand {
         this.addSubCommand(new CommandFlySet(plugin));
         this.addSubCommand(new CommandFlyInfo(plugin));
         this.addSubCommand(new CommandFlyGet(plugin));
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

@@ -13,7 +13,7 @@ public class CommandGameModeSurvival extends GameModeCommand {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_GAMEMODE_SURVIVAL);
         this.setDescription(Message.DESCRIPTION_GAMEMODE_SURVIVAL);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

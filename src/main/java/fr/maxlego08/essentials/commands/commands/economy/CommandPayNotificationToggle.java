@@ -19,7 +19,7 @@ public class CommandPayNotificationToggle extends VCommand {
         this.setPermission(Permission.ESSENTIALS_PAY_NOTIFICATION_TOGGLE);
         this.setDescription(Message.DESCRIPTION_PAY_NOTIFICATION_TOGGLE);
         this.onlyPlayers();
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override
