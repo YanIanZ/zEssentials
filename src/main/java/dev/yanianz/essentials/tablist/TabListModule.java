@@ -29,6 +29,9 @@ public class TabListModule extends ZModule {
     private long refreshSeconds;
     private Map<String, List<String>> worldEntries = new HashMap<>();
     private List<GroupHeaderFooter> groupEntries = new ArrayList<>();
+    private boolean layoutEnabled;
+    private int layoutSlots = 80;
+    private List<String[]> layoutFakeEntries = new ArrayList<>();
 
     @NonLoadable
     private Object refreshTask;
@@ -73,6 +76,18 @@ public class TabListModule extends ZModule {
                 if (permission.isEmpty()) continue;
                 this.groupEntries.add(new GroupHeaderFooter(permission,
                         section.getStringList("header"), section.getStringList("footer")));
+            }
+        }
+
+        this.layoutEnabled = config.getBoolean("layout.enable", false);
+        this.layoutSlots = Math.max(1, config.getInt("layout.slots", 80));
+        this.layoutFakeEntries.clear();
+        var layoutSection = config.getConfigurationSection("layout.fixed-slots");
+        if (layoutSection != null) {
+            for (String key : layoutSection.getKeys(false)) {
+                int slot = Integer.parseInt(key);
+                String text = layoutSection.getString(key, "");
+                this.layoutFakeEntries.add(new String[]{"slot_" + slot, text});
             }
         }
 
@@ -195,5 +210,13 @@ public class TabListModule extends ZModule {
 
     private String colorize(String text) {
         return text == null ? "" : text.replace("&", "§");
+    }
+
+    public boolean isLayoutEnabled() {
+        return this.layoutEnabled;
+    }
+
+    public List<String[]> getLayoutFakeEntries() {
+        return this.layoutFakeEntries;
     }
 }

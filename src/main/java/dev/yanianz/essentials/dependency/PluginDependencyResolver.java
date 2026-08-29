@@ -52,7 +52,8 @@ public final class PluginDependencyResolver {
      */
     private static final List<RequiredPlugin> REQUIRED = List.of(
             new RequiredPlugin("zMenu", Source.MODRINTH, "zmenu"),
-            new RequiredPlugin("PlaceholderAPI", Source.HANGAR, "PlaceholderAPI")
+            new RequiredPlugin("PlaceholderAPI", Source.HANGAR, "PlaceholderAPI"),
+            new RequiredPlugin("ProtocolLib", Source.HANGAR, "ProtocolLib")
     );
 
     private PluginDependencyResolver() {
@@ -166,14 +167,24 @@ public final class PluginDependencyResolver {
      */
     private static String fetchLatestHangarDownload(String slug) throws Exception {
 
-        // The versions list is sorted from newest to oldest
-        JsonObject versionsResponse = getJson(String.format(HANGAR_PROJECT_API, slug) + "?limit=1").getAsJsonObject();
+        String versionsApi = String.format(HANGAR_PROJECT_API, slug) + "?limit=1";
+        JsonObject versionsResponse = getJson(versionsApi).getAsJsonObject();
         JsonArray versions = versionsResponse.getAsJsonArray("result");
         if (versions.isEmpty()) throw new IllegalStateException("No version found on Hangar");
         String version = versions.get(0).getAsJsonObject().get("name").getAsString();
 
         JsonObject detail = getJson(String.format(HANGAR_PROJECT_API, slug) + "/" + version).getAsJsonObject();
-        return detail.getAsJsonObject("downloads").getAsJsonObject("PAPER").get("downloadUrl").getAsString();
+        JsonObject paperDownloads = detail.getAsJsonObject("downloads").getAsJsonObject("PAPER");
+
+        if (paperDownloads.has("downloadUrl") && !paperDownloads.get("downloadUrl").isJsonNull()) {
+            return paperDownloads.get("downloadUrl").getAsString();
+        }
+
+        if (paperDownloads.has("externalUrl") && !paperDownloads.get("externalUrl").isJsonNull()) {
+            return paperDownloads.get("externalUrl").getAsString();
+        }
+
+        throw new IllegalStateException("No download URL found on Hangar for " + slug);
     }
 
     /**

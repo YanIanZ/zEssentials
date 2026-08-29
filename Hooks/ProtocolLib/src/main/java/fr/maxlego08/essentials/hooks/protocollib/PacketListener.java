@@ -8,6 +8,7 @@ public class PacketListener {
     public void registerPackets(EssentialsPlugin plugin) {
 
         this.register(new PacketChatListener(plugin, plugin.getModuleManager().getModuleConfiguration("chat").getString("command-placeholder.result")));
+        this.register(new PacketTabLayoutListener(plugin));
     }
 
     private void register(PacketRegister packetRegister) {

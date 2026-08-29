@@ -240,12 +240,6 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         new VersionChecker(this, 325);
         context.ready();
 
-        // Load ProtocolLib
-        /*if (this.moduleManager.getModuleConfiguration("chat").getBoolean("command-placeholder.enable-replace-all-message") && getServer().getPluginManager().isPluginEnabled("ProtocolLib") && this.isPaperVersion()) {
-            PacketListener packetListener = new PacketListener();
-            packetListener.registerPackets(this);
-        }*/
-
         this.loadHooks();
 
         this.getServer().getServicesManager().register(EssentialsPlugin.class, this, this, ServicePriority.Normal);
@@ -884,6 +878,16 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
                 }
                 this.getLogger().info("Register MythicMobsHook.");
             });
+        }
+
+        if (getServer().getPluginManager().isPluginEnabled("ProtocolLib")) {
+            try {
+                fr.maxlego08.essentials.hooks.protocollib.PacketListener packetListener = new fr.maxlego08.essentials.hooks.protocollib.PacketListener();
+                packetListener.registerPackets(this);
+                this.getLogger().info("Register ProtocolLib packet listener.");
+            } catch (Exception e) {
+                this.getLogger().warning("Failed to register ProtocolLib listener: " + e.getMessage());
+            }
         }
 
         this.permissionCheckers.add(new fr.maxlego08.essentials.hooks.BukkitEventPermissionChecker());

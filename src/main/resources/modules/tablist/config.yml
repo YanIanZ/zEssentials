@@ -62,3 +62,22 @@ animations:
 # Example usage inside header:
 #   header:
 #     - "%anim_gradient-title% &7» &f%player_world%"
+
+# ── Tab slot layouts ──────────────────────────────────────────
+# When enabled, fake player entries are injected into the tab list
+# via ProtocolLib to create custom slot arrangements. Requires the
+# ProtocolLib plugin (auto-installed by zEssentials).
+#
+# fixed-slots maps a tab slot index to a text that fills that slot.
+# Slots are 0-79 (4 columns x 20 rows). Empty slots stay empty.
+# Use &7 for gray text, &f for white, &#hex for custom colors.
+layout:
+  enable: false
+  slots: 80
+  fixed-slots: {}
+  # Example:
+  # fixed-slots:
+  #   0: "&8&l╔"
+  #   1: "&8&l╔"
+  #   2: "&8&l╔"
+  #   3: "&8&l╔"
