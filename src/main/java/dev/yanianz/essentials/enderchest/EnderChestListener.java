@@ -42,9 +42,7 @@ public class EnderChestListener implements Listener {
         } else {
             int rawSlot = event.getRawSlot();
             if (rawSlot < 0) return;
-            if (event.getClick().isShiftClick()) {
-                plugin.getScheduler().runNextTick(wrappedTask -> syncAllSlots(holder));
-            }
+            plugin.getScheduler().runNextTick(wrappedTask -> syncAllSlots(holder));
         }
     }
 
@@ -52,8 +50,10 @@ public class EnderChestListener implements Listener {
         if (slot == EnderChestSlotMap.SLOT_CLOSE) {
             player.closeInventory();
         } else if (slot == EnderChestSlotMap.SLOT_PREV) {
+            syncAllSlots(holder);
             EnderChestGui.switchPage(plugin, player, holder, holder.getCurrentPage() - 1);
         } else if (slot == EnderChestSlotMap.SLOT_NEXT) {
+            syncAllSlots(holder);
             EnderChestGui.switchPage(plugin, player, holder, holder.getCurrentPage() + 1);
         }
     }
