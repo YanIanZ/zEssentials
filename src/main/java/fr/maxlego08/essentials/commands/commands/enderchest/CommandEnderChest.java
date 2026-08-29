@@ -1,5 +1,6 @@
 package fr.maxlego08.essentials.commands.commands.enderchest;
 
+import dev.yanianz.essentials.enderchest.EnderChestModule;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
@@ -17,7 +18,9 @@ public class CommandEnderChest extends VCommand {
 
     @Override
     protected CommandResultType perform(EssentialsPlugin plugin) {
-        this.player.openInventory(this.player.getEnderChest());
+        EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
+        module.openEnderChest(this.player);
+        message(this.sender, Message.COMMAND_ENDERCHEST_OPENED);
         return CommandResultType.SUCCESS;
     }
 }

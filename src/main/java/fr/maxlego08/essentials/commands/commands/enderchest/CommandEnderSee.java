@@ -1,15 +1,12 @@
 package fr.maxlego08.essentials.commands.commands.enderchest;
 
+import dev.yanianz.essentials.enderchest.EnderChestModule;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.messages.Message;
-import fr.maxlego08.essentials.api.nms.PlayerUtil;
-import fr.maxlego08.essentials.zutils.utils.NmsVersionUtils;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 import org.bukkit.OfflinePlayer;
-
-import java.lang.reflect.Constructor;
 
 public class CommandEnderSee extends VCommand {
 
@@ -29,32 +26,20 @@ public class CommandEnderSee extends VCommand {
 
             var targetPlayer = offlinePlayer.getPlayer();
             if (targetPlayer == null) return CommandResultType.SYNTAX_ERROR;
-            this.player.openInventory(targetPlayer.getEnderChest());
+
+            EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
+            module.openEnderChestFor(this.player, offlinePlayer);
+            message(this.sender, Message.COMMAND_ENDERSEE_OPENED, "%player%", offlinePlayer.getName());
+            message(this.sender, Message.COMMAND_ENDERSEE_READONLY);
 
         } else {
 
             if (!hasPermission(sender, Permission.ESSENTIALS_ENDERSEE_OFFLINE)) return CommandResultType.NO_PERMISSION;
 
-            String version = NmsVersionUtils.getNmsPackage();
-            String className = String.format("fr.maxlego08.essentials.nms.%s.PlayerUtils", version);
-
-            try {
-
-                Class<?> clazz = Class.forName(className);
-                Constructor<?> constructor = clazz.getConstructor(EssentialsPlugin.class);
-                PlayerUtil playerUtil = (PlayerUtil) constructor.newInstance(this.plugin);
-                if (!playerUtil.openEnderChest(player, offlinePlayer)) {
-                    message(sender, Message.COMMAND_ENDERSEE_ERROR, "%player%", offlinePlayer.getName());
-                    return CommandResultType.DEFAULT;
-                }
-
-            } catch (Exception exception) {
-                this.plugin.getLogger().severe("Cannot create a new instance for the class " + className);
-                this.plugin.getLogger().severe(exception.getMessage());
-                message(sender, Message.COMMAND_ENDERSEE_ERROR, "%player%", offlinePlayer.getName());
-                return CommandResultType.DEFAULT;
-            }
-
+            EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
+            module.openEnderChestFor(this.player, offlinePlayer);
+            message(this.sender, Message.COMMAND_ENDERSEE_OPENED, "%player%", offlinePlayer.getName());
+            message(this.sender, Message.COMMAND_ENDERSEE_READONLY);
         }
         return CommandResultType.SUCCESS;
     }

@@ -1205,6 +1205,9 @@ step-doesnt-started: "<error>Step &f%step% <error>is not started."
 
 # Enderchest
 command-endersee-error: "<error>Unable to load the ender chest of &f%player%<error>."
+command-enderchest-opened: "<success>You opened your ender chest."
+command-endersee-opened: "<success>You opened &f%player%<success>'s ender chest."
+command-endersee-readonly: "<7>You are viewing this ender chest in read-only mode."
 
 # TPA
 command-tpa-error-no-request-from-player: "<error>You do not have a teleport request from &f%player%<error>."
