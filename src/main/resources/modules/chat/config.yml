@@ -225,7 +225,7 @@ mention-placeholder:
 item-placeholder:
   enable: true
   regex: "(?i)\\[item\\]|\\[i\\]" # [item] or [i] placeholder
-  result: "&bx<amount> &f<item>"
+  result: "&f<item>&7x<amount>" # amount shown only when > 1
   permission: "zessentials.chat.placeholder.item" # You must define a permission
   # Regex used to ensure item names do not contain forbidden characters when displayed in chat
   item-name-regex: "^[a-zA-Z0-9_.?!^¨%ù*&é\"#'{(\\[-|èêë`\\\\çà)\\]=}ûî+<>:²€$/\\-\\,-â@;ô ]+$"

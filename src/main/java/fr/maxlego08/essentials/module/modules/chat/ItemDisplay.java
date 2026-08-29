@@ -43,11 +43,14 @@ public class ItemDisplay extends ZUtils implements ChatDisplay {
         if (itemStack.isEmpty()) {
             return message;
         }
+
         Component itemName = Component.translatable(itemStack);
         int amount = itemStack.getAmount();
 
         if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()) {
             itemName = itemStack.getItemMeta().displayName();
+        } else if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasItemName()) {
+            itemName = itemStack.getItemMeta().itemName();
         }
 
         String plainName = PlainTextComponentSerializer.plainText().serialize(itemName);
@@ -61,12 +64,19 @@ public class ItemDisplay extends ZUtils implements ChatDisplay {
         String name = "item";
         while (matcher.find()) matcher.appendReplacement(formattedMessage, "<" + name + ">");
 
-        Component component = adventureComponent.getComponent(this.result, TagResolver.builder().resolver(Placeholder.component("item", itemName)).resolver(Placeholder.component("amount", Component.text(amount))).build());
+        String displayResult = this.result;
+        if (amount <= 1 && displayResult.contains("<amount>")) {
+            displayResult = displayResult.replace("x<amount> ", "").replace("<amount> ", "").replace("<amount>", "");
+        }
+
+        Component component = adventureComponent.getComponent(displayResult,
+                TagResolver.builder()
+                        .resolver(Placeholder.component("item", itemName))
+                        .resolver(Placeholder.component("amount", Component.text(amount)))
+                        .build());
 
         component = component.hoverEvent(itemStack.asHoverEvent());
         String code = plugin.getModuleManager().getModule(ChatModule.class).createHoverItemStack(sender, itemStack);
-        // ClickEvent.Action.RUN_COMMAND disappeared in newer adventure versions, the
-        // factory keeps working everywhere
         component = component.clickEvent(ClickEvent.runCommand("/showitem " + code));
         builder.resolver(Placeholder.component(name, component));
 
