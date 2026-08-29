@@ -50,6 +50,14 @@ enable-local-chat: false
 # Maximum distance in blocks for local chat messages
 local-chat-distance: 100
 
+# Make the sender name in chat hoverable and clickable.
+# hover-text and click-value support %player% for the sender's name.
+interactive-player-names:
+  enabled: false
+  hover-text: "&6Click to message &f%player%"
+  click-action: "suggest_command"
+  click-value: "/msg %player% "
+
 # Apply a format to the chat, disabled on if you want another plugin to handle this
 enable-chat-format: true
 

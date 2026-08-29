@@ -130,6 +130,10 @@ public class ChatModule extends ZModule {
     private float playerPingSoundPitch;
     private boolean enableLocalChat;
     private double localChatDistance;
+    private boolean interactivePlayerNames;
+    private String interactiveHoverText;
+    private String interactiveClickAction;
+    private String interactiveClickValue;
 
 
     public ChatModule(ZEssentialsPlugin plugin) {
@@ -426,6 +430,12 @@ public class ChatModule extends ZModule {
                     messagePrefix + renderMessage, localBuilder.build()));
             String moderatorAction = (isModerator && viewer instanceof Player playerMod) ? papi(getMessage(this.moderatorAction, "%player%", player.getName()), playerMod) : "";
             String displayName = resolveDisplayName(player);
+
+            if (this.interactivePlayerNames) {
+                String hover = this.interactiveHoverText.replace("%player%", player.getName());
+                String click = this.interactiveClickValue.replace("%player%", player.getName());
+                displayName = "<hover:show_text:'" + hover + "'><click:" + this.interactiveClickAction + ":'" + click + "'>" + displayName + "</click></hover>";
+            }
 
             // Customization tag renders before ranks and names as a symbol prefix
             String chatFormatWithTag = chatFormat;
