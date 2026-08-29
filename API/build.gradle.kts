@@ -13,6 +13,8 @@ dependencies {
     implementation("fr.maxlego08.sarah:sarah:1.23")
     implementation("com.tcoded:FoliaLib:0.5.1")
     implementation("fr.mrmicky:fastboard:2.2.1")
+
+    testImplementation("com.google.code.gson:gson:2.11.0")
 }
 
 tasks {

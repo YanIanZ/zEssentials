@@ -1,15 +1,16 @@
-name: Build Action
+name: Tests
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     types: [ opened, synchronize, reopened ]
+  schedule:
+    - cron: '0 4 * * *'   # 04:00 UTC daily (nightly)
   workflow_dispatch:
 
 permissions:
   contents: read
-  packages: write
   checks: write
 
 concurrency:
@@ -18,7 +19,7 @@ concurrency:
 
 jobs:
   test:
-    name: Run Tests
+    name: Run Tests (Java 21)
     runs-on: ubuntu-latest
 
     steps:
@@ -49,16 +50,25 @@ jobs:
           path: '**/build/test-results/test/*.xml'
           reporter: java-junit
 
-  build:
-    name: Build and Publish zEssentials
-    needs: test
-    uses: GroupeZ-dev/actions/.github/workflows/build.yml@main
-    with:
-      project-name: "zEssentials"
-      publish: true
-      project-to-publish: "API:publish"
-      discord-avatar-url: "https://groupez.dev/storage/images/325.png"
-    secrets:
-      WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.sha }}
+          path: |
+            **/build/test-results/test/*.xml
+            **/build/reports/tests/test/
+          retention-days: 30
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ $? -eq 0 ]; then
+            echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some tests failed. Check the test report for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📋 Full report available in the artifacts." >> $GITHUB_STEP_SUMMARY

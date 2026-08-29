@@ -79,6 +79,17 @@ allprojects {
         compileOnly("fr.maxlego08.sarah:sarah:1.23")
         compileOnly("com.tcoded:FoliaLib:0.5.1")
         compileOnly("fr.mrmicky:fastboard:2.2.1")
+
+        // Test dependencies
+        testImplementation(platform("org.junit:junit-bom:5.11.4"))
+        testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        testImplementation("org.mockito:mockito-core:5.14.2")
+        testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+    }
+
+    tasks.test {
+        useJUnitPlatform()
     }
 }
 
