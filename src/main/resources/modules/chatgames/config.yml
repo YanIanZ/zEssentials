@@ -5,6 +5,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Start a random enabled game every X minutes, 0 disables the automation

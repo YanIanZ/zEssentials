@@ -15,7 +15,7 @@ public class CommandBalanceTop extends VCommand {
         this.setModule(EconomyModule.class);
         this.setPermission(Permission.ESSENTIALS_BALANCE_TOP);
         this.setDescription(Message.DESCRIPTION_BALANCE_TOP);
-        this.addOptionalArg("page");
+        this.addOptionalArg("page", (s, a) -> java.util.List.of("1", "2", "3"));
         this.onlyPlayers();
         this.addSubCommand(new CommandBalanceTopRefresh(plugin));
     }

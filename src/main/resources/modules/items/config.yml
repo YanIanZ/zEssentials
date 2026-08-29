@@ -12,12 +12,39 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 custom-items:
+# Config schema version — do not edit
+config-version: 1
+
   master_sword:
+# Config schema version — do not edit
+config-version: 1
+
     name: "<gradient:#e88d1e:#e8511e>ᴍᴀsᴛᴇʀ sᴡᴏʀᴅ</gradient>"
+# Config schema version — do not edit
+config-version: 1
+
     material: DIAMOND_SWORD
+# Config schema version — do not edit
+config-version: 1
+
     enchants:
+# Config schema version — do not edit
+config-version: 1
+
       - SHARPNESS,10
+# Config schema version — do not edit
+config-version: 1
+
       - UNBREAKING,10
+# Config schema version — do not edit
+config-version: 1
+
       - LOOTING,10
+# Config schema version — do not edit
+config-version: 1
+
       - MENDING,1

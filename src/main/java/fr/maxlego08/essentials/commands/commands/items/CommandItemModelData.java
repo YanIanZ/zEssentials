@@ -14,7 +14,7 @@ public class CommandItemModelData extends VCommand {
         super(plugin);
         this.setModule(fr.maxlego08.essentials.module.modules.ItemModule.class);
         this.setPermission(Permission.ESSENTIALS_ITEM_NAME);
-        this.setDescription(Message.DESCRIPTION_ITEM_NAME);
+        this.setDescription(Message.DESCRIPTION_ITEM_MODEL_DATA);
         this.addOptionalArg("modeldata", (s,a) -> java.util.List.of("clear"));
         this.onlyPlayers();
     }

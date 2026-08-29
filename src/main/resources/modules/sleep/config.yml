@@ -5,6 +5,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Percentage of the world players that must be sleeping to accelerate the night

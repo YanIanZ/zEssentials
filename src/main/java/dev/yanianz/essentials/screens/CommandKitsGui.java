@@ -4,6 +4,7 @@ import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.kit.Kit;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.api.user.User;
 import fr.maxlego08.essentials.module.modules.kit.KitModule;
 import fr.maxlego08.essentials.zutils.utils.TimerBuilder;
@@ -20,7 +21,7 @@ public class CommandKitsGui extends VCommand {
         super(plugin);
         this.setModule(KitModule.class);
         this.setPermission(Permission.ESSENTIALS_KIT);
-        this.setDescription("Open the kits screen");
+        this.setDescription(Message.DESCRIPTION_KITS_GUI);
         this.onlyPlayers();
     }
 

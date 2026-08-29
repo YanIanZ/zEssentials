@@ -11,6 +11,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Opens the warps menu. The file is warps.yml, you need to modify it to match your server

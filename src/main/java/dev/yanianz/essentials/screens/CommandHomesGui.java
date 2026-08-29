@@ -4,6 +4,7 @@ import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.home.Home;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.api.user.User;
 import fr.maxlego08.essentials.module.modules.HomeModule;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
@@ -19,7 +20,7 @@ public class CommandHomesGui extends VCommand {
         super(plugin);
         this.setModule(HomeModule.class);
         this.setPermission(Permission.ESSENTIALS_HOME);
-        this.setDescription("Open the homes screen");
+        this.setDescription(Message.DESCRIPTION_HOMES_GUI);
         this.onlyPlayers();
     }
 

@@ -3,6 +3,7 @@ package fr.maxlego08.essentials.commands.commands.utils;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ public class CommandCondense extends VCommand {
     public CommandCondense(EssentialsPlugin plugin) {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_CONDENSE);
-        this.setDescription("Condense loose items into blocks");
+        this.setDescription(Message.DESCRIPTION_CONDENSE);
         this.onlyPlayers();
     }
 
@@ -73,9 +74,9 @@ public class CommandCondense extends VCommand {
         }
 
         if (condensed == 0) {
-            message(sender, "No items to condense.");
+            message(sender, Message.COMMAND_CONDENSE_EMPTY);
         } else {
-            message(sender, "Condensed " + condensed + " block(s).");
+            message(sender, Message.COMMAND_CONDENSE_SUCCESS, "%amount%", String.valueOf(condensed));
         }
         return CommandResultType.SUCCESS;
     }

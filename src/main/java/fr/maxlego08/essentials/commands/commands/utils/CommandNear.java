@@ -30,10 +30,12 @@ public class CommandNear extends VCommand {
 
         // Optional radius argument overrides the configured distance
         double distance = plugin.getConfiguration().getNearDistance(this.player);
+        double defaultDistance = distance;
         if (this.args.length > 0) {
             try {
                 distance = Math.max(1, Math.min(200, Double.parseDouble(this.argAsString(0))));
             } catch (NumberFormatException ignored) {
+                message(sender, Message.COMMAND_NEAR_INVALID_RADIUS, "%default%", String.valueOf(defaultDistance));
             }
         }
         Collection<Player> players = this.player.getWorld().getNearbyPlayers(this.player.getLocation(), distance, player ->

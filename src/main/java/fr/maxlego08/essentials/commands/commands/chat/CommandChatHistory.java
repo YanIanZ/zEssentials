@@ -15,7 +15,7 @@ public class CommandChatHistory extends VCommand {
         this.setPermission(Permission.ESSENTIALS_CHAT_HISTORY);
         this.setDescription(Message.DESCRIPTION_CHAT_HISTORY);
         this.addRequireOfflinePlayerNameArg();
-        this.addOptionalArg("page");
+        this.addOptionalArg("page", (s, a) -> java.util.List.of("1", "2", "3"));
     }
 
     @Override

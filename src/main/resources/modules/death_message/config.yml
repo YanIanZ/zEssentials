@@ -2,6 +2,9 @@
 # This module allows you to customize death messages displayed in chat.
 
 # Enable or disable this module
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Allow players with essentials.silent.death permission to die without a death message

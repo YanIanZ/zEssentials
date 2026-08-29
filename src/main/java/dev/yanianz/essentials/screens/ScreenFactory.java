@@ -94,6 +94,22 @@ public final class ScreenFactory {
         int size = rows * 9;
         int contentSlots = size - 9;
 
+        if (items == null || items.isEmpty()) {
+            List<Inventory> inventories = new ArrayList<>();
+            Screen screen = new Screen(player.getUniqueId(), inventories, 0, size);
+            Inventory inventory = Bukkit.createInventory(screen, size, LEGACY.deserialize(colorize(titleLegacy)));
+            screen.inventory = inventory;
+            inventories.add(inventory);
+
+            fill(inventory);
+            inventory.setItem(contentSlots / 2, button(Material.BARRIER, "&cNo entries", null));
+            inventory.setItem(size - 5, button(Material.BARRIER, "&cClose", null));
+            screen.action(size - 5, (viewer, ev) -> viewer.closeInventory());
+
+            player.openInventory(inventory);
+            return;
+        }
+
         List<List<ScreenItem>> chunks = new ArrayList<>();
         for (int index = 0; index < Math.max(1, items.size()); index += contentSlots) {
             chunks.add(items.subList(index, Math.min(items.size(), index + contentSlots)));

@@ -123,11 +123,12 @@ public class CommandReports extends VCommand {
                     }));
         }
 
-        EssentialsScreens.get().factory().open(viewer, "&4&lREPORTS", 6, items);
-
         if (open.isEmpty()) {
             viewer.sendMessage(net.kyori.adventure.text.Component.text("No open reports."));
+            return;
         }
+
+        EssentialsScreens.get().factory().open(viewer, "&4&lREPORTS", 6, items);
     }
 
     private void sendReportChatList(ReportsModule module, CommandSender sender) {

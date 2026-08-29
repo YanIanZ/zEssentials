@@ -14,7 +14,7 @@ public class CommandItemGlow extends VCommand {
         super(plugin);
         this.setModule(fr.maxlego08.essentials.module.modules.ItemModule.class);
         this.setPermission(Permission.ESSENTIALS_ITEM_NAME);
-        this.setDescription(Message.DESCRIPTION_ITEM_NAME);
+        this.setDescription(Message.DESCRIPTION_ITEM_GLOW);
         this.addBooleanOptionalArg("toggle");
         this.onlyPlayers();
     }

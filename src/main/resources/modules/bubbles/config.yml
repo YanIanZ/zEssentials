@@ -5,6 +5,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # How long a bubble stays visible, accepts 30s / 5m / 1h style values

@@ -73,6 +73,18 @@ Every change lands in this changelog immediately under its bumped heading.
 - `/rules` now opens the terms dialog screen when the terms module is enabled
 - `/chatslowmode` tab completion suggests common values (0/3/5/10/30)
 
+## UX polish
+
+- **Command descriptions** — `/itemglow`, `/itemunbreakable`, `/itemmodeldata`, `/condense`, `/homesgui`, `/kitsgui`, `/warpgui`, `/baltopgui` now show proper descriptions instead of raw enum names
+- **Tab completion** — `/baltop <page>`, `/chathistory <page>`, `/enchant <player>` now suggest meaningful values instead of empty completions
+- **Empty-state feedback** — `/reports` with no open reports shows a message instead of opening an empty screen; `ScreenFactory.open()` shows a BARRIER "No entries" placeholder when the item list is empty
+- **`/condense` feedback** — success and empty messages now use the Message enum (`COMMAND_CONDENSE_SUCCESS`, `COMMAND_CONDENSE_EMPTY`)
+- **`/near` invalid radius** — non-numeric or out-of-range radius now falls back to the default with a feedback message instead of silent failure
+- **`/trash` confirmation** — opening message added (`COMMAND_TRASH_OPENED`)
+- **Duplicate `/condense` alias** — removed the duplicate registration that caused the "command already registered" warning
+- **Config self-healing** — `config-version` key added to all 40+ module configs; `ConfigHealer` detects schema version mismatch and appends missing keys/sections while preserving user comments and existing values
+- **Test coverage** — 5 new test classes: `ConfigHealerEdgeCaseTest` (8 tests), `ConfigVersionCoverageTest` (2 tests), `MessageCompletenessTest` (3 tests), `EconomyEdgeCaseTest` (5 tests), `ChatDisplayKeywordTest` (7 tests)
+
 # 1.1.0.0
 
 - **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly

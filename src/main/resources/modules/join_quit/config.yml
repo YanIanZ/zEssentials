@@ -11,6 +11,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Should players with permissions be able to join and part silently?

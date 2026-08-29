@@ -11,6 +11,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # If the teleport destination is unsafe, should players be teleported to the nearest safe location?

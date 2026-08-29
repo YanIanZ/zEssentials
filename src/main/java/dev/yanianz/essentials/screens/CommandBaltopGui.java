@@ -2,6 +2,7 @@ package dev.yanianz.essentials.screens;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 
 /**
@@ -11,7 +12,7 @@ public class CommandBaltopGui extends VCommand {
 
     public CommandBaltopGui(EssentialsPlugin plugin) {
         super(plugin);
-        this.setDescription("Open the balance top screen");
+        this.setDescription(Message.DESCRIPTION_BALTOP_GUI);
         this.setPermission(fr.maxlego08.essentials.api.commands.Permission.ESSENTIALS_BALANCE_TOP);
         this.addOptionalArg("economy", (sender, args) ->
                 plugin.getEconomyManager().getEconomies().stream()

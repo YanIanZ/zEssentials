@@ -6,12 +6,21 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: false
 
 # Name of THIS server shown in relayed messages on other servers.
 # Leave empty to auto detect through server.properties (level-name fallback).
+# Config schema version — do not edit
+config-version: 1
+
 server-name: ""
 
 # Format of a message received from another server of the network,
 # supports legacy colors and placeholders: %server% %player% %message%
+# Config schema version — do not edit
+config-version: 1
+
 format: "&#00d4ff[%server%] &f%player% &8» &7%message%"

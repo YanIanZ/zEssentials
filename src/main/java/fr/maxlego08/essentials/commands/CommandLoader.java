@@ -102,7 +102,7 @@ public class CommandLoader {
         register("invsee", CommandInvsee.class);
         register("clearinventory", ClearInventoryCommand.class, "clear", "ci");
         register("afk", CommandAfk.class);
-        register("compact", CommandCompact.class, "blocks", "condense");
+        register("compact", CommandCompact.class, "blocks");
         register("compactall", CommandCompactAll.class, "blocksall", "condenseall");
         register("hat", CommandHat.class);
         register("fly", CommandFly.class);

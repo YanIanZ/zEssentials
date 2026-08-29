@@ -21,7 +21,7 @@ public class CommandEnchant extends VCommand {
         this.setDescription(Message.DESCRIPTION_ENCHANT);
         this.addRequireArg("enchantment", (a, b) -> plugin.getEnchantments().getEnchantments());
         this.addRequireArg("level", (a, b) -> Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"));
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

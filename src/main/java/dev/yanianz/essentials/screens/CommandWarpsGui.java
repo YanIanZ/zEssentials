@@ -4,6 +4,7 @@ import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.api.user.User;
 import fr.maxlego08.essentials.api.utils.Warp;
 import fr.maxlego08.essentials.module.modules.WarpModule;
@@ -21,7 +22,7 @@ public class CommandWarpsGui extends VCommand {
 
     public CommandWarpsGui(EssentialsPlugin plugin) {
         super(plugin);
-        this.setDescription("Open the warp selection screen");
+        this.setDescription(Message.DESCRIPTION_WARPS_GUI);
         this.setPermission(Permission.ESSENTIALS_WARPS);
         this.addOptionalArg("player", getVisiblePlayerNames());
         this.onlyPlayers();
