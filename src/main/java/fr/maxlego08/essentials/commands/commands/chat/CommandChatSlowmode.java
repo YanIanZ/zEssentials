@@ -18,7 +18,7 @@ public class CommandChatSlowmode extends VCommand {
         this.setModule(ChatModule.class);
         this.setPermission(Permission.ESSENTIALS_CHAT_SLOWMODE);
         this.setDescription(Message.DESCRIPTION_CHAT_SLOWMODE);
-        this.addOptionalArg("seconds");
+        this.addOptionalArg("seconds", (sender, args) -> java.util.List.of("0", "3", "5", "10", "30"));
     }
 
     @Override

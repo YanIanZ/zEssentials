@@ -81,12 +81,12 @@ Small quality features:
 - [ ] Custom interactive keywords: config-driven placeholder/hover/click keywords (10 defaults shipped)
 - [ ] Interactive player names: hover + click actions on every player name in chat
 - [x] Player mention system: highlight @name, notify target with sound/title/actionbar/bossbar (togglable)
-- [ ] Slowmode per player/server with staff bypass
+- [x] Slowmode per player/server with staff bypass
 - [x] Message deletion button for staff (click-to-delete own log/history)
-- [ ] DND mode, quick replies, emoji shortcuts
+- [x] DND mode, quick replies, emoji shortcuts
 - [x] Chat games (6 types): math race, scramble, fast-type, reverse, trivia, hot-letter — auto interval or /chatgames <type|stop|reload>
 - [x] Reputation system (/rep <player>, cooldown per giver) & interactive polls (/poll create <s> question | opt1 | opt2, clickable options with % bars)
-- [ ] Chat color selection GUI + tags system
+- [x] Chat color selection GUI + tags system
 - [x] Nicknames with colors (/nick, impersonation guard, per player cooldown, persisted and re-applied on join)
 - [x] Raid protection auto-detection (identical spam from N players in a window, staff alert + actions)
 - [x] Warning system with auto-escalation (configurable thresholds running console commands)

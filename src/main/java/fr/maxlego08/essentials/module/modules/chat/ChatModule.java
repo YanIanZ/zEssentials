@@ -65,6 +65,9 @@ public class ChatModule extends ZModule {
     private final java.util.Map<String, String> emojiShortcuts = new java.util.LinkedHashMap<>();
 
     @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private final java.util.Map<String, String> quickReplies = new java.util.LinkedHashMap<>();
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
     private final java.util.ArrayDeque<RaidEntry> raidWindow = new java.util.ArrayDeque<>();
 
     @fr.maxlego08.essentials.api.configuration.NonLoadable
@@ -188,6 +191,15 @@ public class ChatModule extends ZModule {
             }
         }
 
+        // Quick reply shortcuts like :brb: expanded to a full phrase
+        this.quickReplies.clear();
+        ConfigurationSection replySection = getConfiguration().getConfigurationSection("quick-replies");
+        if (replySection != null) {
+            for (String key : replySection.getKeys(false)) {
+                this.quickReplies.put(java.util.regex.Pattern.quote(key), replySection.getString(key, key));
+            }
+        }
+
         // Raid protection configuration
         var raidConfig = getConfiguration();
         this.raidProtectionEnabled = raidConfig.getBoolean("raid-protection.enabled", true);
@@ -283,6 +295,9 @@ public class ChatModule extends ZModule {
             message = message.substring(1).stripLeading();
         }
         for (java.util.Map.Entry<String, String> entry : this.emojiShortcuts.entrySet()) {
+            message = message.replaceAll(entry.getKey(), java.util.regex.Matcher.quoteReplacement(entry.getValue()));
+        }
+        for (java.util.Map.Entry<String, String> entry : this.quickReplies.entrySet()) {
             message = message.replaceAll(entry.getKey(), java.util.regex.Matcher.quoteReplacement(entry.getValue()));
         }
         final String minecraftMessage = message;

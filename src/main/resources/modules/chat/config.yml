@@ -275,6 +275,16 @@ emoji-shortcuts:
   ":clap:": "👏"
   ":100:": "💯"
 
+# Quick reply shortcuts: typing the key replaces it with the full phrase.
+# Works like emoji-shortcuts but for multi-word text.
+quick-replies:
+  ":brb:": "Be right back!"
+  ":gg:": "Good game!"
+  ":gl:": "Good luck!"
+  ":wb:": "Welcome back!"
+  ":ty:": "Thank you!"
+  ":np:": "No problem!"
+
 # Detects identical chat spam from several different players at once,
 # cancels the messages and alerts every moderator online.
 raid-protection:
