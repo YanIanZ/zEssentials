@@ -95,7 +95,7 @@ public class EffectsModule extends ZModule {
 
     /** Direct triggers record this stamp so the event duplicate skips. */
     @NonLoadable
-    private final java.util.Map<UUID, Long> directStamps = new java.util.HashMap<>();
+    private final java.util.Map<UUID, Long> directStamps = new java.util.concurrent.ConcurrentHashMap<>();
 
     @EventHandler(ignoreCancelled = true)
     public void onTeleport(PlayerTeleportEvent event) {
@@ -154,7 +154,7 @@ public class EffectsModule extends ZModule {
     }
 
     private void playRingFromTo(Player player, Location from, Location to) {
-        spawnRing(from);
+        this.plugin.getScheduler().runAtLocation(from, wrappedTask -> spawnRing(from));
         if (to == null || to.getWorld() == null) return;
         this.plugin.getScheduler().runAtLocation(to, wrappedTask -> spawnRing(to));
     }

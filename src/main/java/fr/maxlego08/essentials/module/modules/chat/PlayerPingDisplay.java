@@ -58,7 +58,7 @@ public class PlayerPingDisplay implements ChatDisplay {
             // Respect the per-player toggle (/pingsound). The global enable flag is handled in ChatModule
             // where the SoundOption is only built when enable-player-ping-sound is true.
             User receiverUser = this.plugin.getUser(receiver.getUniqueId());
-            if (receiverUser == null || !receiverUser.getOption(Option.PLAYER_PING_SOUND_DISABLE)) {
+            if (receiverUser == null || (!receiverUser.getOption(Option.PLAYER_PING_SOUND_DISABLE) && !receiverUser.getOption(Option.CHAT_DND))) {
                 this.playerPingSound.play(receiver);
             }
         }

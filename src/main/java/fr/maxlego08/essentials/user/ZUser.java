@@ -378,6 +378,15 @@ public class ZUser extends ZUtils implements User {
         Player player = this.getPlayer();
         if (player == null || location == null || location.getWorld() == null) return;
 
+        try {
+            var effectsModule = this.plugin.getModuleManager().getModule(
+                    fr.maxlego08.essentials.module.modules.effects.EffectsModule.class);
+            if (effectsModule != null && effectsModule.enabledNow() && effectsModule.teleportEnabled()) {
+                effectsModule.playDirectTeleport(player, player.getLocation(), location);
+            }
+        } catch (Exception ignored) {
+        }
+
         // ToDo, https://github.com/PaperMC/Folia/?tab=readme-ov-file#current-broken-api
         // When folia API is update, remove this
         if (this.plugin.isFolia()) {
@@ -469,15 +478,6 @@ public class ZUser extends ZUtils implements User {
             }
 
             // Play the "from" ring at the current location before teleporting
-            try {
-                var effectsModule = this.plugin.getModuleManager().getModule(
-                        fr.maxlego08.essentials.module.modules.effects.EffectsModule.class);
-                if (effectsModule != null && effectsModule.enabledNow() && effectsModule.teleportEnabled()) {
-                    effectsModule.playDirectTeleport(player, player.getLocation(), location);
-                }
-            } catch (Exception ignored) {
-            }
-
             this.teleportNow(location);
 
             if (message != null) {
