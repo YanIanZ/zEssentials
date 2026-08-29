@@ -5,6 +5,7 @@ import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.module.modules.RuleModule;
+import fr.maxlego08.essentials.module.modules.terms.TermsModule;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 
 public class CommandRules extends VCommand {
@@ -18,6 +19,12 @@ public class CommandRules extends VCommand {
 
     @Override
     protected CommandResultType perform(EssentialsPlugin plugin) {
+
+        TermsModule termsModule = plugin.getModuleManager().getModule(TermsModule.class);
+        if (termsModule != null && termsModule.isEnable()) {
+            termsModule.openScreen(player);
+            return CommandResultType.SUCCESS;
+        }
 
         plugin.getModuleManager().getModule(RuleModule.class).sendRule(player);
 

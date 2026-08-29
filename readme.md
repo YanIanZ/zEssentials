@@ -71,7 +71,7 @@ Small quality features:
 - [ ] `/feed all` alias already exists through `*`
 - [ ] `/near <radius>` optional radius argument
 - [ ] `/xyz` copies coordinates to clipboard with formatted colors
-- [ ] `/rules` alias into terms screen after acceptance flow
+- [x] `/rules` alias into terms screen after acceptance flow
 
 ## Chat module v2
 - [x] Type [inv]/[inventory] to show your inventory (hover items, click copy)
