@@ -30,6 +30,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Enables verification of authorized characters in chat

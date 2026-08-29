@@ -11,6 +11,10 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit. Used by the self-healing system
+# to detect when new keys need to be merged into your existing config.
+config-version: 2
+
 # Displays debug items in the console, if you request support, please enable debug and send logs with debugs
 enable-debug: false
 

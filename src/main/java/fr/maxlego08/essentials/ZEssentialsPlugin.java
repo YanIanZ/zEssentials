@@ -615,38 +615,19 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
             return;
         }
 
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
         try {
-
             InputStream inputStream = this.getResource(resourcePath);
-
             if (inputStream == null) {
                 this.getLogger().severe("Cannot find file " + resourcePath);
                 return;
             }
 
-            Reader defConfigStream = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-
-            Set<String> defaultKeys = defConfig.getKeys(deep);
-
-            boolean configUpdated = false;
-            for (String key : defaultKeys) {
-                if (!config.contains(key)) {
-                    debug("I can’t find " + key + " in the file " + file.getName());
-                    configUpdated = true;
-                }
+            boolean healed = dev.yanianz.essentials.config.ConfigHealer.heal(inputStream, file);
+            if (healed) {
+                this.getLogger().info("Self-healed config: " + toPath);
             }
 
-            config.setDefaults(defConfig);
-            config.options().copyDefaults(true);
-
-            if (configUpdated) {
-                this.getLogger().info("Update file " + toPath);
-                config.save(file);
-            }
-
+            inputStream.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }

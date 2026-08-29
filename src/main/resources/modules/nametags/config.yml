@@ -6,6 +6,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Seconds after join before the nametag applies, gives LuckPerms and

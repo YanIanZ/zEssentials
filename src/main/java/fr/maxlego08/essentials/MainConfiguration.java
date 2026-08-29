@@ -111,6 +111,7 @@ public class MainConfiguration extends YamlLoader implements Configuration {
     @Override
     public void load() {
 
+        this.plugin.saveOrUpdateConfiguration("config.yml", true);
         this.plugin.reloadConfig();
 
         YamlConfiguration configuration = (YamlConfiguration) this.plugin.getConfig();

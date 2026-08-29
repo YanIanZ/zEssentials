@@ -6,6 +6,9 @@
 #
 ########################################################################################################################
 
+# Config schema version — do not edit
+config-version: 1
+
 enable: true
 
 # Seconds between tab list refreshes, keeps placeholders like %ping% accurate
