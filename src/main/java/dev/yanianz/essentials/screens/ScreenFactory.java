@@ -1,5 +1,6 @@
 package dev.yanianz.essentials.screens;
 
+import dev.yanianz.essentials.util.ColorUtil;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -348,6 +349,6 @@ public final class ScreenFactory {
     
 
     private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
+        return ColorUtil.sections(text);
     }
 }

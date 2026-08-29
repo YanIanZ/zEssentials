@@ -2,6 +2,7 @@ package dev.yanianz.essentials.reports;
 
 import dev.yanianz.essentials.screens.EssentialsScreens;
 import dev.yanianz.essentials.screens.ScreenFactory;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
@@ -53,9 +54,13 @@ public class CommandReports extends VCommand {
             }
             case "tp" -> {
                 int id = this.argAsInteger(1, -1);
-                var targetUuid = module.getTargetUuid(id);
                 Player teleporter = getPlayer();
-                if (targetUuid == null || teleporter == null) {
+                if (teleporter == null) {
+                    message(sender, Message.COMMAND_NO_CONSOLE);
+                    return CommandResultType.SUCCESS;
+                }
+                var targetUuid = module.getTargetUuid(id);
+                if (targetUuid == null) {
                     message(sender, Message.REPORT_UNKNOWN_ID, "%id%", String.valueOf(id));
                     return CommandResultType.SUCCESS;
                 }
@@ -64,7 +69,8 @@ public class CommandReports extends VCommand {
                     message(sender, Message.REPORT_TARGET_OFFLINE);
                     return CommandResultType.SUCCESS;
                 }
-                teleporter.teleport(targetPlayer);
+                teleporter.closeInventory();
+                this.plugin.getScheduler().teleportAsync(teleporter, targetPlayer.getLocation());
                 message(sender, Message.REPORT_TELEPORTED, "%player%", targetPlayer.getName());
             }
             case "resolve", "reopen" -> {
@@ -101,30 +107,34 @@ public class CommandReports extends VCommand {
             items.add(new ScreenFactory.ScreenItem(
                     Material.PAPER,
                     "&#ff4d4d#" + id + " &f" + report.targetName,
-                    List.of(colorize("&7By: &f" + report.reporterName),
-                            colorize("&7Date&8: &f" + format.format(new java.util.Date(report.createdAt))),
-                            colorize("&7Reason&8: &f" + reason),
+                    List.of("&7By: &f" + report.reporterName,
+                            "&7Date&8: &f" + format.format(new java.util.Date(report.createdAt)),
+                            "&7Reason&8: &f" + reason,
                             "",
-                            colorize("&aLeft click &7resolve"),
-                            colorize("&bRight click &7teleport to target")),
+                            "&aLeft click &7resolve",
+                            "&bRight click &7teleport to target"),
                     (playerView, clickEvent) -> {
                         if (clickEvent != null && clickEvent.getClick().isRightClick()) {
                             var targetUuid = module.getTargetUuid(id);
                             var online = targetUuid == null ? null : Bukkit.getPlayer(targetUuid);
-                            if (online != null) playerView.teleport(online);
-                            else playerView.sendMessage(net.kyori.adventure.text.Component.text("Target offline."));
+                            if (online != null) {
+                                playerView.closeInventory();
+                                plugin.getScheduler().teleportAsync(playerView, online.getLocation());
+                                playerView.sendMessage(ColorUtil.component("&bTeleported to &f" + online.getName() + "&b."));
+                            } else {
+                                playerView.sendMessage(ColorUtil.component("&cThe reported player is offline."));
+                            }
                             return;
                         }
                         // Left click resolves
                         module.setResolved(id, true);
-                        playerView.sendMessage(dev.yanianz.essentials.util.ColorUtil.component(
-                                "&aReport #" + id + " resolved."));
+                        playerView.sendMessage(ColorUtil.component("&aReport #" + id + " resolved."));
                         sendReportScreen(module, playerView); // refresh
                     }));
         }
 
         if (open.isEmpty()) {
-            viewer.sendMessage(net.kyori.adventure.text.Component.text("No open reports."));
+            viewer.sendMessage(ColorUtil.component("&7No open reports."));
             return;
         }
 
@@ -133,9 +143,5 @@ public class CommandReports extends VCommand {
 
     private void sendReportChatList(ReportsModule module, CommandSender sender) {
         message(sender, Message.REPORT_LIST_HEADER, "%count%", "0");
-    }
-
-    private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
     }
 }

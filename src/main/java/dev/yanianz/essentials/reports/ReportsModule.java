@@ -2,6 +2,7 @@ package dev.yanianz.essentials.reports;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
@@ -94,7 +95,7 @@ public class ReportsModule extends ZModule {
 
         long open = this.reports.values().stream().filter(report -> !report.resolved).count();
         if (open > 0) {
-            player.sendMessage(colorize("&c&l[REPORTS] &7" + open + " unresolved report(s) waiting, use &f/reports&7."));
+            player.sendMessage(ColorUtil.component("&c&l[REPORTS] &7" + open + " unresolved report(s) waiting, use &f/reports&7."));
         }
     }
 
@@ -135,11 +136,11 @@ public class ReportsModule extends ZModule {
         }
 
         // Alert every moderator online with a clickable teleport action
-        Component alert = legacy("&8[&#ff4d4d&lREPORT&8] &f" + reporter.getName()
+        Component alert = ColorUtil.component("&8[&#ff4d4d&lREPORT&8] &f" + reporter.getName()
                 + " &7reported &f" + targetName + "&7: &f" + reason);
         Component clickable = alert
                 .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
-                        legacy("&7Report &f#" + id + " &8• &7Click to teleport to the target")))
+                        ColorUtil.component("&7Report &f#" + id + " &8• &7Click to teleport to the target")))
                 .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/reports tp " + id));
 
         for (Player moderator : Bukkit.getOnlinePlayers()) {
@@ -149,7 +150,7 @@ public class ReportsModule extends ZModule {
             }
         }
 
-        reporter.sendMessage(colorize("&aYour report about &f" + targetName + " &awas sent to the staff!"));
+        reporter.sendMessage(ColorUtil.component("&aYour report about &f" + targetName + " &awas sent to the staff!"));
         return Result.SUCCESS;
     }
 
@@ -251,19 +252,6 @@ public class ReportsModule extends ZModule {
                 .sorted((a, b) -> Integer.compare(a.id, b.id))
                 .toList();
     }
-
-    private Component legacy(String text) {
-        return LEGACY.deserialize(colorize(text));
-    }
-
-    private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
-    }
-
-
-    @fr.maxlego08.essentials.api.configuration.NonLoadable
-    private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer LEGACY =
-            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection();
 
     private static final class RawStorage {
         RawReport[] entries = new RawReport[0];

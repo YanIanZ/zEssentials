@@ -86,6 +86,8 @@ allprojects {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testImplementation("org.mockito:mockito-core:5.14.2")
         testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+        testImplementation("net.kyori:adventure-api:4.20.0")
+        testImplementation("net.kyori:adventure-text-serializer-legacy:4.20.0")
     }
 
     tasks.test {
