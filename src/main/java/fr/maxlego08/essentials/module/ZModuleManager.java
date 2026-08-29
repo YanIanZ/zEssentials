@@ -12,6 +12,7 @@ import fr.maxlego08.essentials.module.modules.kit.KitModule;
 import fr.maxlego08.essentials.module.modules.chat.ChatModule;
 import fr.maxlego08.essentials.module.modules.customcommands.CustomCommandModule;
 import dev.yanianz.essentials.customscreens.CustomScreenModule;
+import dev.yanianz.essentials.enderchest.EnderChestModule;
 import dev.yanianz.essentials.polls.PollsModule;
 import dev.yanianz.essentials.sleep.SleepModule;
 import dev.yanianz.essentials.nametags.NameTagModule;
@@ -115,6 +116,7 @@ public class ZModuleManager implements ModuleManager {
         this.modules.put(SleepModule.class, new SleepModule(this.plugin));
         this.modules.put(TabListModule.class, new TabListModule(this.plugin));
         this.modules.put(NameTagModule.class, new NameTagModule(this.plugin));
+        this.modules.put(EnderChestModule.class, new EnderChestModule(this.plugin));
         if (plugin.isPaperVersion()) {
             this.modules.put(DeathMessageModule.class, new DeathMessageModule(this.plugin));
         }
