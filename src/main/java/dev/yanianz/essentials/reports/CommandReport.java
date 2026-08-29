@@ -26,7 +26,8 @@ public class CommandReport extends VCommand {
         this.setModule(ReportsModule.class);
         this.setPermission(Permission.ESSENTIALS_REPORT_USE);
         this.setDescription(Message.DESCRIPTION_REPORT);
-        this.addRequirePlayerNameArg();
+        this.addOptionalArg("player", (sender, args) ->
+                List.of("list", "resolve", "reopen", "tp"));
         this.setExtendedArgs(true);
     }
 

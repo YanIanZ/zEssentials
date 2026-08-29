@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Manage the private staff notes attached to players: display them with the
@@ -22,7 +23,8 @@ public class CommandNotes extends VCommand {
         this.setModule(NotesModule.class);
         this.setPermission(Permission.ESSENTIALS_NOTES);
         this.setDescription(Message.DESCRIPTION_NOTES);
-        this.addOptionalArg("action");
+        this.addOptionalArg("action", (sender, args) -> List.of("add", "clear"));
+        this.addOptionalArg("player", getVisiblePlayerNames());
         this.setExtendedArgs(true);
     }
 

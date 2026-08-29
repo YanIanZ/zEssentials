@@ -18,7 +18,7 @@ public class CommandReputationView extends VCommand {
         this.setModule(ReputationModule.class);
         this.setPermission(Permission.ESSENTIALS_REPUTATION_USE);
         this.setDescription(Message.DESCRIPTION_REPUTATION);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
     }
 
     @Override

@@ -13,7 +13,9 @@ public class CommandBaltopGui extends VCommand {
         super(plugin);
         this.setDescription("Open the balance top screen");
         this.setPermission(fr.maxlego08.essentials.api.commands.Permission.ESSENTIALS_BALANCE_TOP);
-        this.addOptionalArg("economy");
+        this.addOptionalArg("economy", (sender, args) ->
+                plugin.getEconomyManager().getEconomies().stream()
+                        .map(e -> e.getName()).toList());
         this.onlyPlayers();
     }
 

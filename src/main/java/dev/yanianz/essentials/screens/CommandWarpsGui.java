@@ -23,7 +23,7 @@ public class CommandWarpsGui extends VCommand {
         super(plugin);
         this.setDescription("Open the warp selection screen");
         this.setPermission(Permission.ESSENTIALS_WARPS);
-        this.addOptionalArg("player");
+        this.addOptionalArg("player", getVisiblePlayerNames());
         this.onlyPlayers();
     }
 

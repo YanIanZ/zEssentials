@@ -8,6 +8,7 @@ import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -22,7 +23,7 @@ public class CommandNick extends VCommand {
         this.setModule(NicknamesModule.class);
         this.setPermission(Permission.ESSENTIALS_NICKNAMES_USE);
         this.setDescription(Message.DESCRIPTION_NICK);
-        this.addOptionalArg("nickname");
+        this.addOptionalArg("nickname", (sender, args) -> List.of("off"));
         this.setExtendedArgs(true);
     }
 

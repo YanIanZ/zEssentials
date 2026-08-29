@@ -226,16 +226,18 @@ public class NameTagModule extends ZModule {
             }
         });
 
-        // Below name objective
+        // Below name objective — scoreboard ops need the main thread on Folia
         if (this.belowNameEnabled) {
-            org.bukkit.scoreboard.Objective objective = belowNameObjective();
-            if (objective != null && "PLACEHOLDER".equals(this.belowNameMode)) {
-                String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
-                try {
-                    objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
-                } catch (NumberFormatException ignored) {
+            this.plugin.getScheduler().runNextTick(wrappedTask -> {
+                org.bukkit.scoreboard.Objective objective = belowNameObjective();
+                if (objective != null && "PLACEHOLDER".equals(this.belowNameMode)) {
+                    String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
+                    try {
+                        objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
-            }
+            });
         }
 
         // Spectator tab name override

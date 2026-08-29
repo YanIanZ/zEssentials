@@ -7,6 +7,8 @@ import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 /**
  * Creates and manages the chat polls:
  * create with a duration seconds argument followed by the question and the
@@ -20,7 +22,7 @@ public class CommandPoll extends VCommand {
         this.setModule(dev.yanianz.essentials.polls.PollsModule.class);
         this.setPermission(Permission.ESSENTIALS_POLLS_USE);
         this.setDescription(Message.DESCRIPTION_POLL);
-        this.addOptionalArg("action");
+        this.addOptionalArg("action", (sender, args) -> List.of("create", "vote", "stop"));
         this.addOptionalArg("value");
         this.setExtendedArgs(true);
     }
