@@ -7,5 +7,6 @@ public enum StorageType {
     MARIADB,
     SQLITE,
     HIKARICP,
+    MONGO,
 
 }

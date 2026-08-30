@@ -32,6 +32,7 @@ dependency-loader:
 # SQLITE - For the launch of the plugin only.
 # MYSQL - Allows creating a simple connection to the database, only for small servers.
 # HIKARICP - HikariCP is a fast and lightweight JDBC connection pool. It optimizes database connections, ensuring quick acquisition and low latency. This improves performance and reliability, making it ideal for high-demand applications.
+# MONGO - MongoDB NoSQL database, ideal for cross-server data sharing
 #
 # We advise you to use MYSQL or HIKARICP, the SQLITE storage is only there to install the plugin and do some tests, not all features are available with SQLITE yet.
 # The plugin will work, but some features like sanctions update when launching the plugin will not work.
@@ -71,6 +72,18 @@ redis-configuration:
   host: "192.168.10.10"
   port: 6379
   password: "123456a"
+
+# Configuration for your MongoDB server
+# Set storage-type to MONGO to use MongoDB instead of SQL/JSON
+mongo-configuration:
+  # Full connection URI (overrides individual fields if non-empty)
+  uri: ""
+  # Individual fields (used when uri is empty)
+  host: localhost
+  port: 27017
+  user: ""
+  password: ""
+  database: zessentials
 
 # Commands that will work even if their module is disabled
 force-commands:

@@ -11,6 +11,7 @@ import fr.maxlego08.essentials.api.configuration.ReplacePlaceholderElement;
 import fr.maxlego08.essentials.api.configuration.ReplacePlaceholderType;
 import fr.maxlego08.essentials.api.configuration.placeholders.NumberPlaceholder;
 import fr.maxlego08.essentials.api.configuration.placeholders.StringPlaceholder;
+import fr.maxlego08.essentials.api.server.MongoConfiguration;
 import fr.maxlego08.essentials.api.server.RedisConfiguration;
 import fr.maxlego08.essentials.api.server.ServerType;
 import fr.maxlego08.essentials.api.storage.StorageType;
@@ -65,6 +66,7 @@ public class MainConfiguration extends YamlLoader implements Configuration {
     private DatabaseConfiguration databaseConfiguration;
     private ServerType serverType;
     private RedisConfiguration redisConfiguration;
+    private MongoConfiguration mongoConfiguration;
     private SimpleDateFormat simpleDateFormat;
     private List<ReplacePlaceholder> replacePlaceholders = new ArrayList<>();
     private List<String> randomWords;
@@ -160,6 +162,18 @@ public class MainConfiguration extends YamlLoader implements Configuration {
                 configuration.getBoolean("database-configuration.debug"),
                 DatabaseType.MYSQL
         );
+
+        ConfigurationSection mongoSection = configuration.getConfigurationSection("mongo-configuration");
+        if (mongoSection != null) {
+            this.mongoConfiguration = new MongoConfiguration(
+                mongoSection.getString("uri", ""),
+                mongoSection.getString("host", "localhost"),
+                mongoSection.getInt("port", 27017),
+                mongoSection.getString("user", ""),
+                mongoSection.getString("password", ""),
+                mongoSection.getString("database", "zessentials")
+            );
+        }
 
         final ConfigurationSection nearDirSection = configuration.getConfigurationSection("near-direction-replacements");
         if (nearDirSection != null) {
@@ -258,6 +272,10 @@ public class MainConfiguration extends YamlLoader implements Configuration {
     @Override
     public RedisConfiguration getRedisConfiguration() {
         return redisConfiguration;
+    }
+
+    public MongoConfiguration getMongoConfiguration() {
+        return mongoConfiguration;
     }
 
     @Override
