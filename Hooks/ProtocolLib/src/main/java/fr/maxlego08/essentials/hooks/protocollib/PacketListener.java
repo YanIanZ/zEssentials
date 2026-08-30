@@ -10,6 +10,7 @@ public class PacketListener {
         this.register(new PacketChatListener(plugin, plugin.getModuleManager().getModuleConfiguration("chat").getString("command-placeholder.result")));
         this.register(new PacketTabLayoutListener(plugin));
         this.register(new PacketTooltipListener(plugin));
+        this.register(new PacketCraftingListener(plugin));
     }
 
     private void register(PacketRegister packetRegister) {

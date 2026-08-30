@@ -121,6 +121,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - **MongoDB driver** — `org.mongodb:mongodb-driver-sync:5.2.1` added to `plugin.yml` libraries (runtime download by Paper, not shaded)
 - **MongoDB config** — `mongo-configuration` section in `config.yml` supports full URI or individual `host`/`port`/`user`/`password`/`database` fields
 
+## Custom Crafting GUI + Quick Crafting
+
+- **Custom crafting GUI** — replaces the vanilla 3x3 crafting table with a Hypixel SkyBlock-style 54-slot custom GUI (3x3 grid, result slot, player inventory, decorative fill)
+- **Bukkit recipe matching** — reuses Bukkit's built-in recipe registry (shaped + shapeless), no custom recipe database needed
+- **Quick Crafting** — VIP+ players (`essentials.crafting.quickcraft` permission) can craft as many items as possible in one click
+- **Crafting table interception** — ProtocolLib intercepts `OPEN_WINDOW` packets and redirects to the custom GUI
+- **Items return on close** — grid items return to player inventory on close, overflow drops at feet
+- **Config-driven** — title, quick craft button material/text/lore, close button, filler color in `modules/crafting/config.yml`
+
 # 1.1.0.0
 
 - **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly

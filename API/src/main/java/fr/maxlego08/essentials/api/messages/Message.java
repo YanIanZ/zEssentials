@@ -238,6 +238,7 @@ public enum Message {
     DESCRIPTION_TRASH("Open a trash can"),
     DESCRIPTION_FEED("Feed a player"),
     DESCRIPTION_CRAFT("Open workbrench"),
+    DESCRIPTION_QUICKCRAFT("Quick craft items from the crafting grid"),
     DESCRIPTION_ENCHANTING("Open enchantment table"),
     DESCRIPTION_ANVIL("Open an anvil"),
     DESCRIPTION_CARTOGRAPHYTABLE("Open a cartography table"),
