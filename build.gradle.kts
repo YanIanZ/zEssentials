@@ -99,6 +99,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("io.papermc.paper:paper-api:26.2.build.119-stable")
     testImplementation("io.papermc.paper:paper-api:26.2.build.119-stable")
+    compileOnly("org.mongodb:mongodb-driver-sync:5.2.1")
 
     implementation("dev.faststats.metrics:bukkit:0.29.4") {
         exclude(group = "com.google.code.gson", module = "gson")
