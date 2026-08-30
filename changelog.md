@@ -17,6 +17,15 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.2.0.0
 
+## Item Tooltips & Pricing
+
+- **Real-time price tooltips** — sell/buy/NPC prices from shop plugins shown directly in inventory item tooltips via ProtocolLib packet interception
+- **Multi-shop support** — separate hooks for RoyaleEconomy, EconomyShopGUI, QuickShop; PriceResolver aggregates all active providers and returns the best price
+- **Packet-only modification** — actual server-side items are never modified; tooltips are injected in-transit only
+- **Idempotent injection** — marker component prevents lore duplication on packet re-send
+- **Per-player toggle** — `/pricing` command lets players turn price display on/off for themselves
+- **Config-driven** — lore line templates, marker, toggle permission all in `modules/pricing/config.yml`
+
 ## Bug fixes
 
 - **Fixed** TP effects not appearing for tpa/tp/tphere — the direct trigger was only in the countdown `teleport()` path; `teleportNow()` (the universal funnel) now calls `playDirectTeleport` so ALL teleport paths trigger the particle ring

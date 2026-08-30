@@ -8,6 +8,7 @@ import dev.yanianz.essentials.reports.CommandReport;
 import dev.yanianz.essentials.reports.CommandReports;
 import dev.yanianz.essentials.notes.CommandNotes;
 import dev.yanianz.essentials.polls.CommandPoll;
+import dev.yanianz.essentials.pricing.CommandPricing;
 import dev.yanianz.essentials.reputation.CommandRepGive;
 import dev.yanianz.essentials.reputation.CommandReputationView;
 import fr.maxlego08.essentials.commands.commands.chat.*;
@@ -269,6 +270,7 @@ public class CommandLoader {
         register("step", CommandStep.class);
         register("itemframe", CommandItemFrame.class, "iframe");
         register("deathmessage", CommandDeathMessageToggle.class, "dm", "deathmsg");
+        register("pricing", CommandPricing.class);
 
         for (RegisterCommand registerCommand : this.commands) {
             try {

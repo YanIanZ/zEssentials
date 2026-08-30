@@ -1181,6 +1181,9 @@ public enum Message {
     COMMAND_DEATH_MESSAGE_TOGGLE_DISABLE("#C084FC☠ #B794F4Death messages are now #E9D5FFhidden #B794F4for %player%#B794F4."),
     COMMAND_DEATH_MESSAGE_TOGGLE_ENABLE("#C084FC☠ #B794F4Death messages are now #E9D5FFvisible #B794F4for %player%#B794F4."),
     DESCRIPTION_DEATH_MESSAGE_TOGGLE("Toggle death messages visibility"),
+    COMMAND_PRICING_ENABLED("<success>Item pricing tooltips are now enabled."),
+    COMMAND_PRICING_DISABLED("<error>Item pricing tooltips are now disabled."),
+    DESCRIPTION_PRICING("Toggle item pricing tooltips"),
 
     // Death messages used by DeathMessageModule (fallback messages when no custom config is set)
     DEATH_MESSAGE_GENERIC("#99E0FF%player% &7died."),
