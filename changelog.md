@@ -69,6 +69,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Friend cap** — `max-friends` config (default 50); enforced in `sendRequest` before adding the pending request
 - **Config-driven** — `modules/friends/config.yml`; `FriendStorage` POJO keeps the friend graph for clean unit testing
 
+## Guild system
+
+- **Guild create/disband** — /guild create <name> creates; /guild disband destroys (leader only)
+- **Guild join/leave** — /guild join <id> | /guild leave
+- **Guild info** — /guild info shows name and member count
+- **Rank system** — MEMBER, OFFICER, LEADER hierarchy
+- **Guild chat** — /gc <message> sends to all members (format in config)
+- **Permission cap** — `max-members` in config (default 25)
+
 ## Chat v2
 
 - **Mention system** with configurable title, action bar and boss bar notifications — each toggle independently in `mention-placeholder` config (title-enabled, actionbar-enabled, bossbar-enabled); DND suppresses all notification types; `%player%` placeholder in all texts

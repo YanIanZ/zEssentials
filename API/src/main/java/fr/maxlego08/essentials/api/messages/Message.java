@@ -1207,6 +1207,18 @@ public enum Message {
     COMMAND_FRIEND_DECLINED("<error>Declined friend request from %player%."),
     COMMAND_FRIEND_NOT_ONLINE("<error>%player% is not online."),
     COMMAND_FRIEND_LIST("<success>Your friends: %friends%"),
+
+    DESCRIPTION_GUILD("Manage your guild"),
+    COMMAND_GUILD_CREATED("<success>Guild &a%name%<success> created."),
+    COMMAND_GUILD_ALREADY_IN("<error>You are already in a guild."),
+    COMMAND_GUILD_USAGE("<error>Usage: /guild <create|disband|join|leave|info>"),
+    COMMAND_GUILD_DISBANDED("<success>Guild disbanded."),
+    COMMAND_GUILD_NOT_LEADER("<error>Only the leader can disband."),
+    COMMAND_GUILD_JOINED("<success>Joined the guild."),
+    COMMAND_GUILD_LEADER_CANNOT_LEAVE("<error>Leader cannot leave. Disband instead."),
+    COMMAND_GUILD_LEFT("<success>Left the guild."),
+    COMMAND_GUILD_NOT_IN("<error>You are not in a guild."),
+    COMMAND_GUILD_INFO("<success>Guild: &a%name% &7(%members% members)"),
     ;
 
     private EssentialsPlugin plugin;

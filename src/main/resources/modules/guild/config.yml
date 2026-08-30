@@ -1,0 +1,19 @@
+########################################################################################################################
+#
+# zEssentials - Guild System
+# Cross-server guilds with rank hierarchy and dedicated guild chat.
+# Leader is set on creation; promote/demote and invite/join flow are wired through /guild subcommands.
+#
+########################################################################################################################
+
+config-version: 1
+enable: true
+
+# Maximum members per guild
+max-members: 25
+
+# Maximum length of a guild name (3..32)
+max-name-length: 16
+
+# Format of guild chat messages (placeholders: %player%, %message%)
+chat-format: "&2[&aGUILD&2] &f%player%&8: &7%message%"
