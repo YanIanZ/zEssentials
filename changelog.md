@@ -78,6 +78,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Guild chat** — /gc <message> sends to all members (format in config)
 - **Permission cap** — `max-members` in config (default 25)
 
+## Party system
+
+- **Create/disband** — /party create | /party disband (leader only)
+- **Invite/leave** — /party invite <player> | /party leave
+- **Leader transfer** — auto-transfer to longest-tenured member when leader leaves
+- **Party chat** — /pc <message> sends to all party members
+- **Max size** — configurable cap (default 8)
+- **Auto-disband** — when last member leaves
+
 ## Chat v2
 
 - **Mention system** with configurable title, action bar and boss bar notifications — each toggle independently in `mention-placeholder` config (title-enabled, actionbar-enabled, bossbar-enabled); DND suppresses all notification types; `%player%` placeholder in all texts

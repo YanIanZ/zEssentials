@@ -1,0 +1,15 @@
+########################################################################################################################
+#
+# zEssentials - Party
+# Player parties with create/disband, invite, leader auto-transfer, and party chat.
+#
+########################################################################################################################
+
+config-version: 1
+enable: true
+
+# Maximum party size (leader + members)
+max-size: 8
+
+# Format of party chat messages (placeholders: %player%, %message%)
+chat-format: "&d[&5PARTY&d] &f%player%&8: &7%message%"

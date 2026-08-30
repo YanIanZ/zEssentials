@@ -356,6 +356,7 @@ public enum Permission {
     ESSENTIALS_DEATH_MESSAGE_TOGGLE_OTHER("Allows toggling death messages for other players"),
     ESSENTIALS_FRIENDS,
     ESSENTIALS_GUILD,
+    ESSENTIALS_PARTY,
     ESSENTIALS_LIST,
     ESSENTIALS_ITEMDB,
     ESSENTIALS_TERMS_ADMIN("Manage the terms of service module");

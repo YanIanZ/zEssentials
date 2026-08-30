@@ -1220,6 +1220,17 @@ public enum Message {
     COMMAND_GUILD_LEFT("<success>Left the guild."),
     COMMAND_GUILD_NOT_IN("<error>You are not in a guild."),
     COMMAND_GUILD_INFO("<success>Guild: &a%name% &7(%members% members)"),
+
+    DESCRIPTION_PARTY("Manage your party"),
+    DESCRIPTION_PARTY_CHAT("Send a message to your party"),
+    COMMAND_PARTY_CREATED("<success>Party created."),
+    COMMAND_PARTY_DISBANDED("<success>Party disbanded."),
+    COMMAND_PARTY_INVITED("<success>%player% joined the party."),
+    COMMAND_PARTY_INVITED_NOTIFY("<success>%player% invited you to their party."),
+    COMMAND_PARTY_LEFT("<success>Left the party."),
+    COMMAND_PARTY_NOT_IN("<error>You are not in a party."),
+    COMMAND_PARTY_ALREADY_IN("<error>You are already in a party."),
+    COMMAND_PARTY_INFO("<success>Party leader: &a%leader% &7(%size% members)"),
     ;
 
     private EssentialsPlugin plugin;

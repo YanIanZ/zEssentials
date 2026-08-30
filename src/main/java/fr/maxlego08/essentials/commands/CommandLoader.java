@@ -8,6 +8,8 @@ import dev.yanianz.essentials.networkchat.CommandGlobalChat;
 import dev.yanianz.essentials.friends.CommandFriend;
 import dev.yanianz.essentials.guild.CommandGuild;
 import dev.yanianz.essentials.guild.CommandGuildChat;
+import dev.yanianz.essentials.party.CommandParty;
+import dev.yanianz.essentials.party.CommandPartyChat;
 import dev.yanianz.essentials.reports.CommandReport;
 import dev.yanianz.essentials.reports.CommandReports;
 import dev.yanianz.essentials.notes.CommandNotes;
@@ -137,6 +139,8 @@ public class CommandLoader {
         register("friend", CommandFriend.class, "friends");
         register("guild", CommandGuild.class, "g");
         register("gc", CommandGuildChat.class, "guildchat");
+        register("party", CommandParty.class);
+        register("pc", CommandPartyChat.class, "partychat");
 
         register("balancetop", CommandBalanceTop.class, "baltop");
         register("economy", CommandEconomy.class, "eco");
