@@ -87,6 +87,14 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Max size** — configurable cap (default 8)
 - **Auto-disband** — when last member leaves
 
+## Network/Social Layer
+
+- **NetworkManager** — BungeeCord plugin messaging transport with sub-channel routing
+- **Global chat** — cross-server public chat relay with configurable format
+- **Friends** — friend requests, accept/decline, list, remove, online notifications
+- **Guild** — create/disband/join/leave, rank system, guild chat, configurable max members
+- **Party** — create/disband/invite/leave, auto leader transfer, party chat, configurable max size
+
 ## Chat v2
 
 - **Mention system** with configurable title, action bar and boss bar notifications — each toggle independently in `mention-placeholder` config (title-enabled, actionbar-enabled, bossbar-enabled); DND suppresses all notification types; `%player%` placeholder in all texts
