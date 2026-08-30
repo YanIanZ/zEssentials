@@ -9,6 +9,7 @@ import fr.maxlego08.essentials.api.storage.IStorage;
 import fr.maxlego08.essentials.api.storage.StorageManager;
 import fr.maxlego08.essentials.api.storage.StorageType;
 import fr.maxlego08.essentials.module.modules.SpawnModule;
+import fr.maxlego08.essentials.storage.mongodb.MongoStorage;
 import fr.maxlego08.essentials.storage.storages.JsonStorage;
 import fr.maxlego08.essentials.storage.storages.SqlStorage;
 import fr.maxlego08.essentials.zutils.utils.TimerBuilder;
@@ -37,6 +38,7 @@ public class ZStorageManager extends ZUtils implements StorageManager {
         this.storageType = plugin.getConfiguration().getStorageType();
         this.iStorage = switch (this.storageType) {
             case HIKARICP, SQLITE, MYSQL, MARIADB -> new SqlStorage(plugin, this.storageType);
+            case MONGO -> new MongoStorage(plugin);
             default -> new JsonStorage(plugin);
         };
     }

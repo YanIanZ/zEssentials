@@ -5,6 +5,7 @@ import fr.maxlego08.essentials.api.commands.CommandCooldown;
 import fr.maxlego08.essentials.api.commands.CommandRestriction;
 import fr.maxlego08.essentials.api.config.models.NearDirectionReplacements;
 import fr.maxlego08.essentials.api.configuration.ReplacePlaceholder;
+import fr.maxlego08.essentials.api.server.MongoConfiguration;
 import fr.maxlego08.essentials.api.server.RedisConfiguration;
 import fr.maxlego08.essentials.api.server.ServerType;
 import fr.maxlego08.essentials.api.storage.StorageType;
@@ -109,6 +110,13 @@ public interface Configuration extends ConfigurationFile {
      * @return The RedisConfiguration representing the Redis configuration.
      */
     RedisConfiguration getRedisConfiguration();
+
+    /**
+     * Gets the MongoDB configuration from the plugin configuration.
+     *
+     * @return The MongoConfiguration representing the MongoDB configuration.
+     */
+    MongoConfiguration getMongoConfiguration();
 
     /**
      * Retrieves a list of message colors available.
