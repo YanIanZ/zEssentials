@@ -25,14 +25,17 @@ import org.bukkit.OfflinePlayer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class MongoStorage extends StorageHelper implements IStorage {
 
@@ -69,6 +72,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
         this.totalUser = repositories.users.totalUsers();
         repositories.cooldowns.deleteExpiredCooldowns();
         repositories.users.clearExpiredSanctions();
+        repositories.mailBox.deleteExpiredItems();
         this.existingUUIDs.addAll(repositories.users.selectUUIDs());
         setActiveSanctions(repositories.sanctions.getActiveBan());
     }
@@ -80,7 +84,59 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public User createOrLoad(UUID uniqueId, String playerName) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: createOrLoad");
+        User user = new ZUser(this.plugin, uniqueId);
+        user.setName(playerName);
+        this.users.put(uniqueId, user);
+
+        async(() -> {
+            var optional = repositories.users.selectUser(uniqueId).stream().findFirst();
+            if (optional.isEmpty()) {
+                this.firstJoin(user);
+            }
+
+            repositories.users.upsert(uniqueId, playerName);
+
+            this.localUUIDS.entrySet().removeIf(entry -> entry.getValue().equals(uniqueId) && !entry.getKey().equals(playerName));
+            this.localUUIDS.put(playerName, uniqueId);
+
+            if (Bukkit.getOnlineMode()) {
+                List<UserDTO> duplicates = repositories.users.selectUsers(playerName);
+                for (UserDTO duplicate : duplicates) {
+                    if (duplicate.unique_id().equals(uniqueId)) continue;
+                    String currentName = fetchNameFromMojang(duplicate.unique_id());
+                    if (currentName != null && !currentName.equals(playerName)) {
+                        repositories.users.updateName(duplicate.unique_id(), currentName);
+                        this.localUUIDS.remove(playerName);
+                        this.localUUIDS.put(currentName, duplicate.unique_id());
+                        this.plugin.getLogger().info("Updated player name for UUID " + duplicate.unique_id() + " from '" + playerName + "' to '" + currentName + "' (detected duplicate name).");
+                    } else if (currentName == null) {
+                        this.plugin.getLogger().warning("Could not fetch current name from Mojang for UUID " + duplicate.unique_id() + " (duplicate name '" + playerName + "'). The player may have plugin inconsistencies.");
+                    }
+                }
+            }
+
+            if (optional.isPresent()) {
+                UserDTO userDTO = optional.get();
+                if (userDTO.mute_sanction_id() != null) {
+                    SanctionDTO sanction = repositories.sanctions.getSanction(userDTO.mute_sanction_id());
+                    if (sanction != null && sanction.isActive()) {
+                        user.setMuteSanction(Sanction.fromDTO(sanction));
+                    }
+                }
+                user.setSanction(userDTO.ban_sanction_id(), userDTO.mute_sanction_id());
+                user.setWithDTO(userDTO);
+                user.setOptions(repositories.options.select(uniqueId));
+                user.setCooldowns(repositories.cooldowns.select(uniqueId));
+                user.setEconomies(repositories.economy.select(uniqueId));
+                user.setHomes(repositories.homes.select(uniqueId));
+                user.setIgnoredPlayers(repositories.ignores.select(uniqueId));
+                user.setPowerTools(repositories.powerTools.select(uniqueId).stream().collect(Collectors.toMap(PowerToolsDTO::material, PowerToolsDTO::command, (a, b) -> b, LinkedHashMap::new)));
+                user.setMailBoxItems(repositories.mailBox.select(uniqueId));
+                user.setMailMessages(repositories.mailMessages.select(uniqueId));
+            }
+        });
+
+        return user;
     }
 
     @Override
@@ -95,7 +151,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void updateOption(UUID uniqueId, Option option, boolean value) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: updateOption");
+        async(() -> repositories.options.upsert(uniqueId, option, value));
     }
 
     @Override
@@ -175,12 +231,14 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void storeTransactions(UUID fromUuid, UUID toUuid, Economy economy, BigDecimal fromAmount, BigDecimal toAmount, String reason) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: storeTransactions");
+        EconomyTransactionDTO transaction = new EconomyTransactionDTO(fromUuid, toUuid, economy.getName(), reason,
+                toAmount.subtract(fromAmount), fromAmount, toAmount, new Date(), new Date());
+        async(() -> repositories.transactions.insertTransactions(List.of(transaction)));
     }
 
     @Override
     public List<EconomyTransactionDTO> getTransactions(UUID toUuid, Economy economy) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getTransactions");
+        return repositories.transactions.selectTransactions(toUuid, economy);
     }
 
     @Override
@@ -245,12 +303,12 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void addIgnore(UUID uniqueId, UUID ignoredId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: addIgnore");
+        async(() -> repositories.ignores.upsert(uniqueId, ignoredId));
     }
 
     @Override
     public void removeIgnore(UUID uniqueId, UUID ignoredId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: removeIgnore");
+        async(() -> repositories.ignores.delete(uniqueId, ignoredId));
     }
 
     @Override
@@ -299,47 +357,59 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void insertChatMessage(UUID uuid, String content) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: insertChatMessage");
+        async(() -> repositories.chatMessages.insertMessages(List.of(new ChatMessageDTO(uuid, content, new Date()))));
     }
 
     @Override
     public void insertPrivateMessage(UUID sender, UUID receiver, String content) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: insertPrivateMessage");
+        async(() -> repositories.privateMessages.insertMessages(List.of(new PrivateMessageDTO(sender, receiver, content, new Date()))));
     }
 
     @Override
     public List<ChatMessageDTO> getMessages(UUID targetUuid) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getMessages");
+        return repositories.chatMessages.getMessages(targetUuid);
     }
 
     @Override
     public int deleteChatMessage(UUID playerUuid, String content) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: deleteChatMessage");
+        return repositories.chatMessages.deleteMessages(playerUuid, content);
     }
 
     @Override
     public Map<Option, Boolean> getOptions(UUID uuid) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getOptions");
+        if (this.users.containsKey(uuid)) {
+            return this.users.get(uuid).getOptions();
+        }
+        return repositories.options.select(uuid).stream().collect(Collectors.toMap(OptionDTO::option_name, OptionDTO::option_value));
     }
 
     @Override
     public void getOption(UUID uuid, Option option, Consumer<Boolean> consumer) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getOption");
+        var user = getUser(uuid);
+        if (user != null) consumer.accept(user.getOption(option));
+        else async(() -> repositories.options.select(uuid, option, consumer));
     }
 
     @Override
     public void insertCommand(UUID uuid, String command) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: insertCommand");
+        async(() -> repositories.commands.insertCommands(List.of(new CommandDTO(uuid, command, new Date()))));
     }
 
     @Override
     public void insertPlayTime(UUID uniqueId, long sessionPlayTime, long playtime, String address) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: insertPlayTime");
+        async(() -> {
+            if (sessionPlayTime > 0) {
+                repositories.playTime.insert(uniqueId, sessionPlayTime, address);
+            }
+            repositories.users.updatePlayTime(uniqueId, playtime);
+        });
     }
 
     @Override
     public UserRecord fetchUserRecord(UUID uuid) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: fetchUserRecord");
+        UserDTO userDTO = repositories.users.selectUser(uuid).getFirst();
+        List<PlayTimeDTO> playTimeDTOS = repositories.playTime.select(uuid);
+        return new UserRecord(userDTO, playTimeDTOS);
     }
 
     @Override
@@ -354,47 +424,47 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void setPowerTools(UUID uniqueId, Material material, String command) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: setPowerTools");
+        async(() -> repositories.powerTools.upsert(uniqueId, material, command));
     }
 
     @Override
     public void deletePowerTools(UUID uniqueId, Material material) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: deletePowerTools");
+        async(() -> repositories.powerTools.delete(uniqueId, material));
     }
 
     @Override
     public void addMailBoxItem(MailBoxItem mailBoxItem) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: addMailBoxItem");
+        async(() -> repositories.mailBox.insert(mailBoxItem));
     }
 
     @Override
     public void clearMailBox(UUID uuid) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: clearMailBox");
+        async(() -> repositories.mailBox.clear(uuid));
     }
 
     @Override
     public void removeMailBoxItem(int id) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: removeMailBoxItem");
+        async(() -> repositories.mailBox.delete(id));
     }
 
     @Override
     public void addMailMessage(MailMessage mailMessage) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: addMailMessage");
+        async(() -> repositories.mailMessages.insert(mailMessage));
     }
 
     @Override
     public void markMailMessagesAsRead(UUID uniqueId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: markMailMessagesAsRead");
+        async(() -> repositories.mailMessages.markAsRead(uniqueId));
     }
 
     @Override
     public void clearMailMessages(UUID uniqueId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: clearMailMessages");
+        async(() -> repositories.mailMessages.clear(uniqueId));
     }
 
     @Override
     public List<MailMessageDTO> getMailMessages(UUID uniqueId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getMailMessages");
+        return repositories.mailMessages.select(uniqueId);
     }
 
     @Override
@@ -415,7 +485,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public List<MailBoxDTO> getMailBox(UUID uuid) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getMailBox");
+        return repositories.mailBox.select(uuid);
     }
 
     @Override
@@ -587,5 +657,26 @@ public class MongoStorage extends StorageHelper implements IStorage {
         String name = offlinePlayer != null && offlinePlayer.getName() != null ? offlinePlayer.getName() : uniqueId.toString();
         repositories.users.upsert(uniqueId, name);
         this.existingUUIDs.add(uniqueId);
+    }
+
+    private String fetchNameFromMojang(UUID uuid) {
+        String uuidString = uuid.toString().replace("-", "");
+        String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuidString;
+        try {
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            if (connection.getResponseCode() == 200) {
+                try (java.io.InputStreamReader reader = new java.io.InputStreamReader(connection.getInputStream())) {
+                    com.google.gson.JsonObject jsonObject = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
+                    return jsonObject.get("name").getAsString();
+                }
+            }
+        } catch (Exception exception) {
+            this.plugin.getLogger().warning("Failed to fetch player name from Mojang API for UUID " + uuid + ": " + exception.getMessage());
+        }
+        return null;
     }
 }
