@@ -18,6 +18,7 @@ import fr.maxlego08.essentials.api.user.UserRecord;
 import fr.maxlego08.essentials.api.vault.Vault;
 import fr.maxlego08.essentials.user.ZUser;
 import fr.maxlego08.essentials.zutils.utils.StorageHelper;
+import fr.maxlego08.menu.common.utils.nms.ItemStackUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -75,6 +76,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
         repositories.mailBox.deleteExpiredItems();
         this.existingUUIDs.addAll(repositories.users.selectUUIDs());
         setActiveSanctions(repositories.sanctions.getActiveBan());
+        this.plugin.getServerStorage().setContents(repositories.serverStorage.select());
     }
 
     @Override
@@ -129,10 +131,13 @@ public class MongoStorage extends StorageHelper implements IStorage {
                 user.setCooldowns(repositories.cooldowns.select(uniqueId));
                 user.setEconomies(repositories.economy.select(uniqueId));
                 user.setHomes(repositories.homes.select(uniqueId));
+                user.setHomeShares(repositories.homeShares.selectByOwner(uniqueId));
                 user.setIgnoredPlayers(repositories.ignores.select(uniqueId));
                 user.setPowerTools(repositories.powerTools.select(uniqueId).stream().collect(Collectors.toMap(PowerToolsDTO::material, PowerToolsDTO::command, (a, b) -> b, LinkedHashMap::new)));
                 user.setMailBoxItems(repositories.mailBox.select(uniqueId));
                 user.setMailMessages(repositories.mailMessages.select(uniqueId));
+                user.setVoteSites(repositories.votes.select(uniqueId));
+                repositories.linkAccounts.select(uniqueId).ifPresent(user::setDiscordAccount);
             }
         });
 
@@ -248,7 +253,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void upsertStorage(String key, Object value) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: upsertStorage");
+        async(() -> repositories.serverStorage.upsert(key, value));
     }
 
     @Override
@@ -278,17 +283,17 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void addHomeShare(UUID owner, String homeName, UUID target) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: addHomeShare");
+        async(() -> repositories.homeShares.upsert(owner, homeName, target));
     }
 
     @Override
     public void removeHomeShare(UUID owner, String homeName, UUID target) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: removeHomeShare");
+        async(() -> repositories.homeShares.delete(owner, homeName, target));
     }
 
     @Override
     public void removeAllHomeShares(UUID owner, String homeName) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: removeAllHomeShares");
+        async(() -> repositories.homeShares.deleteAll(owner, homeName));
     }
 
     @Override
@@ -298,7 +303,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void isHomeSharedWith(UUID owner, String homeName, UUID target, Consumer<Boolean> consumer) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: isHomeSharedWith");
+        async(() -> consumer.accept(repositories.homeShares.isSharedWith(owner, homeName, target)));
     }
 
     @Override
@@ -414,7 +419,7 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public List<UserDTO> getUsers(String ip) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getUsers");
+        return repositories.users.getUsers(ip);
     }
 
     @Override
@@ -508,12 +513,12 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void updateServerStorage(String key, Object object) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: updateServerStorage");
+        async(() -> repositories.serverStorage.upsert(key, object));
     }
 
     @Override
     public void setLastVote(UUID uniqueId, String site) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: setLastVote");
+        async(() -> repositories.votes.setLastVote(uniqueId, site));
     }
 
     @Override
@@ -523,52 +528,52 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void updateVaultQuantity(UUID uniqueId, int vaultId, int slot, long quantity) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: updateVaultQuantity");
+        async(() -> repositories.vaultItems.updateQuantity(uniqueId, vaultId, slot, quantity));
     }
 
     @Override
     public void removeVaultItem(UUID uniqueId, int vaultId, int slot) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: removeVaultItem");
+        async(() -> repositories.vaultItems.removeItem(uniqueId, vaultId, slot));
     }
 
     @Override
     public void createVaultItem(UUID uniqueId, int vaultId, int slot, long quantity, String item) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: createVaultItem");
+        async(() -> repositories.vaultItems.createNewItem(uniqueId, vaultId, slot, quantity, item));
     }
 
     @Override
     public Optional<VaultItemDTO> getVaultItem(UUID uniqueId, int vaultId, int slot) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getVaultItem");
+        return repositories.vaultItems.select(uniqueId, vaultId, slot);
     }
 
     @Override
     public boolean forceRemoveVaultItem(UUID uniqueId, int vaultId, int slot) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: forceRemoveVaultItem");
+        return repositories.vaultItems.forceRemove(uniqueId, vaultId, slot);
     }
 
     @Override
     public void setVaultSlot(UUID uniqueId, int slots) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: setVaultSlot");
+        async(() -> repositories.playerSlots.setSlot(uniqueId, slots));
     }
 
     @Override
     public List<VaultDTO> getVaults() {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getVaults");
+        return repositories.vaults.select();
     }
 
     @Override
     public List<VaultItemDTO> getVaultItems() {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getVaultItems");
+        return repositories.vaultItems.select();
     }
 
     @Override
     public List<PlayerSlotDTO> getPlayerVaultSlots() {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: getPlayerVaultSlots");
+        return repositories.playerSlots.select();
     }
 
     @Override
     public void updateVault(UUID uniqueId, Vault vault) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: updateVault");
+        async(() -> repositories.vaults.update(uniqueId, vault.getVaultId(), vault.getName(), vault.getIconItemStack() == null ? null : ItemStackUtils.serializeItemStack(vault.getIconItemStack())));
     }
 
     @Override
@@ -599,47 +604,47 @@ public class MongoStorage extends StorageHelper implements IStorage {
 
     @Override
     public void linkDiscordAccount(UUID uniqueId, String minecraftName, String discordName, long userId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: linkDiscordAccount");
+        async(() -> repositories.linkAccounts.insert(uniqueId, minecraftName, discordName, userId));
     }
 
     @Override
     public Optional<DiscordAccountDTO> selectDiscordAccount(UUID uniqueId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: selectDiscordAccount");
+        return repositories.linkAccounts.select(uniqueId);
     }
 
     @Override
     public Optional<DiscordCodeDTO> selectCode(String code) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: selectCode");
+        return repositories.linkCodes.getCode(code);
     }
 
     @Override
     public void clearCode(DiscordCodeDTO code) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: clearCode");
+        repositories.linkCodes.clearCode(code);
     }
 
     @Override
     public void insertDiscordLog(DiscordAction action, UUID uniqueId, String minecraftName, String discordName, long userId, String data) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: insertDiscordLog");
+        async(() -> repositories.linkHistory.insertLog(action, uniqueId, minecraftName, discordName, userId, data));
     }
 
     @Override
     public void unlinkDiscordAccount(UUID uniqueId) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: unlinkDiscordAccount");
+        async(() -> repositories.linkAccounts.delete(uniqueId));
     }
 
     @Override
     public StepDTO selectStep(UUID uniqueId, Step step) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: selectStep");
+        return repositories.steps.selectStep(uniqueId, step);
     }
 
     @Override
     public void createStep(UUID uniqueId, Step step, long playTime) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: createStep");
+        async(() -> repositories.steps.createStep(uniqueId, step, playTime));
     }
 
     @Override
     public void finishStep(UUID uniqueId, Step step, String data, long playTimeEnd, long playTimeBetween) {
-        throw new UnsupportedOperationException("Not yet implemented for MongoDB: finishStep");
+        async(() -> repositories.steps.finishStep(uniqueId, step, data, playTimeBetween, playTimeEnd));
     }
 
     @Override

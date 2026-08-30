@@ -104,6 +104,14 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Switched** ItemStack persistence to lossless `serializeAsBytes()`/`deserializeBytes()` Base64 (was `serialize()`+Gson, version-shape-coupled); added `EnderChestSerializerTest` round-trip coverage (5 tests)
 - **Fixed** `default-pages` not clamped to `max-pages` — misconfig could bypass the hard cap; now `Math.min(defaultPages, maxPages)` in `loadConfiguration`
 
+## Database backends
+
+- **Redis activated** — `server-type: REDIS` now activates the `RedisServer` for cross-server messaging (chat, kicks, cooldowns, private messages, player list sync); previously the activation code was commented out
+- **Redis hook paper-api fixed** — updated from stale `1.21.5` to `26.2.build.119-stable` matching the root project
+- **MongoDB storage backend** — `storage-type: MONGO` now supported as a full `IStorage` implementation with 25 MongoDB repositories mirroring the SQL Repository pattern
+- **MongoDB driver** — `org.mongodb:mongodb-driver-sync:5.2.1` added to `plugin.yml` libraries (runtime download by Paper, not shaded)
+- **MongoDB config** — `mongo-configuration` section in `config.yml` supports full URI or individual `host`/`port`/`user`/`password`/`database` fields
+
 # 1.1.0.0
 
 - **Fixed** nicknames not showing in chat — the display name is now passed through the MiniMessage renderer which converts legacy and hex codes correctly

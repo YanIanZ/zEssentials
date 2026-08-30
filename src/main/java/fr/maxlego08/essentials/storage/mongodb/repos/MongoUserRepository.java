@@ -106,6 +106,17 @@ public class MongoUserRepository extends MongoRepository {
         return users;
     }
 
+    public List<UserDTO> getUsers(String ip) {
+        MongoCollection<Document> playTimeCol = database().getCollection("play_time");
+        List<String> uuidStrings = new ArrayList<>();
+        for (Document doc : playTimeCol.find(new Document("address", ip))) {
+            String uuid = doc.getString("unique_id");
+            if (uuid != null && !uuidStrings.contains(uuid)) uuidStrings.add(uuid);
+        }
+        if (uuidStrings.isEmpty()) return new ArrayList<>();
+        return find(new Document("unique_id", new Document("$in", uuidStrings)), UserDTO.class);
+    }
+
     public List<UserVoteDTO> selectVoteUser(UUID uniqueId) {
         return find(new Document("unique_id", uniqueId.toString()), UserVoteDTO.class);
     }
