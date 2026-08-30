@@ -1,0 +1,33 @@
+########################################################################################################################
+#
+# zEssentials - Custom Crafting GUI
+# Replaces the vanilla crafting table with a Hypixel SkyBlock-style custom GUI.
+# Requires ProtocolLib for crafting table interception.
+#
+########################################################################################################################
+
+# Config schema version — do not edit
+config-version: 1
+
+enable: true
+
+# Title of the custom crafting GUI
+title: "&8&lCrafting Table"
+
+# Quick Craft button (shown only for players with the permission)
+quick-craft:
+  material: ANVIL
+  text: "&6&lQuick Craft"
+  lore:
+    - "&7Click to craft as many"
+    - "&7as possible at once"
+  permission: "essentials.crafting.quickcraft"
+
+# Close button
+close:
+  material: BARRIER
+  text: "&cClose"
+
+# Decorative glass pane
+filler-material: GRAY_STAINED_GLASS_PANE
+filler-color: "&8"

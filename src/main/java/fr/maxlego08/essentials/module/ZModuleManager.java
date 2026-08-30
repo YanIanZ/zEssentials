@@ -39,6 +39,7 @@ import fr.maxlego08.essentials.module.modules.RuleModule;
 import fr.maxlego08.essentials.module.modules.SanctionModule;
 import fr.maxlego08.essentials.module.modules.SpawnModule;
 import fr.maxlego08.essentials.module.modules.AutoMessageModule;
+import fr.maxlego08.essentials.module.modules.CraftingModule;
 import fr.maxlego08.essentials.module.modules.StepModule;
 import fr.maxlego08.essentials.module.modules.TeleportationModule;
 import fr.maxlego08.essentials.module.modules.VoteModule;
@@ -123,6 +124,7 @@ public class ZModuleManager implements ModuleManager {
         }
 
         this.modules.put(PricingModule.class, new PricingModule(this.plugin));
+        this.modules.put(CraftingModule.class, new CraftingModule(this.plugin));
 
         this.loadConfigurations();
 
