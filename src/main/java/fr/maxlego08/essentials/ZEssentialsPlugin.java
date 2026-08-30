@@ -875,5 +875,24 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
 
         this.permissionCheckers.add(new fr.maxlego08.essentials.hooks.BukkitEventPermissionChecker());
         this.getLogger().fine("Registered Bukkit event permission checker.");
+
+        fr.maxlego08.essentials.module.modules.PricingModule pricingModule =
+                this.moduleManager.getModule(fr.maxlego08.essentials.module.modules.PricingModule.class);
+
+        if (pricingModule != null && pricingModule.isEnabled()) {
+            if (getServer().getPluginManager().isPluginEnabled("RoyaleEconomy")) {
+                pricingModule.addProvider(new fr.maxlego08.essentials.hooks.pricing.RoyaleEconomyPriceProvider());
+                this.getLogger().info("Register RoyaleEconomy pricing provider.");
+            }
+            if (getServer().getPluginManager().isPluginEnabled("EconomyShopGUI")) {
+                pricingModule.addProvider(new fr.maxlego08.essentials.hooks.pricing.EconomyShopGUIPriceProvider());
+                this.getLogger().info("Register EconomyShopGUI pricing provider.");
+            }
+            if (getServer().getPluginManager().isPluginEnabled("QuickShop")
+                    || getServer().getPluginManager().isPluginEnabled("QuickShop-Hikari")) {
+                pricingModule.addProvider(new fr.maxlego08.essentials.hooks.pricing.QuickShopPriceProvider());
+                this.getLogger().info("Register QuickShop pricing provider.");
+            }
+        }
     }
 }
