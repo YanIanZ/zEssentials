@@ -270,6 +270,18 @@ public interface User {
     void setOption(Option option, boolean value);
 
     /**
+     * Toggles the value of the specified option for the user and returns the new value.
+     *
+     * @param option The option to toggle.
+     * @return The new value of the option after toggling.
+     */
+    default boolean toggleOption(Option option) {
+        boolean newValue = !getOption(option);
+        setOption(option, newValue);
+        return newValue;
+    }
+
+    /**
      * Gets all options and their values for the user.
      *
      * @return A map containing all options and their values for the user.

@@ -42,6 +42,13 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Fixed** from/to ring spawning on the wrong region thread on Folia — both rings now scheduled via `runAtLocation` for correct region ownership
 - **Fixed** DND not suppressing the ping sound — `PlayerPingDisplay` now also checks `CHAT_DND` (previously only `MentionDisplay` respected DND)
 - **Fixed** belowname objective not showing on Folia — `belowNameObjective()` in `apply()` was not wrapped in `runNextTick`, silently failing on region threads
+
+## Global chat relay
+
+- **NetworkManager** — BungeeCord plugin messaging transport with sub-channel routing; reusable for friends/guild/party
+- **GlobalChatModule** — cross-server public chat relay; messages from one server appear in all servers with configurable format
+- **/g toggle** — per-player toggle to opt out of global chat relay
+- **Config-driven format** — `%server%`, `%player%`, `%message%` placeholders
 - **Fixed** `/reports` screen GUI not opening — `addRequirePlayerNameArg()` caused a `SYNTAX_ERROR` before `perform()` ran; changed to `addOptionalArg` so 0-arg `/reports` reaches the staff screen
 - **Fixed** tab completion missing on 7 commands (`/notes`, `/poll`, `/reputation`, `/nick`, `/baltopgui`, `/warpgui`, `/reports`) — all now use `addOptionalArg(String, TabCompletion)` with meaningful suggestions
 - **Fixed** tablist animations not working — `resolveAnimations` was a stub returning input unchanged; now resolves `%anim_<name>%` tokens to the current frame on each refresh tick

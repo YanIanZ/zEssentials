@@ -1330,4 +1330,7 @@ command-home-import-start: "<success>Importing homes from &f%source%<success>...
 command-home-import-done: "<success>Import finished: &f%imported% <success>imported, &f%skipped% <success>skipped, &f%errors% <success>errors."
 command-home-import-unknown: "<error>Unknown import source &f%source%<error>. Available: essentialsx."
 command-home-import-error: "<error>An error occurred during the import, check the console."
+description-globalchat: "Toggle global cross-server chat"
+command-globalchat-enabled: "<success>Global chat enabled."
+command-globalchat-disabled: "<error>Global chat disabled."
 death-message-fists: "&7fists"

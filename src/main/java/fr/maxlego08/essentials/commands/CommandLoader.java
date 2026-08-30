@@ -4,6 +4,7 @@ import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandManager;
 import dev.yanianz.essentials.nicknames.CommandNick;
+import dev.yanianz.essentials.networkchat.CommandGlobalChat;
 import dev.yanianz.essentials.reports.CommandReport;
 import dev.yanianz.essentials.reports.CommandReports;
 import dev.yanianz.essentials.notes.CommandNotes;
@@ -129,6 +130,7 @@ public class CommandLoader {
         register("tpacancel", CommandTeleportCancel.class);
         register("back", CommandTeleportBack.class);
         register("tpr", CommandTeleportRandom.class, "rtp");
+        register("g", CommandGlobalChat.class, "globalchat");
 
         register("balancetop", CommandBalanceTop.class, "baltop");
         register("economy", CommandEconomy.class, "eco");

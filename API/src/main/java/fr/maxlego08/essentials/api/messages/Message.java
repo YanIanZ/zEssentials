@@ -1193,6 +1193,9 @@ public enum Message {
     DEATH_MESSAGE_MOB("#99E0FF%player% &7was killed by &c%mob%&7."),
     DEATH_MESSAGE_MYTHIC_MOB("#99E0FF%player% &7was slain by <gradient:#ff6600:#ff0000>%mob%</gradient>&7!"),
     DEATH_MESSAGE_FISTS("&7fists"),
+    DESCRIPTION_GLOBALCHAT("Toggle global cross-server chat"),
+    COMMAND_GLOBALCHAT_ENABLED("<success>Global chat enabled."),
+    COMMAND_GLOBALCHAT_DISABLED("<error>Global chat disabled."),
     ;
 
     private EssentialsPlugin plugin;
