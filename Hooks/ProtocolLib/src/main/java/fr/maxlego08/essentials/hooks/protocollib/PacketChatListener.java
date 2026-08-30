@@ -100,11 +100,15 @@ public class PacketChatListener extends PacketAdapter implements PacketRegister 
      * @return A new component with the corrected click event values.
      */
     private Component fixClickEvent(final Component component) {
-        final ClickEvent event = component.clickEvent();
+        final ClickEvent<?> event = component.clickEvent();
         Component copied = component;
 
-        if (event != null && event.value().startsWith("&f")) {
-            copied = component.clickEvent(ClickEvent.clickEvent(event.action(), event.value().substring(2)));
+        if (event != null && event.payload() instanceof ClickEvent.Payload.Text text
+                && text.value().startsWith("&f")) {
+            @SuppressWarnings("unchecked")
+            ClickEvent.Action<ClickEvent.Payload.Text> action =
+                    (ClickEvent.Action<ClickEvent.Payload.Text>) event.action();
+            copied = component.clickEvent(ClickEvent.clickEvent(action, ClickEvent.Payload.string(text.value().substring(2))));
         }
 
         copied = copied.children(copied.children().stream().map(this::fixClickEvent).collect(Collectors.toList()));
