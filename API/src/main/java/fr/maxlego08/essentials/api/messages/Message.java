@@ -1209,6 +1209,7 @@ public enum Message {
     COMMAND_FRIEND_LIST("<success>Your friends: %friends%"),
 
     DESCRIPTION_GUILD("Manage your guild"),
+    DESCRIPTION_GUILD_CHAT("Send a message to your guild"),
     COMMAND_GUILD_CREATED("<success>Guild &a%name%<success> created."),
     COMMAND_GUILD_ALREADY_IN("<error>You are already in a guild."),
     COMMAND_GUILD_USAGE("<error>Usage: /guild <create|disband|join|leave|info>"),
