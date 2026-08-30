@@ -27,6 +27,7 @@ import fr.maxlego08.essentials.api.placeholders.PlaceholderRegister;
 import fr.maxlego08.essentials.api.sanction.SanctionManager;
 import fr.maxlego08.essentials.api.scoreboard.ScoreboardManager;
 import fr.maxlego08.essentials.api.server.EssentialsServer;
+import fr.maxlego08.essentials.api.server.ServerType;
 import fr.maxlego08.essentials.api.steps.StepManager;
 import fr.maxlego08.essentials.api.storage.Persist;
 import fr.maxlego08.essentials.api.storage.ServerStorage;
@@ -56,6 +57,7 @@ import fr.maxlego08.essentials.commands.CommandLoader;
 import fr.maxlego08.essentials.commands.ZCommandManager;
 import fr.maxlego08.essentials.commands.commands.essentials.CommandEssentials;
 import fr.maxlego08.essentials.enchantments.ZEnchantments;
+import fr.maxlego08.essentials.hooks.redis.RedisServer;
 import fr.maxlego08.essentials.listener.InvseeListener;
 import fr.maxlego08.essentials.listener.PlayerListener;
 import fr.maxlego08.essentials.loader.*;
@@ -199,10 +201,10 @@ public final class ZEssentialsPlugin extends ZPlugin implements EssentialsPlugin
         this.getLogger().info("Create " + this.commandManager.countCommands() + " commands.");
 
         // Essentials Server
-        /*if (this.configuration.getServerType() == ServerType.REDIS) {
+        if (this.configuration.getServerType() == ServerType.REDIS) {
             this.essentialsServer = new RedisServer(this);
             this.getLogger().info("Using Redis server.");
-        }*/
+        }
 
         this.essentialsServer.onEnable();
 
