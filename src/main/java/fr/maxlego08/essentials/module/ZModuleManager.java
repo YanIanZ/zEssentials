@@ -31,6 +31,7 @@ import fr.maxlego08.essentials.module.modules.terms.TermsModule;
 import fr.maxlego08.essentials.module.modules.HomeModule;
 import fr.maxlego08.essentials.module.modules.ItemModule;
 import fr.maxlego08.essentials.module.modules.JoinQuitModule;
+import fr.maxlego08.essentials.module.modules.PricingModule;
 import fr.maxlego08.essentials.module.modules.MailBoxModule;
 import fr.maxlego08.essentials.module.modules.MessageModule;
 import fr.maxlego08.essentials.module.modules.DeathMessageModule;
@@ -120,6 +121,8 @@ public class ZModuleManager implements ModuleManager {
         if (plugin.isPaperVersion()) {
             this.modules.put(DeathMessageModule.class, new DeathMessageModule(this.plugin));
         }
+
+        this.modules.put(PricingModule.class, new PricingModule(this.plugin));
 
         this.loadConfigurations();
 

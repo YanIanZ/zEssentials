@@ -1,0 +1,28 @@
+########################################################################################################################
+#
+# zEssentials - Item Tooltips & Pricing
+# Shows real-time sell/buy/NPC prices from shop plugins in item tooltips.
+# Requires ProtocolLib for packet interception.
+#
+########################################################################################################################
+
+# Config schema version — do not edit
+config-version: 1
+
+enable: true
+
+# Lore lines to inject into item tooltips.
+# %sell% = best sell price, %buy% = best buy price, %npc% = NPC sell price
+# Lines with null prices are skipped (the line is not shown).
+lore-lines:
+  - ""
+  - "&8&m─────────────"
+  - "&6Sell: &a%sell%"
+  - "&6Buy: &c%buy%"
+  - "&6NPC: &e%npc%"
+
+# Separator marker used for idempotency (prevents lore duplication on re-send)
+marker: "&8&lzE Pricing"
+
+# Per-player toggle permission
+toggle-permission: "essentials.pricing.toggle"
