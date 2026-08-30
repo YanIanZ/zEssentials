@@ -26,6 +26,16 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Per-player toggle** — `/pricing` command lets players turn price display on/off for themselves
 - **Config-driven** — lore line templates, marker, toggle permission all in `modules/pricing/config.yml`
 
+## Stash system
+
+- **Item Stash** — personal storage for up to 720 non-stackable items (weapons, tools, rare drops) across 16 paginated pages of 45 slots
+- **Material Stash** — unlimited stackable material storage (cobblestone, crops); displays one slot per distinct material with total count
+- **Permission-based pages** — `essentials.stash.item.pages.<n>` grants additional Item Stash pages (up to `max-item-pages`)
+- **Category picker** — `/stash` opens a GUI to choose between Item Stash and Material Stash; `/stash item` and `/stash material` open directly
+- **Vanilla migration** — first open migrates non-stackable items from player inventory into Item Stash (config-toggleable)
+- **JSON persistence** — lossless `serializeAsBytes()` + Base64 in `modules/stash/data/{items,materials}/<uuid>.json`
+- **Config-driven** — titles, nav row, picker icons, migration toggle in `modules/stash/config.yml`
+
 ## Bug fixes
 
 - **Fixed** TP effects not appearing for tpa/tp/tphere — the direct trigger was only in the countdown `teleport()` path; `teleportNow()` (the universal funnel) now calls `playDirectTeleport` so ALL teleport paths trigger the particle ring

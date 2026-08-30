@@ -271,6 +271,7 @@ public class CommandLoader {
         register("itemframe", CommandItemFrame.class, "iframe");
         register("deathmessage", CommandDeathMessageToggle.class, "dm", "deathmsg");
         register("pricing", CommandPricing.class);
+        register("stash", dev.yanianz.essentials.stash.CommandStash.class, "itemstash", "materialstash");
 
         for (RegisterCommand registerCommand : this.commands) {
             try {

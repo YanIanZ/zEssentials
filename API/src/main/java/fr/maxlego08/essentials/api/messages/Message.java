@@ -443,6 +443,7 @@ public enum Message {
     DESCRIPTION_STEP("Show step commands"),
     DESCRIPTION_STEP_START("Start a step"),
     DESCRIPTION_STEP_FINISH("Finish a step"),
+    DESCRIPTION_STASH("Open your personal stash"),
 
     YOU("you"),
     TRASH("&8Trash"),
