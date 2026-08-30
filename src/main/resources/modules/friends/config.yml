@@ -1,0 +1,15 @@
+########################################################################################################################
+#
+# zEssentials - Friends System
+# Per-server friend list with optional Redis-backed cross-server sync via NetworkManager.
+#
+########################################################################################################################
+
+config-version: 1
+enable: true
+
+# Maximum number of friends per player
+max-friends: 50
+
+# Days before pending friend requests auto-expire
+request-expiry-days: 7

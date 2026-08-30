@@ -354,6 +354,7 @@ public enum Permission {
     ESSENTIALS_DEATH_MESSAGE_TELEPORT("Allows clicking death messages to teleport to death location"),
     ESSENTIALS_DEATH_MESSAGE_TOGGLE("Allows toggling death messages visibility"),
     ESSENTIALS_DEATH_MESSAGE_TOGGLE_OTHER("Allows toggling death messages for other players"),
+    ESSENTIALS_FRIENDS,
     ESSENTIALS_LIST,
     ESSENTIALS_ITEMDB,
     ESSENTIALS_TERMS_ADMIN("Manage the terms of service module");

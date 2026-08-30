@@ -1196,6 +1196,17 @@ public enum Message {
     DESCRIPTION_GLOBALCHAT("Toggle global cross-server chat"),
     COMMAND_GLOBALCHAT_ENABLED("<success>Global chat enabled."),
     COMMAND_GLOBALCHAT_DISABLED("<error>Global chat disabled."),
+
+    DESCRIPTION_FRIEND("Manage friends"),
+    COMMAND_FRIEND_REQUEST_SENT("<success>Friend request sent to %player%."),
+    COMMAND_FRIEND_REQUEST_RECEIVED("<success>%player% sent you a friend request."),
+    COMMAND_FRIEND_ALREADY_FRIEND("<error>Already friends with %player%."),
+    COMMAND_FRIEND_REMOVED("<success>Removed %player% from your friends."),
+    COMMAND_FRIEND_ACCEPTED("<success>You are now friends with %player%."),
+    COMMAND_FRIEND_ACCEPTED_NOTIFY("<success>%player% accepted your friend request."),
+    COMMAND_FRIEND_DECLINED("<error>Declined friend request from %player%."),
+    COMMAND_FRIEND_NOT_ONLINE("<error>%player% is not online."),
+    COMMAND_FRIEND_LIST("<success>Your friends: %friends%"),
     ;
 
     private EssentialsPlugin plugin;

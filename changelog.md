@@ -59,6 +59,16 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Fixed** chat history delete and report tp/resolve click commands using `/essentials:` namespaced prefix that didn't resolve — now use direct paths
 - **Fixed** freeze/unfreeze `Cannot register new team async` on Folia — scoreboard ops wrapped in `runNextTick`
 
+## Friends system
+
+- **Friend requests** — `/friend add <player>` sends a request; `/friend accept <player>` and `/friend decline <player>` respond
+- **Friend list** — `/friend list` shows all current friends (UUIDs shown as short names when offline)
+- **Remove friends** — `/friend remove <player>` drops the friendship on both sides
+- **Request expiry** — pending requests auto-prune after the configured number of days (default 7)
+- **Online notifications** — `/friend` listener notifies online friends when a player joins (Adventure Component)
+- **Friend cap** — `max-friends` config (default 50); enforced in `sendRequest` before adding the pending request
+- **Config-driven** — `modules/friends/config.yml`; `FriendStorage` POJO keeps the friend graph for clean unit testing
+
 ## Chat v2
 
 - **Mention system** with configurable title, action bar and boss bar notifications — each toggle independently in `mention-placeholder` config (title-enabled, actionbar-enabled, bossbar-enabled); DND suppresses all notification types; `%player%` placeholder in all texts
