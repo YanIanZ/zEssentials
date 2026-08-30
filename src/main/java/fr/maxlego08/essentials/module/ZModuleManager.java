@@ -38,6 +38,7 @@ import fr.maxlego08.essentials.module.modules.DeathMessageModule;
 import fr.maxlego08.essentials.module.modules.RuleModule;
 import fr.maxlego08.essentials.module.modules.SanctionModule;
 import fr.maxlego08.essentials.module.modules.SpawnModule;
+import fr.maxlego08.essentials.module.modules.StashModule;
 import fr.maxlego08.essentials.module.modules.AutoMessageModule;
 import fr.maxlego08.essentials.module.modules.CraftingModule;
 import fr.maxlego08.essentials.module.modules.StepModule;
@@ -125,6 +126,7 @@ public class ZModuleManager implements ModuleManager {
 
         this.modules.put(PricingModule.class, new PricingModule(this.plugin));
         this.modules.put(CraftingModule.class, new CraftingModule(this.plugin));
+        this.modules.put(StashModule.class, new StashModule(this.plugin));
 
         this.loadConfigurations();
 

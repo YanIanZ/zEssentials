@@ -20,6 +20,7 @@ public enum Permission {
     ESSENTIALS_NIGHT,
     ESSENTIALS_SUN,
     ESSENTIALS_ENDERCHEST,
+    ESSENTIALS_STASH,
     ESSENTIALS_ENDERSEE,
     ESSENTIALS_ENDERSEE_OFFLINE("Allows you to see the enderchest of an offline player"),
     ESSENTIALS_TOP,
