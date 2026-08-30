@@ -1,0 +1,16 @@
+########################################################################################################################
+#
+# zEssentials - Global Chat
+# Cross-server public chat relay via BungeeCord plugin messaging.
+# All servers in the network must run this module with it enabled.
+#
+########################################################################################################################
+
+config-version: 1
+enable: true
+
+# Server name shown in relayed messages on other servers
+server-name: ""
+
+# Format of relayed messages (placeholders: %server%, %player%, %message%)
+format: "&7[&b%server%&7] &f%player%&8: &7%message%"

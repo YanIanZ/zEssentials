@@ -21,6 +21,7 @@ import dev.yanianz.essentials.nicknames.NicknamesModule;
 import dev.yanianz.essentials.bubbles.ChatBubblesModule;
 import dev.yanianz.essentials.discordbridge.DiscordBridgeModule;
 import dev.yanianz.essentials.network.BungeeChatModule;
+import dev.yanianz.essentials.networkchat.GlobalChatModule;
 import dev.yanianz.essentials.chatcustomization.ChatCustomizationModule;
 import dev.yanianz.essentials.reports.ReportsModule;
 import dev.yanianz.essentials.notes.NotesModule;
@@ -115,6 +116,7 @@ public class ZModuleManager implements ModuleManager {
         this.modules.put(ChatCustomizationModule.class, new ChatCustomizationModule(this.plugin));
         this.modules.put(ChatBubblesModule.class, new ChatBubblesModule(this.plugin));
         this.modules.put(BungeeChatModule.class, new BungeeChatModule(this.plugin));
+        this.modules.put(GlobalChatModule.class, new GlobalChatModule(this.plugin));
         this.modules.put(DiscordBridgeModule.class, new DiscordBridgeModule(this.plugin));
         this.modules.put(SleepModule.class, new SleepModule(this.plugin));
         this.modules.put(TabListModule.class, new TabListModule(this.plugin));
