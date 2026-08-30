@@ -34,6 +34,10 @@ public abstract class MongoRepository extends ZUtils {
         return collectionName;
     }
 
+    protected MongoDatabase database() {
+        return this.database;
+    }
+
     protected void upsert(Document filter, Document document) {
         collection().replaceOne(filter, document, new com.mongodb.client.model.ReplaceOptions().upsert(true));
     }
