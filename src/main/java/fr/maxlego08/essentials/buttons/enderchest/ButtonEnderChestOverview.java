@@ -8,12 +8,8 @@ import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.menu.api.button.Button;
 import fr.maxlego08.menu.api.engine.InventoryEngine;
 import fr.maxlego08.menu.api.utils.Placeholders;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
 
 /**
  * zMenu button rendering the Hypixel-style ender chest overview: one

@@ -73,6 +73,12 @@ public final class ItemStashGui {
                     namedItem(parseMaterial(nav.getString("next-button", "ARROW"), Material.ARROW),
                             nav.getString("next-text", "&7Next Page »")));
         }
+        if (!holder.isReadOnly()) {
+            inventory.setItem(48,
+                    namedItem(parseMaterial(nav.getString("withdraw-all-button", "EMERALD"), Material.EMERALD),
+                            nav.getString("withdraw-all-text", "&a&lWithdraw All"),
+                            nav.getStringList("withdraw-all-lore")));
+        }
     }
 
     static void switchPage(ZEssentialsPlugin plugin, Player player, ItemStashHolder holder, int newPage) {
@@ -91,6 +97,20 @@ public final class ItemStashGui {
         if (meta != null) {
             meta.displayName(LEGACY.deserialize(ColorUtil.sections(nameLegacy)));
             item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    static ItemStack namedItem(Material material, String nameLegacy, List<String> loreLegacy) {
+        ItemStack item = namedItem(material, nameLegacy);
+        if (loreLegacy != null && !loreLegacy.isEmpty()) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.lore(loreLegacy.stream()
+                        .map(line -> LEGACY.deserialize(ColorUtil.sections(line)))
+                        .toList());
+                item.setItemMeta(meta);
+            }
         }
         return item;
     }

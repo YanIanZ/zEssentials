@@ -89,6 +89,17 @@ public class ButtonCraft extends Button {
             event.setCancelled(true);
             player.closeInventory();
         });
+
+        // Hypixel bottom row: craft button at 48, close barrier at 50, red filler between
+        inventory.addItem(48, CraftingGuiItems.craftButton()).setClick(event -> {
+            event.setCancelled(true);
+            craftMultiple(player, session, inventory);
+        });
+        for (int slot = 45; slot < 54; slot++) {
+            if (slot == 48) continue;
+            if (slot == CraftingSlotMap.SLOT_CLOSE) continue;
+            inventory.addItem(slot, CraftingGuiItems.redFiller()).setClick(event -> event.setCancelled(true));
+        }
     }
 
     private void renderResult(InventoryEngine inventory, CraftingSession session) {

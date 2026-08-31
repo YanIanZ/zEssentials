@@ -15,6 +15,20 @@ Every change lands in this changelog immediately under its bumped heading.
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
+# 1.2.2.0
+
+## zMenu GUI — Hypixel bottom row polish
+
+- **Crafting bottom row** — craft button at slot 48, red filler glass across 45-53 (except close at 49); `CraftingGuiItems.craftButton()` + `redFiller()` helpers; `crafting.yml` slots updated
+- **Stash withdraw-all** — emerald button at slot 48 in the stash nav row, iterates all pages and moves items to player inventory with overflow drop; `namedItem` 3-arg overload added for lore support
+- **Enderchest overview cleanup** — removed redundant back/close buttons (slots 48/50) that duplicated the decorations config; cleaned unused imports
+- **Enderchest content fix** — reverted erroneous close/back placement at content slots 0/1 that caused the first two items of every page to be skipped (flatIndex off-by-two)
+
+## Roadmap
+
+- Velocity-native proxy plugin marked done (`:ProxyVelocity` module, commit 989c326d)
+- Craft/enderchest zMenu GUI bottom-row TODO marked done
+
 # 1.2.1.0
 
 ## Chat upgrade — LPC reference (https://github.com/ThePM2/LPC-Pro-Wiki)

@@ -12,6 +12,9 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+import java.util.Map;
+
 public class ItemStashListener implements Listener {
 
     private final ZEssentialsPlugin plugin;
@@ -67,7 +70,27 @@ public class ItemStashListener implements Listener {
         } else if (slot == EnderChestSlotMap.SLOT_NEXT) {
             plugin.getScheduler().runNextTick(wrappedTask -> ItemStashGui.switchPage(
                     plugin, player, holder, holder.getCurrentPage() + 1));
+        } else if (slot == 48 && !holder.isReadOnly()) {
+            withdrawAll(player, holder);
         }
+    }
+
+    private void withdrawAll(Player player, ItemStashHolder holder) {
+        ItemStashData data = holder.getData();
+        for (int page = 0; page < data.getPages(); page++) {
+            List<ItemStack> contents = data.getPageContents(page);
+            for (int slot = 0; slot < contents.size(); slot++) {
+                ItemStack item = contents.get(slot);
+                if (item == null) continue;
+                Map<Integer, ItemStack> overflow = player.getInventory().addItem(item);
+                for (ItemStack drop : overflow.values()) {
+                    player.getWorld().dropItemNaturally(player.getLocation(), drop);
+                }
+                data.setContent(page, slot, null);
+            }
+        }
+        plugin.getScheduler().runNextTick(wrappedTask -> ItemStashGui.switchPage(
+                plugin, player, holder, Math.min(holder.getCurrentPage(), holder.getPages() - 1)));
     }
 
     @EventHandler

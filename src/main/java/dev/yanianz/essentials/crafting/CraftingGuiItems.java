@@ -28,6 +28,16 @@ public final class CraftingGuiItems {
                 module.getCloseText(), null);
     }
 
+    public static ItemStack craftButton() {
+        return namedItem(Material.BONE, "&a&lCraft Item", java.util.List.of(
+                "&7Click to craft the result",
+                "&7into your inventory."));
+    }
+
+    public static ItemStack redFiller() {
+        return namedItem(Material.RED_STAINED_GLASS_PANE, "&e", null);
+    }
+
     private static Material parse(String name, Material fallback) {
         try {
             return Material.valueOf(name.toUpperCase());
