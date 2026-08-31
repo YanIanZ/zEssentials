@@ -278,14 +278,20 @@ public class PlayerListener extends ZUtils implements Listener {
                 event.setCancelled(true);
                 dev.yanianz.essentials.crafting.CraftingListener.ensureRegistered((fr.maxlego08.essentials.ZEssentialsPlugin) this.plugin);
                 craftingModule.openCrafting(player);
+                return;
             }
+            event.setCancelled(true);
+            message(player, Message.MODULE_DISABLE, "%name%", "crafting");
         } else if (material == org.bukkit.Material.ENDER_CHEST) {
             dev.yanianz.essentials.enderchest.EnderChestModule ecModule =
                     this.plugin.getModuleManager().getModule(dev.yanianz.essentials.enderchest.EnderChestModule.class);
             if (ecModule != null && ecModule.isEnable()) {
                 event.setCancelled(true);
                 ecModule.openEnderChest(player);
+                return;
             }
+            event.setCancelled(true);
+            message(player, Message.MODULE_DISABLE, "%name%", "enderchest");
         }
     }
 

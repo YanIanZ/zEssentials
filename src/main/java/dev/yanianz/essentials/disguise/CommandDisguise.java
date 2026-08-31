@@ -26,7 +26,7 @@ public class CommandDisguise extends VCommand {
         this.setModule(NicknamesModule.class);
         this.setPermission(Permission.ESSENTIALS_DISGUISE_USE);
         this.setDescription(Message.DESCRIPTION_DISGUISE);
-        this.addOptionalArg("action", (sender, args) -> List.of("off", "random", "skin", "list"));
+        this.addOptionalArg("action", (sender, args) -> List.of("off", "random", "skin", "mob", "list"));
         this.setExtendedArgs(true);
         this.onlyPlayers();
     }
@@ -128,6 +128,36 @@ public class CommandDisguise extends VCommand {
             return CommandResultType.SUCCESS;
         }
 
+        if (firstArg.equalsIgnoreCase("mob")) {
+            if (!hasPermission(sender, Permission.ESSENTIALS_DISGUISE_USE)) {
+                return CommandResultType.NO_PERMISSION;
+            }
+            if (this.args.length < 2) {
+                message(sender, Message.DISGUISE_USAGE);
+                return CommandResultType.SUCCESS;
+            }
+            String mobType = this.argAsString(1);
+            if (this.args.length >= 3 && hasPermission(sender, Permission.ESSENTIALS_DISGUISE_OTHER)) {
+                Player other = Bukkit.getPlayerExact(this.argAsString(1));
+                if (other != null) {
+                    target = other;
+                    mobType = this.argAsString(2);
+                }
+            }
+            try {
+                org.bukkit.entity.EntityType.valueOf(mobType.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                message(sender, Message.DISGUISE_INVALID_MOB, "%type%", mobType);
+                return CommandResultType.SUCCESS;
+            }
+            if (!module.getAllowedMobs().isEmpty() && !module.getAllowedMobs().contains(mobType.toUpperCase())) {
+                message(sender, Message.DISGUISE_INVALID_MOB, "%type%", mobType);
+                return CommandResultType.SUCCESS;
+            }
+            applyMobDisguise(module, target, mobType);
+            return CommandResultType.SUCCESS;
+        }
+
         if (this.args.length >= 2 && hasPermission(sender, Permission.ESSENTIALS_DISGUISE_OTHER)) {
             Player other = Bukkit.getPlayerExact(this.argAsString(0));
             if (other != null) {
@@ -160,12 +190,28 @@ public class CommandDisguise extends VCommand {
         }
         data.setTextureValue(texture);
         data.setTextureSignature(signature);
+        data.setEntityType(null);
         module.applyDisguise(target, data);
         if (target.equals(this.player)) {
             message(sender, Message.DISGUISE_SKIN_SET);
         } else {
             message(sender, Message.DISGUISE_SKIN_SET_OTHER, "%player%", target.getName());
             message(target, Message.DISGUISE_SKIN_SET);
+        }
+    }
+
+    private void applyMobDisguise(NicknamesModule module, Player target, String mobType) {
+        DisguiseData data = new DisguiseData();
+        data.setEntityType(mobType);
+        data.setDisguiseName(null);
+        data.setTextureValue(null);
+        module.applyDisguise(target, data);
+        if (target.equals(this.player)) {
+            module.markDisguiseChanged(target.getUniqueId());
+            message(sender, Message.DISGUISE_MOB, "%type%", mobType);
+        } else {
+            message(sender, Message.DISGUISE_MOB_OTHER, "%player%", target.getName(), "%type%", mobType);
+            message(target, Message.DISGUISE_MOB, "%type%", mobType);
         }
     }
 

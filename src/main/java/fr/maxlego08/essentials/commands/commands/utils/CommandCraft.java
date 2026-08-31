@@ -22,7 +22,7 @@ public class CommandCraft extends VCommand {
             dev.yanianz.essentials.crafting.CraftingListener.ensureRegistered((fr.maxlego08.essentials.ZEssentialsPlugin) plugin);
             module.openCrafting(this.player);
         } else {
-            this.player.openWorkbench(this.player.getLocation(), true);
+            message(sender, Message.MODULE_DISABLE, "%name%", "crafting");
         }
         return CommandResultType.SUCCESS;
     }

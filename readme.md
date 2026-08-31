@@ -101,13 +101,22 @@ Small quality features:
 
 ## Disguise system
 - [x] `/disguise <player>` — disguise as online player (name + skin at packet level via ProtocolLib)
+- [x] `/disguise mob <type>` — transform into a mob (ZOMBIE, SKELETON, CREEPER, etc.)
 - [x] `/disguise random` — random from config pool, skin fetched from Mojang API async
 - [x] `/disguise skin <texture> [signature]` — custom skin from texture string
 - [x] `/disguise off` / `/undisguise [player]` — remove disguise (self or admin)
+- [x] `/realname [player]` — staff command to reveal real name of disguised/nicknamed player
 - [x] Skin cache with TTL (24h default, configurable)
 - [x] Persistence — disguises.json with migration from old nicknames.json
-- [x] Full sync — NameTag, TabList, chat all use disguise name
+- [x] Full sync — NameTag, TabList, chat, below-name all use disguise/nickname
 - [x] Self-view config toggle (disguised player sees own disguise or not)
+- [x] Allowed-mobs config list (25 default mob types)
+- [x] Chat format: %displayName% for visible name, %realname% for click commands
+
+## Crafting & enderchest — no vanilla fallback
+- [x] Right-click crafting table → custom crafting GUI only (no vanilla fallback)
+- [x] Right-click enderchest → custom enderchest GUI only (no vanilla fallback)
+- [x] Sneak bypass for vanilla behavior
 
 ## Storage & database
 - [x] MongoDB backend (MongoStorage + 25 repositories, StorageType.MONGO)

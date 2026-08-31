@@ -5,6 +5,7 @@ import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandManager;
 import dev.yanianz.essentials.disguise.CommandDisguise;
 import dev.yanianz.essentials.disguise.CommandUnDisguise;
+import dev.yanianz.essentials.disguise.CommandRealname;
 import dev.yanianz.essentials.nicknames.CommandNick;
 import dev.yanianz.essentials.networkchat.CommandGlobalChat;
 import dev.yanianz.essentials.friends.CommandFriend;
@@ -186,6 +187,7 @@ public class CommandLoader {
         register("nick", CommandNick.class);
         register("disguise", CommandDisguise.class);
         register("undisguise", CommandUnDisguise.class);
+        register("realname", CommandRealname.class);
         register("report", CommandReport.class);
         register("reports", CommandReports.class);
 

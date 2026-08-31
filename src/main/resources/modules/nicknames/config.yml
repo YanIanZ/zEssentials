@@ -53,3 +53,32 @@ disguise:
     - Grumm
     - deadmau5
     - MidasGolden
+
+  # Mob disguise — /disguise mob <type> transforms the player into a mob
+  # List of allowed mob types. Players can only disguise as these.
+  # Full list at https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+  allowed-mobs:
+    - ZOMBIE
+    - SKELETON
+    - CREEPER
+    - SPIDER
+    - CAVE_SPIDER
+    - ENDERMAN
+    - BLAZE
+    - WITCH
+    - PIG
+    - COW
+    - SHEEP
+    - CHICKEN
+    - WOLF
+    - OCELOT
+    - BAT
+    - SLIME
+    - MAGMA_CUBE
+    - GHAST
+    - ZOMBIFIED_PIGLIN
+    - VILLAGER
+    - IRON_GOLEM
+    - SNOWMAN
+    - WITHER
+    - ENDER_DRAGON

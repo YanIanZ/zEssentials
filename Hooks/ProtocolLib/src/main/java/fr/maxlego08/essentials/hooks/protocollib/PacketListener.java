@@ -12,6 +12,7 @@ public class PacketListener {
         this.register(new PacketTooltipListener(plugin));
         this.register(new PacketCraftingListener(plugin));
         this.register(new PacketDisguiseListener(plugin));
+        this.register(new PacketMobDisguiseListener(plugin));
     }
 
     private void register(PacketRegister packetRegister) {
