@@ -30,10 +30,10 @@ public class CommandGuildChat extends VCommand {
             return CommandResultType.SUCCESS;
         }
         String messageText = getArgs(0);
-        String formatted = module.getChatFormat()
-                .replace("%player%", this.player.getName())
-                .replace("%message%", messageText)
-                .replace("&", "§");
+        String formatted = dev.yanianz.essentials.util.ColorUtil.sections(
+                module.getChatFormat()
+                        .replace("%player%", this.player.getName())
+                        .replace("%message%", messageText));
         for (UUID memberUuid : module.getGuild(guildId).members().keySet()) {
             Player p = Bukkit.getPlayer(memberUuid);
             if (p != null) p.sendMessage(LegacyComponentSerializer.legacySection().deserialize(formatted));

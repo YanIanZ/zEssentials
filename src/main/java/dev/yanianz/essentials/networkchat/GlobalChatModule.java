@@ -45,10 +45,11 @@ public class GlobalChatModule extends ZModule {
                 String originServer = parts[0];
                 String playerName = parts[1];
                 String content = parts[2];
-                String line = this.format
-                        .replace("%server%", originServer)
-                        .replace("%player%", playerName)
-                        .replace("%message%", content.replace("&", "§"));
+                String line = dev.yanianz.essentials.util.ColorUtil.sections(
+                        this.format
+                                .replace("%server%", originServer)
+                                .replace("%player%", playerName)
+                                .replace("%message%", content));
                 Bukkit.getOnlinePlayers().forEach(p ->
                         p.sendMessage(LegacyComponentSerializer.legacySection().deserialize(line)));
             });
