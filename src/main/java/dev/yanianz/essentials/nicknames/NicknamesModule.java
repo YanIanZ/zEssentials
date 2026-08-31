@@ -7,6 +7,7 @@ import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -93,8 +94,7 @@ public class NicknamesModule extends ZModule {
      */
     public NickError validate(Player player, String rawNickname) {
 
-        String stripped = rawNickname == null ? "" : rawNickname
-                .replace("§x", "").replaceAll("§[0-9a-fk-orA-FK-OR]", "");
+        String stripped = rawNickname == null ? "" : plain(rawNickname);
 
         if (stripped.length() > this.maxLength) return NickError.TOO_LONG;
         if (stripped.isBlank()) return NickError.INVALID_CHARACTERS;
@@ -104,19 +104,14 @@ public class NicknamesModule extends ZModule {
             return NickError.COLORS_NOT_ALLOWED;
         }
 
-        // Every visible character must match the configured whitelist
         for (char c : stripped.toCharArray()) {
-            if (!Character.isLetterOrDigit(c) && c != '_' && !"§&".contains(String.valueOf(c))) {
+            if (!Character.isLetterOrDigit(c) && c != '_') {
                 return NickError.INVALID_CHARACTERS;
             }
         }
 
         if (this.blockImpersonation) {
-            String plain = PlainTextSupport.plain(LEGACY.deserialize(colorize(rawNickname)));
             for (Player online : Bukkit.getOnlinePlayers()) {
-                if (!online.equals(player) && online.getName().equalsIgnoreCase(plain)) {
-                    return NickError.IMPERSONATION;
-                }
                 if (!online.equals(player) && online.getName().equalsIgnoreCase(stripped)) {
                     return NickError.IMPERSONATION;
                 }
@@ -124,6 +119,12 @@ public class NicknamesModule extends ZModule {
         }
 
         return null;
+    }
+
+    private static String plain(String text) {
+        if (text == null || text.isEmpty()) return "";
+        String withSections = dev.yanianz.essentials.util.ColorUtil.sections(text);
+        return PlainTextComponentSerializer.plainText().serialize(LEGACY.deserialize(withSections));
     }
 
     /**
@@ -173,13 +174,9 @@ public class NicknamesModule extends ZModule {
     }
 
     private void applyDisplayName(Player player, String legacyName) {
-        Component component = dev.yanianz.essentials.util.ColorUtil.component(colorize(legacyName));
+        Component component = dev.yanianz.essentials.util.ColorUtil.component(legacyName);
         player.displayName(component);
         player.playerListName(component);
-    }
-
-    private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
     }
 
     public enum NickError {
@@ -224,11 +221,5 @@ public class NicknamesModule extends ZModule {
 
     private static final class Storage {
         Map<String, String> entries = new HashMap<>();
-    }
-
-    private static final class PlainTextSupport {
-        static String plain(Component component) {
-            return net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(component);
-        }
     }
 }

@@ -88,6 +88,7 @@ allprojects {
         testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
         testImplementation("net.kyori:adventure-api:4.20.0")
         testImplementation("net.kyori:adventure-text-serializer-legacy:4.20.0")
+        testImplementation(files("libs/zMenu-1.1.1.6.jar"))
     }
 
     tasks.test {

@@ -8,6 +8,7 @@ import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,8 +24,20 @@ public class CommandNick extends VCommand {
         this.setModule(NicknamesModule.class);
         this.setPermission(Permission.ESSENTIALS_NICKNAMES_USE);
         this.setDescription(Message.DESCRIPTION_NICK);
-        this.addOptionalArg("nickname", (sender, args) -> List.of("off"));
+        this.addOptionalArg("nickname", (sender, args) -> nickCompletion(args));
+        this.addOptionalArg("nickname", (sender, args) -> nickCompletionAdmin(args));
         this.setExtendedArgs(true);
+    }
+
+    private List<String> nickCompletion(String[] args) {
+        List<String> out = new ArrayList<>();
+        out.add("off");
+        out.addAll(plugin.getEssentialsServer().getVisiblePlayerNames(this.sender));
+        return out;
+    }
+
+    private List<String> nickCompletionAdmin(String[] args) {
+        return plugin.getEssentialsServer().getVisiblePlayerNames(this.sender);
     }
 
     @Override
@@ -36,12 +49,11 @@ public class CommandNick extends VCommand {
         String nickname = null;
 
         if (this.args.length == 0) {
-            this.syntaxMessage();
+            message(sender, Message.NICK_USAGE);
             return CommandResultType.SUCCESS;
         }
 
         if (this.args.length >= 2) {
-            // Admin usage: /nick <player> <nickname|off>
             if (!hasPermission(sender, Permission.ESSENTIALS_NICKNAMES_OTHER)) {
                 return CommandResultType.NO_PERMISSION;
             }
@@ -69,8 +81,11 @@ public class CommandNick extends VCommand {
 
         if (nickname == null) {
             module.setNickname(targetUuid, null);
-            message(sender, Message.NICK_REMOVED, "%player%",
-                    target == this.player ? Message.YOU.getMessageAsString() : target.getName());
+            if (target == this.player || sender.equals(target)) {
+                message(sender, Message.NICK_REMOVED, "%player%", Message.YOU.getMessageAsString());
+            } else {
+                message(sender, Message.NICK_REMOVED, "%player%", target.getName());
+            }
             return CommandResultType.SUCCESS;
         }
 
@@ -86,9 +101,16 @@ public class CommandNick extends VCommand {
                 case COLORS_NOT_ALLOWED -> Message.NICK_COLORS_NOT_ALLOWED;
                 case IMPERSONATION -> Message.NICK_IMPERSONATION;
             };
+            String errorText = switch (error) {
+                case TOO_LONG -> "too long (max " + module.maxLengthValue() + ")";
+                case INVALID_CHARACTERS -> "contains forbidden characters";
+                case COLORS_NOT_ALLOWED -> "colors are not allowed";
+                case IMPERSONATION -> "you cannot impersonate another player";
+            };
             message(sender, errorMessage,
                     "%max%", String.valueOf(module.maxLengthValue()),
                     "%nickname%", nickname);
+            message(sender, Message.NICK_INVALID, "%error%", errorText);
             return CommandResultType.SUCCESS;
         }
 
@@ -103,9 +125,12 @@ public class CommandNick extends VCommand {
         module.setNickname(targetUuid, nickname);
         if (selfChange) module.markChanged(targetUuid);
 
-        message(sender, Message.NICK_SET, "%player%",
-                        target == this.player ? Message.YOU.getMessageAsString() : target.getName(),
-                "%nickname%", nickname);
+        if (selfChange) {
+            message(sender, Message.NICK_CHANGED, "%nickname%", nickname);
+        } else {
+            message(sender, Message.NICK_SET, "%player%", target.getName(), "%nickname%", nickname);
+            message(target, Message.NICK_CHANGED, "%nickname%", nickname);
+        }
         return CommandResultType.SUCCESS;
     }
 }

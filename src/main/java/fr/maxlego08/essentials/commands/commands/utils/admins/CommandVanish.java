@@ -42,12 +42,15 @@ public class CommandVanish extends VCommand {
         user.setOption(Option.VANISH, vanish);
         updateVanishState(plugin, player, vanish);
 
-        Message messageKey = vanish ? Message.COMMAND_VANISH_ENABLE : Message.COMMAND_VANISH_DISABLE;
         if (self) {
-            message(this.sender, messageKey, "%player%", Message.YOU.getMessageAsString());
+            message(this.sender, vanish ? Message.COMMAND_VANISH_ENABLE : Message.COMMAND_VANISH_DISABLE,
+                    "%player%", Message.YOU.getMessageAsString());
         } else {
-            message(this.sender, messageKey, "%player%", player.getName());
-            message(player, messageKey, "%player%", Message.YOU.getMessageAsString());
+            message(this.sender, Message.COMMAND_VANISH_TOGGLED_OTHER,
+                    "%player%", player.getName(),
+                    "%state%", vanish ? "<success>vanished" : "<error>visible");
+            message(player, vanish ? Message.COMMAND_VANISH_ENABLE : Message.COMMAND_VANISH_DISABLE,
+                    "%player%", Message.YOU.getMessageAsString());
         }
 
         return CommandResultType.SUCCESS;
