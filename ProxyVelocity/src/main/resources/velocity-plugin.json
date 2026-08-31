@@ -1,0 +1,9 @@
+{
+  "id": "zessentialsproxy",
+  "name": "zEssentialsProxy",
+  "version": "${version}",
+  "description": "Velocity-native relay for zEssentials cross-server messaging (global chat, friends, guilds, parties).",
+  "authors": ["YanIanZ"],
+  "dependencies": [],
+  "main": "fr.maxlego08.essentials.proxy.velocity.VelocityProxyPlugin"
+}

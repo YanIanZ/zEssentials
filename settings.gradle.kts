@@ -30,6 +30,7 @@ include("Hooks:RoyaleEconomy")
 include("Hooks:EconomyShopGUI")
 include("Hooks:QuickShop")
 include("Proxy")
+include("ProxyVelocity")
 
 include("NMS:V1_20_6")
 include("NMS:V1_21")
