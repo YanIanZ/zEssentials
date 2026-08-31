@@ -95,6 +95,17 @@ Every change lands in this changelog immediately under its bumped heading.
 - **4 new NicknamesModule tests** — validate rejects too long / accepts valid / rejects invalid chars / cooldown window
 - **Cleaned unused imports** — `Modifier`, `Locale` removed from NicknamesModule and ReputationModule
 
+## Disguise system
+
+- **Full disguise suite** — `/disguise <player>` changes name + skin at the packet level via ProtocolLib; `/disguise random` picks from config pool; `/disguise skin <texture> [signature]` sets custom skin; `/disguise off` and `/undisguise [player]` remove disguise
+- **Skin sources** — online players (instant, reads player profile), offline players (Mojang API async + 24h cache), custom texture strings, random pool
+- **Packet interception** — `PacketDisguiseListener` intercepts outgoing `PLAYER_INFO` packets, replaces `WrappedGameProfile` with disguise name + texture properties in-flight; self-view config toggle controls whether disguised player sees their own disguise
+- **Persistence** — disguise state stored in `disguises.json`; auto-migrates from old `nicknames.json`; re-applied on join
+- **Full sync** — NameTagModule uses `DisguiseManager.getDisplayName()` for scoreboard team entries; tablist displayName set to disguise name; chat name uses disguise name
+- **Config v2** — `modules/nicknames/config.yml` bumped to config-version 2 with `disguise` section: enable, self-view, cooldown-seconds, skin-cache-hours, block-staff, random-pool
+- **5 new permissions** — `ESSENTIALS_DISGUISE_USE`, `ESSENTIALS_DISGUISE_OTHER`, `ESSENTIALS_DISGUISE_RANDOM`, `ESSENTIALS_DISGUISE_SKIN`, `ESSENTIALS_DISGUISE_BYPASS_COOLDOWN`
+- **12 new tests** — DisguiseData (5), SkinCache (7)
+
 ## Network/Social Layer
 
 - **NetworkManager** — BungeeCord plugin messaging transport with sub-channel routing
