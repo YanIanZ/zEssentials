@@ -25,13 +25,8 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
                 .plugin(plugin)
                 .listenerPriority(ListenerPriority.HIGH)
                 .types(
-                        PacketType.Play.Server.ENTITY_METADATA,
-                        PacketType.Play.Server.ENTITY_DESTROY,
-                        PacketType.Play.Server.NAMED_ENTITY_SPAWN,
-                        PacketType.Play.Server.REL_ENTITY_MOVE,
-                        PacketType.Play.Server.REL_ENTITY_MOVE_LOOK,
-                        PacketType.Play.Server.ENTITY_LOOK,
-                        PacketType.Play.Server.ENTITY_TELEPORT
+                        PacketType.Play.Server.SPAWN_ENTITY,
+                        PacketType.Play.Server.ENTITY_METADATA
                 ));
         this.plugin = plugin;
         this.nicknamesModuleClass = loadNicknamesModuleClass();
@@ -67,8 +62,8 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
         }
         if (!disguiseEnabled) return;
 
-        if (event.getPacketType() == PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
-            handleNamedEntitySpawn(event, module);
+        if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
+            handleSpawnEntity(event, module);
         } else if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
             handleEntityMetadata(event, module);
         }
@@ -98,22 +93,32 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
         }
     }
 
-    private void handleNamedEntitySpawn(PacketEvent event, Module module) {
-        UUID spawnUuid = event.getPacket().getUUIDs().read(0);
-        if (spawnUuid == null) return;
+    private void handleSpawnEntity(PacketEvent event, Module module) {
+        try {
+            UUID spawnUuid = event.getPacket().getUUIDs().read(0);
+            if (spawnUuid == null) return;
 
-        Object disguiseData = getDisguiseData(module, spawnUuid);
-        if (disguiseData == null) return;
+            Object disguiseData = getDisguiseData(module, spawnUuid);
+            if (disguiseData == null) return;
 
-        String entityType = getEntityType(disguiseData);
-        if (entityType == null) return;
+            String entityTypeStr = getEntityType(disguiseData);
+            if (entityTypeStr == null) return;
 
-        if (!isSelfView(module) && event.getPlayer().getUniqueId().equals(spawnUuid)) return;
+            if (!isSelfView(module) && event.getPlayer().getUniqueId().equals(spawnUuid)) return;
 
-        int entityId = event.getPacket().getIntegers().read(0);
-        event.setCancelled(true);
+            EntityType mobType;
+            try {
+                mobType = EntityType.valueOf(entityTypeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return;
+            }
 
-        spawnMobEntity(event, entityId, spawnUuid, entityType);
+            int mobTypeId = mobType.getTypeId();
+            if (mobTypeId < 0) return;
+
+            event.getPacket().getIntegers().write(1, mobTypeId);
+        } catch (Exception ignored) {
+        }
     }
 
     private void handleEntityMetadata(PacketEvent event, Module module) {
@@ -124,60 +129,23 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
         Object disguiseData = getDisguiseData(module, targetPlayer.getUniqueId());
         if (disguiseData == null) return;
 
-        String entityType = getEntityType(disguiseData);
-        if (entityType == null) return;
+        String entityTypeStr = getEntityType(disguiseData);
+        if (entityTypeStr == null) return;
 
         if (!isSelfView(module) && event.getPlayer().getUniqueId().equals(targetPlayer.getUniqueId())) return;
 
-        EntityType type;
         try {
-            type = EntityType.valueOf(entityType.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return;
-        }
+            WrappedDataWatcher watcher = event.getPacket().getDataWatcherModifier().read(0);
+            if (watcher == null) watcher = new WrappedDataWatcher();
 
-        WrappedDataWatcher watcher = new WrappedDataWatcher();
-        watcher.setObject(0, Byte.valueOf((byte) 0));
-        watcher.setObject(1, Short.valueOf((short) 300));
-        watcher.setObject(2, "");
-        watcher.setObject(3, Boolean.FALSE);
-        watcher.setObject(4, Byte.valueOf((byte) 0));
-        watcher.setObject(5, Boolean.FALSE);
-        watcher.setObject(6, 20.0f);
-        watcher.setObject(7, Integer.valueOf(0));
-        watcher.setObject(8, Integer.valueOf(0));
-        watcher.setObject(9, Float.valueOf(0.0f));
-        watcher.setObject(10, Integer.valueOf(0));
+            if (watcher.hasIndex(0)) watcher.setObject(0, Byte.valueOf((byte) 0));
+            if (watcher.hasIndex(2)) watcher.setObject(2, "");
+            if (watcher.hasIndex(3)) watcher.setObject(3, Boolean.FALSE);
+            if (watcher.hasIndex(6)) watcher.setObject(6, 20.0f);
+            if (watcher.hasIndex(8)) watcher.setObject(8, Integer.valueOf(0));
+            if (watcher.hasIndex(9)) watcher.setObject(9, Float.valueOf(0.0f));
 
-        event.getPacket().getDataWatcherModifier().write(0, watcher);
-    }
-
-    private void spawnMobEntity(PacketEvent event, int entityId, UUID uuid, String entityTypeStr) {
-        EntityType type;
-        try {
-            type = EntityType.valueOf(entityTypeStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-
-        var spawnPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY);
-
-        Player target = lookupPlayerByEntityId(entityId);
-        if (target == null) return;
-
-        spawnPacket.getIntegers().write(0, entityId);
-        spawnPacket.getUUIDs().write(0, uuid);
-        spawnPacket.getDoubles().write(0, target.getLocation().getX());
-        spawnPacket.getDoubles().write(1, target.getLocation().getY());
-        spawnPacket.getDoubles().write(2, target.getLocation().getZ());
-
-        int typeId = type.getTypeId();
-        spawnPacket.getIntegers().write(1, typeId);
-
-        spawnPacket.getIntegers().write(2, 0);
-
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), spawnPacket);
+            event.getPacket().getDataWatcherModifier().write(0, watcher);
         } catch (Exception ignored) {
         }
     }

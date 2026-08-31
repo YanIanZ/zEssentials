@@ -13,13 +13,7 @@ enable: false
 
 # Format of the line forwarded to Discord,
 # %server% %player% and %message% are available.
-# Config schema version — do not edit
-config-version: 1
-
 format: "**%player%** (on %server%): %message%"
 
 # Min length of a message to be forwarded
-# Config schema version — do not edit
-config-version: 1
-
 min-length: 1

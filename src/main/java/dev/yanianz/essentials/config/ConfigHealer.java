@@ -143,6 +143,9 @@ public final class ConfigHealer {
         if (line.isEmpty() || line.startsWith(" ") || line.startsWith("\t") || line.startsWith("#")) {
             return false;
         }
+        if (line.trim().startsWith("config-version:")) {
+            return false;
+        }
         Matcher m = SECTION_HEADER.matcher(line);
         return m.matches();
     }

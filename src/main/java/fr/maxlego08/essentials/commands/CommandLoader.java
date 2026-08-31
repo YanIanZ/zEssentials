@@ -140,7 +140,7 @@ public class CommandLoader {
         register("tpr", CommandTeleportRandom.class, "rtp");
         register("g", CommandGlobalChat.class, "globalchat");
         register("friend", CommandFriend.class, "friends");
-        register("guild", CommandGuild.class, "g");
+        register("guild", CommandGuild.class);
         register("gc", CommandGuildChat.class, "guildchat");
         register("party", CommandParty.class);
         register("pc", CommandPartyChat.class, "partychat");
