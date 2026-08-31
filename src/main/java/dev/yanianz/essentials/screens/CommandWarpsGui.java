@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.screens;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
@@ -43,12 +44,12 @@ public class CommandWarpsGui extends VCommand {
             items.add(new ScreenFactory.ScreenItem(
                     Material.ENDER_PEARL,
                     "&b&l" + warp.name(),
-                    java.util.List.of(colorize("&7Click to teleport to &f" + warp.name())),
+                    java.util.List.of(ColorUtil.sections("&7Click to teleport to &f" + warp.name())),
                     (viewer, ev) -> warpModule.teleport(user, warp)));
         }
 
         if (items.isEmpty()) {
-            player.sendMessage(colorize("&cNo warps available."));
+            player.sendMessage(ColorUtil.sections("&cNo warps available."));
             return CommandResultType.SUCCESS;
         }
 
@@ -56,7 +57,4 @@ public class CommandWarpsGui extends VCommand {
         return CommandResultType.SUCCESS;
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

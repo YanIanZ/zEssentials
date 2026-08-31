@@ -119,7 +119,7 @@ public class TermsModule extends ZModule {
 
         if (!event.getMessage().toLowerCase().startsWith("/terms")) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage(colorize(this.title + " &7» &cAccept the terms first with &f/terms accept&c."));
+            event.getPlayer().sendMessage(ColorUtil.sections(this.title + " &7» &cAccept the terms first with &f/terms accept&c."));
         }
     }
 
@@ -224,19 +224,19 @@ public class TermsModule extends ZModule {
 
         List<String> bookLore = new ArrayList<>();
         if (!this.question.isEmpty()) {
-            bookLore.add(colorize(this.question));
+            bookLore.add(ColorUtil.sections(this.question));
             bookLore.add("");
         }
         for (String rule : this.rules) {
-            String colorized = colorize(rule);
+            String colorized = ColorUtil.sections(rule);
             if (!colorized.isBlank()) bookLore.add(colorized);
         }
         inventory.setItem(22, buildItem(Material.WRITABLE_BOOK, this.title, bookLore));
 
         inventory.setItem(SLOT_ACCEPT, buildItem(Material.LIME_STAINED_GLASS,
-                this.acceptButton, List.of(colorize(this.acceptHover))));
+                this.acceptButton, List.of(ColorUtil.sections(this.acceptHover))));
         inventory.setItem(SLOT_DENY, buildItem(Material.RED_STAINED_GLASS,
-                this.denyButton, List.of(colorize(this.denyHover))));
+                this.denyButton, List.of(ColorUtil.sections(this.denyHover))));
 
         player.openInventory(inventory);
     }
@@ -301,12 +301,9 @@ public class TermsModule extends ZModule {
     }
 
     private Component component(String text) {
-        return LegacyComponentSerializer.legacySection().deserialize(colorize(text));
+        return LegacyComponentSerializer.legacySection().deserialize(ColorUtil.sections(text));
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 
     private File getStorageFile() {
         return new File(getFolder(), "accepted.yml");

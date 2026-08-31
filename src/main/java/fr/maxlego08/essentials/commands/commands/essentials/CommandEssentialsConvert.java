@@ -2,6 +2,7 @@ package fr.maxlego08.essentials.commands.commands.essentials;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.convert.Convert;
 import fr.maxlego08.essentials.convert.axvault.AxVaultsConvert;
@@ -21,6 +22,7 @@ public class CommandEssentialsConvert extends VCommand {
         super(plugin);
         this.addSubCommand("convert", "conv", "c");
         this.setPermission(Permission.ESSENTIALS_CONVERT);
+        this.setDescription(Message.DESCRIPTION_ESSENTIALS_CONVERT);
         this.addOptionalArg("plugin", (a, b) -> Arrays.stream(Plugins.values()).map(Enum::name).map(String::toLowerCase).toList());
     }
 

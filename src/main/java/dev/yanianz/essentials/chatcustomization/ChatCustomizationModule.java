@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.chatcustomization;
 
 import com.google.gson.Gson;
+import dev.yanianz.essentials.util.ColorUtil;
 import com.google.gson.GsonBuilder;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
@@ -150,14 +151,14 @@ public class ChatCustomizationModule extends ZModule {
         Holder holder = new Holder();
         holder.kind = Holder.Kind.COLOR;
         Inventory inventory = Bukkit.createInventory(holder, 45,
-                LEGACY.deserialize(colorize("&b&lChat Colors")));
+                LEGACY.deserialize(ColorUtil.sections("&b&lChat Colors")));
         holder.inventory = inventory;
 
         ItemStack filler = item(Material.GRAY_STAINED_GLASS_PANE, " ", null, false);
         for (int slot = 0; slot < 45; slot++) inventory.setItem(slot, filler);
 
         inventory.setItem(SLOT_RESET, item(Material.WATER_BUCKET, "&b&lReset All",
-                List.of(colorize("&7Removes your chat color"), colorize("&7and every decoration.")), false));
+                List.of(ColorUtil.sections("&7Removes your chat color"), ColorUtil.sections("&7and every decoration.")), false));
 
         Preference pref = getPreference(player.getUniqueId());
 
@@ -170,8 +171,8 @@ public class ChatCustomizationModule extends ZModule {
             holder.colorSlots.put(slot, index);
 
             List<String> lore = new ArrayList<>();
-            lore.add(colorize("&7Sample&8: " + COLOR_CODES[index] + colorize(COLOR_NAMES[index])));
-            lore.add(colorize(selected ? "&aSelected" : "&7Click to select"));
+            lore.add(ColorUtil.sections("&7Sample&8: " + COLOR_CODES[index] + ColorUtil.sections(COLOR_NAMES[index])));
+            lore.add(ColorUtil.sections(selected ? "&aSelected" : "&7Click to select"));
 
             ItemStack itemStack = item(Material.WHITE_WOOL,
                     COLOR_CODES[index] + COLOR_NAMES[index], lore, selected);
@@ -194,9 +195,9 @@ public class ChatCustomizationModule extends ZModule {
                              String legacyName, boolean active, boolean allowed) {
 
         List<String> lore = new ArrayList<>();
-        lore.add(colorize(allowed ? "&7Click to toggle"
+        lore.add(ColorUtil.sections(allowed ? "&7Click to toggle"
                 : "&cRequires " + this.decorationsPermission));
-        lore.add(colorize("&7State&8: " + (active ? "&aON" : "&cOFF")));
+        lore.add(ColorUtil.sections("&7State&8: " + (active ? "&aON" : "&cOFF")));
 
         ItemStack itemStack = item(material, legacyName, lore, active && allowed);
         inventory.setItem(slot, itemStack);
@@ -217,7 +218,7 @@ public class ChatCustomizationModule extends ZModule {
         Holder holder = new Holder();
         holder.kind = Holder.Kind.TAGS;
         Inventory inventory = Bukkit.createInventory(holder, size,
-                LEGACY.deserialize(colorize("&6&lChat Tags")));
+                LEGACY.deserialize(ColorUtil.sections("&6&lChat Tags")));
         holder.inventory = inventory;
 
         ItemStack filler = item(Material.BLUE_STAINED_GLASS_PANE, " ", null, false);
@@ -233,13 +234,13 @@ public class ChatCustomizationModule extends ZModule {
             boolean selected = tag.text().equals(pref.tagText());
 
             List<String> lore = new ArrayList<>();
-            if (!tag.text().isBlank()) lore.add(colorize("&7Preview&8: &f" + tag.text().trim() + "hello"));
-            else lore.add(colorize("&7No tag before your messages."));
+            if (!tag.text().isBlank()) lore.add(ColorUtil.sections("&7Preview&8: &f" + tag.text().trim() + "hello"));
+            else lore.add(ColorUtil.sections("&7No tag before your messages."));
             lore.add("");
-            lore.add(colorize(allowed ? (selected ? "&aSelected ✔" : "&7Click to select") : "&cLocked"));
+            lore.add(ColorUtil.sections(allowed ? (selected ? "&aSelected ✔" : "&7Click to select") : "&cLocked"));
 
             ItemStack itemStack = item(allowed ? Material.WRITABLE_BOOK : Material.GRAY_DYE,
-                    colorize(tag.name()) + (selected && allowed ? " &a✔" : ""), lore, selected && allowed);
+                    ColorUtil.sections(tag.name()) + (selected && allowed ? " &a✔" : ""), lore, selected && allowed);
             inventory.setItem(slot, itemStack);
             holder.tagSlots.add(slot);
             holder.tagIndexes.add(index);
@@ -302,7 +303,7 @@ public class ChatCustomizationModule extends ZModule {
                     if (colorIndex != null) {
                         save(player, COLOR_CODES[colorIndex], pref.decorations(), pref.tagText());
                         playSelectSound(player);
-                        player.sendMessage(LEGACY.deserialize(colorize("&aChat color selected&7: "
+                        player.sendMessage(LEGACY.deserialize(ColorUtil.sections("&aChat color selected&7: "
                                 + COLOR_CODES[colorIndex] + COLOR_NAMES[colorIndex])));
                         player.closeInventory();
                     }
@@ -318,13 +319,13 @@ public class ChatCustomizationModule extends ZModule {
         TagEntry tag = this.tags.get(holder.tagIndexes.get(tagIndexPosition));
         boolean allowed = tag.permission().isEmpty() || player.hasPermission(tag.permission());
         if (!allowed) {
-            player.sendMessage(LEGACY.deserialize(colorize("&cYou cannot use this tag.")));
+            player.sendMessage(LEGACY.deserialize(ColorUtil.sections("&cYou cannot use this tag.")));
             return;
         }
 
         save(player, pref.colorCode(), pref.decorations(), tag.text());
         playSelectSound(player);
-        player.sendMessage(LEGACY.deserialize(colorize("&aTag updated! Messages now start with&7: &f"
+        player.sendMessage(LEGACY.deserialize(ColorUtil.sections("&aTag updated! Messages now start with&7: &f"
                 + (tag.text().isBlank() ? "(no tag)" : tag.text().trim()))));
         player.closeInventory();
     }
@@ -334,7 +335,7 @@ public class ChatCustomizationModule extends ZModule {
     private boolean check(Player player) {
         if (!this.isEnable) return false;
         if (!this.usePermission.isEmpty() && !player.hasPermission(this.usePermission)) {
-            player.sendMessage(LEGACY.deserialize(colorize("&cYou cannot customize your chat.")));
+            player.sendMessage(LEGACY.deserialize(ColorUtil.sections("&cYou cannot customize your chat.")));
             return false;
         }
         return true;
@@ -344,9 +345,9 @@ public class ChatCustomizationModule extends ZModule {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
-            meta.displayName(LEGACY.deserialize(colorize(name)));
+            meta.displayName(LEGACY.deserialize(ColorUtil.sections(name)));
             if (lore != null && !lore.isEmpty()) {
-                meta.lore(lore.stream().map(line -> LEGACY.deserialize(colorize(line))).toList());
+                meta.lore(lore.stream().map(line -> LEGACY.deserialize(ColorUtil.sections(line))).toList());
             }
             meta.setEnchantmentGlintOverride(shine);
             itemStack.setItemMeta(meta);
@@ -359,9 +360,6 @@ public class ChatCustomizationModule extends ZModule {
         else decorations.add(code);
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 
     private void playSelectSound(Player player) {
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.6f);

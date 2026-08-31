@@ -1,6 +1,7 @@
 package fr.maxlego08.essentials.module.modules.chat;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.chat.ChatDisplay;
 import fr.maxlego08.essentials.api.utils.component.AdventureComponent;
 import net.kyori.adventure.text.Component;
@@ -96,7 +97,7 @@ public class MentionDisplay implements ChatDisplay {
             boolean isViewerMention = viewer != null && name.equalsIgnoreCase(viewer.getName());
 
             Component component = Component.text("§6§l@" + name)
-                    .hoverEvent(HoverEvent.showText(Component.text(colorize(
+                    .hoverEvent(HoverEvent.showText(Component.text(ColorUtil.sections(
                             isViewerMention ? this.hoverSelf : this.hoverOther))))
                     .clickEvent(ClickEvent.suggestCommand("/msg " + name + " "));
 
@@ -125,10 +126,10 @@ public class MentionDisplay implements ChatDisplay {
             viewer.playSound(viewer.getLocation(), resolveSound(), 1f, 1.4f);
 
             if (this.titleEnabled && !this.titleText.isEmpty()) {
-                Component title = Component.text(colorize(this.titleText.replace("%player%", sender.getName())));
+                Component title = Component.text(ColorUtil.sections(this.titleText.replace("%player%", sender.getName())));
                 Component subtitle = this.subtitleText.isEmpty()
                         ? Component.empty()
-                        : Component.text(colorize(this.subtitleText.replace("%player%", sender.getName())));
+                        : Component.text(ColorUtil.sections(this.subtitleText.replace("%player%", sender.getName())));
                 viewer.showTitle(net.kyori.adventure.title.Title.title(title, subtitle,
                         net.kyori.adventure.title.Title.Times.times(
                                 java.time.Duration.ofMillis(300),
@@ -137,13 +138,13 @@ public class MentionDisplay implements ChatDisplay {
             }
 
             if (this.actionbarEnabled && !this.actionbarText.isEmpty()) {
-                viewer.sendActionBar(Component.text(colorize(
+                viewer.sendActionBar(Component.text(ColorUtil.sections(
                         this.actionbarText.replace("%player%", sender.getName()))));
             }
 
             if (this.bossbarEnabled && !this.bossbarText.isEmpty() && this.plugin != null) {
                 var bossBar = net.kyori.adventure.bossbar.BossBar.bossBar(
-                        Component.text(colorize(this.bossbarText.replace("%player%", sender.getName()))),
+                        Component.text(ColorUtil.sections(this.bossbarText.replace("%player%", sender.getName()))),
                         1f,
                         net.kyori.adventure.bossbar.BossBar.Color.YELLOW,
                         net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_10);
@@ -164,9 +165,6 @@ public class MentionDisplay implements ChatDisplay {
         }
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 
     @Override
     public String display(AdventureComponent adventureComponent, net.kyori.adventure.text.minimessage.tag.resolver.TagResolver.Builder builder,

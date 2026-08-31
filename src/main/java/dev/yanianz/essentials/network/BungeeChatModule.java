@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.network;
 
 import com.google.common.io.ByteArrayDataInput;
+import dev.yanianz.essentials.util.ColorUtil;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
@@ -79,7 +80,7 @@ public class BungeeChatModule extends ZModule {
                         String line = this.format
                                 .replace("%server%", originServer)
                                 .replace("%player%", playerName)
-                                .replace("%message%", colorize(content));
+                                .replace("%message%", ColorUtil.sections(content));
 
                         Component component = LegacyComponentSerializer.legacySection().deserialize(line);
                         Bukkit.getOnlinePlayers().forEach(online -> online.sendMessage(component));
@@ -124,7 +125,4 @@ public class BungeeChatModule extends ZModule {
         return output.toByteArray();
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

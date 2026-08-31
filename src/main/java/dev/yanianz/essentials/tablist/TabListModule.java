@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.tablist;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
 import net.kyori.adventure.text.Component;
@@ -106,7 +107,7 @@ public class TabListModule extends ZModule {
                 if (animSection2 == null) continue;
                 List<Component> frames = new ArrayList<>();
                 for (String frame : animSection2.getStringList("frames")) {
-                    frames.add(LEGACY.deserialize(colorize(frame)));
+                    frames.add(LEGACY.deserialize(ColorUtil.sections(frame)));
                 }
                 if (!frames.isEmpty()) this.animations.put(name, frames);
             }
@@ -190,7 +191,7 @@ public class TabListModule extends ZModule {
     private Component buildComponent(List<String> lines) {
         StringBuilder builder = new StringBuilder();
         for (int index = 0; index < lines.size(); index++) {
-            String line = colorize(lines.get(index));
+            String line = ColorUtil.sections(lines.get(index));
             builder.append(resolveAnimTokens(line));
             if (index < lines.size() - 1) builder.append("\n");
         }
@@ -217,9 +218,6 @@ public class TabListModule extends ZModule {
         return sb.toString();
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 
     public boolean isLayoutEnabled() {
         return this.layoutEnabled;

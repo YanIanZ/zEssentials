@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.polls;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
 import net.kyori.adventure.text.Component;
@@ -189,7 +190,7 @@ public class PollsModule extends ZModule {
             int filled = (int) Math.round(percent / 100.0 * this.barLength);
 
             String bar = this.barFilled.repeat(filled)
-                    + colorize("&8") + this.barEmpty.repeat(Math.max(0, this.barLength - filled));
+                    + ColorUtil.sections("&8") + this.barEmpty.repeat(Math.max(0, this.barLength - filled));
             String lineText = this.resultBar
                     .replace("%index%", String.valueOf(index + 1))
                     .replace("%option%", poll.options.get(index))
@@ -212,9 +213,9 @@ public class PollsModule extends ZModule {
         if (totalVotes == 0) {
             outcome = legacy(this.noVotesLine);
         } else if (tie) {
-            outcome = legacy(colorize("&e&lPOLL RESULT &8» &fIt is a tie!"));
+            outcome = legacy(ColorUtil.sections("&e&lPOLL RESULT &8» &fIt is a tie!"));
         } else {
-            outcome = legacy(colorize(this.winnerLine
+            outcome = legacy(ColorUtil.sections(this.winnerLine
                     .replace("%option%", poll.options.get(bestIndex))
                     .replace("%percent%", String.format(Locale.US, "%.0f", bestCount * 100.0 / totalVotes))));
         }
@@ -238,7 +239,7 @@ public class PollsModule extends ZModule {
 
         for (int index = 0; index < poll.options.size(); index++) {
             int count = poll.votes.get(index).size();
-            String text = colorize(this.optionLine
+            String text = ColorUtil.sections(this.optionLine
                     .replace("%index%", String.valueOf(index + 1))
                     .replace("%option%", poll.options.get(index))
                     .replace("%votes%", String.valueOf(count)));
@@ -249,7 +250,7 @@ public class PollsModule extends ZModule {
                             legacyRaw("&7Click to vote for &f" + poll.options.get(index))));
 
             if (poll.votes.get(index).contains(player.getUniqueId())) {
-                component = component.append(LEGACY.deserialize(colorize(this.votedMark)));
+                component = component.append(LEGACY.deserialize(ColorUtil.sections(this.votedMark)));
             }
             player.sendMessage(component);
         }
@@ -276,14 +277,11 @@ public class PollsModule extends ZModule {
     }
 
     private Component legacy(String text) {
-        return LEGACY.deserialize(colorize(text));
+        return LEGACY.deserialize(ColorUtil.sections(text));
     }
 
     private Component legacyRaw(String text) {
-        return LEGACY.deserialize(colorize(text));
+        return LEGACY.deserialize(ColorUtil.sections(text));
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

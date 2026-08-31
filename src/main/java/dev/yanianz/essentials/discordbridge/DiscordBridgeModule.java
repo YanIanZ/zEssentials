@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.discordbridge;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -66,7 +67,7 @@ public class DiscordBridgeModule extends ZModule {
         if (!player.hasPermission("essentials.discordbridge.notify")) return;
         if (!this.isEnable || this.discordSrvPresent) return;
         player.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                .legacySection().deserialize(colorize("&7[Discord bridge] &cDiscordSRV is not installed, forwarding disabled.")));
+                .legacySection().deserialize(ColorUtil.sections("&7[Discord bridge] &cDiscordSRV is not installed, forwarding disabled.")));
     }
 
     /**
@@ -104,7 +105,4 @@ public class DiscordBridgeModule extends ZModule {
     }
 
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

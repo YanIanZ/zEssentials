@@ -11,6 +11,7 @@ public class CommandEssentials extends VCommand {
     public CommandEssentials(EssentialsPlugin plugin) {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_USE);
+        this.setDescription(Message.DESCRIPTION_ESSENTIALS);
         this.addSubCommand(new CommandEssentialsReload(plugin));
         this.addSubCommand(new CommandEssentialsConvert(plugin));
         this.addSubCommand(new CommandEssentialsDeleteWorld(plugin));

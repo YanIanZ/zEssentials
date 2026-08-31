@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.screens;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -46,7 +47,7 @@ public final class EssentialsScreens {
         var economyOptional = economyManager.getEconomy(economyName);
         if (economyOptional.isEmpty()) {
             player.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                    .legacySection().deserialize(colorize("&cUnknown economy: &f" + economyName)));
+                    .legacySection().deserialize(ColorUtil.sections("&cUnknown economy: &f" + economyName)));
             return;
         }
 
@@ -63,7 +64,7 @@ public final class EssentialsScreens {
             items.add(new ScreenFactory.ScreenItem(
                     Material.PLAYER_HEAD,
                     "&e#" + position + " &f" + entry.getName(),
-                    List.of(colorize("&7Balance&8: &#00d4ff" + formatted)),
+                    List.of(ColorUtil.sections("&7Balance&8: &#00d4ff" + formatted)),
                     null));
         }
 
@@ -73,7 +74,4 @@ public final class EssentialsScreens {
         this.factory.open(player, "&#00d4ff&lBaltop", Math.max(3, Math.min(6, rows)), items);
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

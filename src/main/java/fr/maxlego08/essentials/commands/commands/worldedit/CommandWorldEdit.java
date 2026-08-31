@@ -2,6 +2,7 @@ package fr.maxlego08.essentials.commands.commands.worldedit;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.commands.commands.worldedit.options.CommandWorldEditOption;
 import fr.maxlego08.essentials.module.modules.worldedit.WorldeditModule;
@@ -13,6 +14,7 @@ public class CommandWorldEdit extends VCommand {
         super(plugin);
         this.setModule(WorldeditModule.class);
         this.setPermission(Permission.ESSENTIALS_WORLDEDIT_USE);
+        this.setDescription(Message.DESCRIPTION_WORLDEDIT);
         this.addSubCommand(new CommandWorldEditConfirm(plugin));
         this.addSubCommand(new CommandWorldEditCut(plugin));
         this.addSubCommand(new CommandWorldEditFill(plugin));

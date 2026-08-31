@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.terms;
 
 import io.papermc.paper.dialog.Dialog;
+import dev.yanianz.essentials.util.ColorUtil;
 import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
@@ -41,14 +42,14 @@ public final class TermsDialogs {
                                String acceptLabelLegacy, String denyLabelLegacy, String acceptHoverLegacy, String denyHoverLegacy,
                                Supplier<Boolean> onAccept, Runnable onDeny) {
 
-        Component title = LEGACY.deserialize(colorize(titleLegacy));
+        Component title = LEGACY.deserialize(ColorUtil.sections(titleLegacy));
 
         List<DialogBody> bodies = new ArrayList<>();
         if (questionLegacy != null && !questionLegacy.isBlank()) {
-            bodies.add(DialogBody.plainMessage(LEGACY.deserialize(colorize(questionLegacy))));
+            bodies.add(DialogBody.plainMessage(LEGACY.deserialize(ColorUtil.sections(questionLegacy))));
         }
         for (String line : ruleLinesLegacy) {
-            String colorized = colorize(line);
+            String colorized = ColorUtil.sections(line);
             if (!colorized.isBlank()) {
                 bodies.add(DialogBody.plainMessage(LEGACY.deserialize(colorized)));
             }
@@ -62,14 +63,14 @@ public final class TermsDialogs {
                 net.kyori.adventure.text.event.ClickCallback.Options.builder().build();
 
         ActionButton acceptButton = ActionButton.create(
-                LEGACY.deserialize(colorize(acceptLabelLegacy)),
-                LEGACY.deserialize(colorize(acceptHoverLegacy)),
+                LEGACY.deserialize(ColorUtil.sections(acceptLabelLegacy)),
+                LEGACY.deserialize(ColorUtil.sections(acceptHoverLegacy)),
                 150,
                 DialogAction.customClick((response, audience) -> onAccept.get(), callbackOptions));
 
         ActionButton denyButton = ActionButton.create(
-                LEGACY.deserialize(colorize(denyLabelLegacy)),
-                LEGACY.deserialize(colorize(denyHoverLegacy)),
+                LEGACY.deserialize(ColorUtil.sections(denyLabelLegacy)),
+                LEGACY.deserialize(ColorUtil.sections(denyHoverLegacy)),
                 150,
                 DialogAction.customClick((response, audience) -> onDeny.run(), callbackOptions));
 
@@ -83,7 +84,4 @@ public final class TermsDialogs {
         return true;
     }
 
-    private static String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

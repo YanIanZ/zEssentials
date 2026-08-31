@@ -1,6 +1,7 @@
 package fr.maxlego08.essentials.commands.commands.utils;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.messages.Message;
@@ -36,12 +37,12 @@ public class CommandXyz extends VCommand {
         String shortForm = String.format(Locale.US, "%d %d %d",
                 location.getBlockX(), location.getBlockY(), location.getBlockZ());
         String coords = worldName + " " + shortForm;
-        String coloredCoords = colorize("&b" + worldName + " &8» &f" + shortForm.replace(" ", "&7, &f"));
+        String coloredCoords = ColorUtil.sections("&b" + worldName + " &8» &f" + shortForm.replace(" ", "&7, &f"));
 
-        Component message = LEGACY.deserialize(colorize(
+        Component message = LEGACY.deserialize(ColorUtil.sections(
                 "&#00d4ff&lXYZ &8» &f" + shortForm + " &7in &f" + worldName))
                 .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
-                        LEGACY.deserialize(colorize("&7Click to copy formatted coords"))))
+                        LEGACY.deserialize(ColorUtil.sections("&7Click to copy formatted coords"))))
                 .clickEvent(ClickEvent.copyToClipboard(coloredCoords));
 
         this.player.sendMessage(message);
@@ -50,7 +51,4 @@ public class CommandXyz extends VCommand {
         return CommandResultType.SUCCESS;
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

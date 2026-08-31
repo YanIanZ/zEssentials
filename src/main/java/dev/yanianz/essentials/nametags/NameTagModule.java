@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.nametags;
 
 import dev.yanianz.essentials.nicknames.NicknamesModule;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
@@ -209,7 +210,7 @@ public class NameTagModule extends ZModule {
             }
         }
         String format = this.fallbackTabFormat != null ? this.fallbackTabFormat : "&7%player%";
-        String fallbackTab = colorize(format.replace("%player%", effectiveName));
+        String fallbackTab = ColorUtil.sections(format.replace("%player%", effectiveName));
 
         Component tabName = rule == null
                 ? dev.yanianz.essentials.util.ColorUtil.component(fallbackTab)
@@ -302,7 +303,4 @@ public class NameTagModule extends ZModule {
                 .legacySection().serialize(component);
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

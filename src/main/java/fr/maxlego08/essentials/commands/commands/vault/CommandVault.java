@@ -2,6 +2,7 @@ package fr.maxlego08.essentials.commands.commands.vault;
 
 import fr.maxlego08.essentials.api.EssentialsPlugin;
 import fr.maxlego08.essentials.api.commands.CommandResultType;
+import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.module.modules.vault.VaultModule;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
@@ -14,6 +15,7 @@ public class CommandVault extends VCommand {
     public CommandVault(EssentialsPlugin plugin) {
         super(plugin);
         this.setPermission(Permission.ESSENTIALS_VAULT_USE);
+        this.setDescription(Message.DESCRIPTION_VAULT);
         this.setModule(VaultModule.class);
         this.onlyPlayers();
         this.addOptionalArg("vault id", (sender, args) -> sender instanceof Player player ? plugin.getVaultManager().getVaultAsTabCompletion(player) : new ArrayList<>());

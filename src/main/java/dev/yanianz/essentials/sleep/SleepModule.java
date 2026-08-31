@@ -1,6 +1,7 @@
 package dev.yanianz.essentials.sleep;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
 import net.kyori.adventure.text.Component;
@@ -120,11 +121,8 @@ public class SleepModule extends ZModule {
     private void announce(World world, String legacyLine) {
         if (legacyLine == null || legacyLine.isEmpty() || "false".equalsIgnoreCase(legacyLine)) return;
         Component component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                .legacySection().deserialize(colorize(legacyLine));
+                .legacySection().deserialize(ColorUtil.sections(legacyLine));
         world.getPlayers().forEach(player -> player.sendMessage(component));
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 }

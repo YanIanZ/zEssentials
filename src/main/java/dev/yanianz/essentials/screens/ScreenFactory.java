@@ -98,7 +98,7 @@ public final class ScreenFactory {
         if (items == null || items.isEmpty()) {
             List<Inventory> inventories = new ArrayList<>();
             Screen screen = new Screen(player.getUniqueId(), inventories, 0, size);
-            Inventory inventory = Bukkit.createInventory(screen, size, LEGACY.deserialize(colorize(titleLegacy)));
+            Inventory inventory = Bukkit.createInventory(screen, size, LEGACY.deserialize(ColorUtil.sections(titleLegacy)));
             screen.inventory = inventory;
             inventories.add(inventory);
 
@@ -124,7 +124,7 @@ public final class ScreenFactory {
         for (int pageIndex = 0; pageIndex < chunks.size(); pageIndex++) {
             Screen screen = new Screen(uniqueId, inventories, pageIndex, size);
             Inventory inventory = Bukkit.createInventory(screen, size,
-                    LEGACY.deserialize(colorize(titleLegacy)
+                    LEGACY.deserialize(ColorUtil.sections(titleLegacy)
                             + (chunks.size() > 1 ? " §8(" + (pageIndex + 1) + "/" + chunks.size() + ")" : "")));
             screen.inventory = inventory;
             inventories.add(inventory);
@@ -183,9 +183,9 @@ public final class ScreenFactory {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
-            meta.displayName(LEGACY.deserialize(colorize(nameLegacy)));
+            meta.displayName(LEGACY.deserialize(ColorUtil.sections(nameLegacy)));
             if (loreLegacy != null && !loreLegacy.isEmpty()) {
-                meta.lore(loreLegacy.stream().map(line -> LEGACY.deserialize(colorize(line))).toList());
+                meta.lore(loreLegacy.stream().map(line -> LEGACY.deserialize(ColorUtil.sections(line))).toList());
             }
             itemStack.setItemMeta(meta);
         }
@@ -247,7 +247,7 @@ public final class ScreenFactory {
                                 java.util.LinkedHashMap<String, List<ScreenItem>> categories) {
 
         if (categories.isEmpty()) {
-            player.sendMessage(LEGACY.deserialize(colorize("&7Nothing to show yet.")));
+            player.sendMessage(LEGACY.deserialize(ColorUtil.sections("&7Nothing to show yet.")));
             return;
         }
 
@@ -256,7 +256,7 @@ public final class ScreenFactory {
 
         PickerHolder pickerHolder = new PickerHolder();
         Inventory picker = Bukkit.createInventory(pickerHolder, 27,
-                LegacyComponentSerializer.legacySection().deserialize(colorize(titleLegacy)));
+                LegacyComponentSerializer.legacySection().deserialize(ColorUtil.sections(titleLegacy)));
 
         ItemStack filler = button(Material.GRAY_STAINED_GLASS_PANE, " ", null);
         for (int slot = 0; slot < 27; slot++) picker.setItem(slot, filler);
@@ -276,7 +276,7 @@ public final class ScreenFactory {
             Inventory firstPage = chain.get(0);
 
             picker.setItem(slot, button(icon, "&b" + entry.getKey(),
-                    List.of(colorize("&7Open this category"))));
+                    List.of(ColorUtil.sections("&7Open this category"))));
             final Inventory target = firstPage;
             pickerAction(picker, slot, (viewer, ev) -> viewer.openInventory(target));
 
@@ -308,7 +308,7 @@ public final class ScreenFactory {
         for (int pageIndex = 0; pageIndex < chunks.size(); pageIndex++) {
             Screen screen = new Screen(uniqueId, inventories, pageIndex, size);
             Inventory inventory = Bukkit.createInventory(screen, size,
-                    LEGACY.deserialize(colorize(titleLegacy)
+                    LEGACY.deserialize(ColorUtil.sections(titleLegacy)
                             + (chunks.size() > 1 ? " §8(" + (pageIndex + 1) + "/" + chunks.size() + ")" : "")));
             screen.inventory = inventory;
             inventories.add(inventory);
@@ -344,11 +344,5 @@ public final class ScreenFactory {
                 screen.action(size - 1, (viewer, ev) -> viewer.openInventory(inventories.get(current + 1)));
             }
         }
-    }
-
-    
-
-    private String colorize(String text) {
-        return ColorUtil.sections(text);
     }
 }

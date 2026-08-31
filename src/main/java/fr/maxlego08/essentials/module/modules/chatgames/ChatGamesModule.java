@@ -1,6 +1,7 @@
 package fr.maxlego08.essentials.module.modules.chatgames;
 
 import fr.maxlego08.essentials.ZEssentialsPlugin;
+import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.module.ZModule;
@@ -164,7 +165,7 @@ public class ChatGamesModule extends ZModule {
 
         this.activeGame = game;
         broadcast(game.display);
-        broadcast(colorize("&7Type the answer in the chat to win!"));
+        broadcast(ColorUtil.sections("&7Type the answer in the chat to win!"));
         return true;
     }
 
@@ -173,7 +174,7 @@ public class ChatGamesModule extends ZModule {
      */
     public void stop() {
         this.activeGame = null;
-        broadcast(colorize("&cThe chat game was cancelled."));
+        broadcast(ColorUtil.sections("&cThe chat game was cancelled."));
     }
 
     public boolean hasActiveGame() {
@@ -212,7 +213,7 @@ public class ChatGamesModule extends ZModule {
         this.activeGame = null;
 
         String answer = game.typeLabel.equals("hot-letter") ? plain : game.answers.get(0);
-        broadcast(colorize(this.winMessage
+        broadcast(ColorUtil.sections(this.winMessage
                 .replace("%player%", player.getName())
                 .replace("%answer%", answer)));
 
@@ -236,7 +237,7 @@ public class ChatGamesModule extends ZModule {
             default -> a + b;
         };
 
-        String display = colorize(String.format(this.mathQuestionFormat, a + " " + operator + " " + b));
+        String display = ColorUtil.sections(String.format(this.mathQuestionFormat, a + " " + operator + " " + b));
         return new ActiveGame("math", display, List.of(String.valueOf(result)), null);
     }
 
@@ -256,7 +257,7 @@ public class ChatGamesModule extends ZModule {
             shuffled = builder.toString();
         }
 
-        String display = colorize("§b§lCHAT GAME §8» §fUnscramble this word: §e§l" + shuffled.toUpperCase(Locale.ROOT));
+        String display = ColorUtil.sections("§b§lCHAT GAME §8» §fUnscramble this word: §e§l" + shuffled.toUpperCase(Locale.ROOT));
         return new ActiveGame("scramble", display, List.of(word), null);
     }
 
@@ -264,7 +265,7 @@ public class ChatGamesModule extends ZModule {
         if (this.fastTypeSentences.isEmpty()) return null;
 
         String sentence = this.fastTypeSentences.get(this.random.nextInt(this.fastTypeSentences.size()));
-        String display = colorize("§b§lCHAT GAME §8» §fFirst one to type: §e" + sentence);
+        String display = ColorUtil.sections("§b§lCHAT GAME §8» §fFirst one to type: §e" + sentence);
         return new ActiveGame("fast-type", display, List.of(sentence), null);
     }
 
@@ -274,7 +275,7 @@ public class ChatGamesModule extends ZModule {
         String word = this.reverseWords.get(this.random.nextInt(this.reverseWords.size()));
         String reversed = new StringBuilder(word).reverse().toString();
 
-        String display = colorize("§b§lCHAT GAME §8» §fUn-reverse this word: §e§l" + reversed);
+        String display = ColorUtil.sections("§b§lCHAT GAME §8» §fUn-reverse this word: §e§l" + reversed);
         return new ActiveGame("reverse", display, List.of(word), null);
     }
 
@@ -282,7 +283,7 @@ public class ChatGamesModule extends ZModule {
         if (this.triviaQuestions.isEmpty()) return null;
 
         TriviaQuestion trivia = this.triviaQuestions.get(this.random.nextInt(this.triviaQuestions.size()));
-        String display = colorize(trivia.question());
+        String display = ColorUtil.sections(trivia.question());
         return new ActiveGame("trivia", display, trivia.answers(), null);
     }
 
@@ -291,7 +292,7 @@ public class ChatGamesModule extends ZModule {
         String letters = "abcdefghijklmnopqrstuvwxyz";
         char letter = letters.charAt(this.random.nextInt(letters.length()));
 
-        String display = colorize("§b§lCHAT GAME §8» §fFirst word starting with §e§l"
+        String display = ColorUtil.sections("§b§lCHAT GAME §8» §fFirst word starting with §e§l"
                 + Character.toUpperCase(letter)
                 + " §fwith at least §e" + this.hotLetterMinLength + "§f letters wins!");
         return new ActiveGame("hot-letter", display,
@@ -306,9 +307,6 @@ public class ChatGamesModule extends ZModule {
         Bukkit.getConsoleSender().sendMessage(legacyLine);
     }
 
-    private String colorize(String text) {
-        return dev.yanianz.essentials.util.ColorUtil.sections(text);
-    }
 
     private static final class LegacyComponentSerializerSupport {
         private static final net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer S =
