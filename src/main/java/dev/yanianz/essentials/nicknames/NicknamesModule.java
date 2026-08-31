@@ -42,6 +42,7 @@ public class NicknamesModule extends ZModule {
 
     private boolean disguiseEnabled;
     private boolean selfView;
+    private boolean hideFromTab;
     private int disguiseCooldownSeconds;
     private int skinCacheHours;
     private boolean blockStaff;
@@ -86,6 +87,7 @@ public class NicknamesModule extends ZModule {
 
         this.disguiseEnabled = config.getBoolean("disguise.enable", true);
         this.selfView = config.getBoolean("disguise.self-view", false);
+        this.hideFromTab = config.getBoolean("disguise.hide-from-tab", true);
         this.disguiseCooldownSeconds = Math.max(0, config.getInt("disguise.cooldown-seconds", 120));
         this.skinCacheHours = Math.max(1, config.getInt("disguise.skin-cache-hours", 24));
         this.blockStaff = config.getBoolean("disguise.block-staff", false);
@@ -119,6 +121,10 @@ public class NicknamesModule extends ZModule {
             if (nickname != null) {
                 applyDisplayName(player, nickname);
             }
+        }
+
+        if (disguise != null) {
+            this.plugin.getScheduler().runAtEntityLater(player, wrappedTask -> refreshDisguise(player), 40L);
         }
     }
 
@@ -239,6 +245,7 @@ public class NicknamesModule extends ZModule {
         if (data.getDisguiseName() != null) {
             applyDisplayName(player, data.getDisguiseName());
         }
+        refreshDisguise(player);
     }
 
     public void removeDisguise(UUID uuid) {
@@ -253,6 +260,83 @@ public class NicknamesModule extends ZModule {
             } else {
                 applyDisplayName(player, player.getName());
             }
+            refreshDisguise(player);
+        }
+    }
+
+    /**
+     * LibsDisguises-style refresh: forces every viewer to receive a fresh
+     * spawn sequence for the disguised player. The hide/show cycle makes the
+     * server resend the spawn + metadata packets, which the ProtocolLib
+     * listeners rewrite in-flight to the disguise.
+     */
+    public void refreshDisguise(Player player) {
+        if (!this.isEnable) return;
+
+        for (Player viewer : Bukkit.getOnlinePlayers()) {
+            if (viewer.getUniqueId().equals(player.getUniqueId())) continue;
+            this.plugin.getScheduler().runAtEntity(viewer, wrappedTask -> {
+                if (!viewer.isOnline() || !player.isOnline()) return;
+                try {
+                    viewer.hidePlayer(this.plugin, player);
+                    viewer.showPlayer(this.plugin, player);
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
+        if (this.selfView) {
+            this.plugin.getScheduler().runAtEntity(player, wrappedTask -> sendSelfViewPackets(player, isDisguised(player.getUniqueId())));
+        }
+    }
+
+    /**
+     * Self-view: destroys the player's own entity client-side and respawns it
+     * as the mob so F5 third person shows the disguise. Movement stays in sync
+     * because the fake entity reuses the real entity id (client predicts it).
+     */
+    private void sendSelfViewPackets(Player player, boolean disguised) {
+        try {
+            if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) return;
+            var manager = com.comphenix.protocol.ProtocolLibrary.getProtocolManager();
+
+            var destroy = manager.createPacket(com.comphenix.protocol.PacketType.Play.Server.ENTITY_DESTROY);
+            destroy.getIntegerArrays().write(0, new int[]{player.getEntityId()});
+            manager.sendServerPacket(player, destroy);
+
+            var spawn = manager.createPacket(com.comphenix.protocol.PacketType.Play.Server.SPAWN_ENTITY);
+            spawn.getIntegers().write(0, player.getEntityId());
+            spawn.getUUIDs().write(0, player.getUniqueId());
+            spawn.getDoubles().write(0, player.getLocation().getX());
+            spawn.getDoubles().write(1, player.getLocation().getY());
+            spawn.getDoubles().write(2, player.getLocation().getZ());
+
+            if (disguised) {
+                DisguiseData data = getDisguise(player.getUniqueId());
+                if (data != null && data.getEntityType() != null) {
+                    org.bukkit.entity.EntityType type = org.bukkit.entity.EntityType.valueOf(data.getEntityType().toUpperCase());
+                    try {
+                        spawn.getEntityTypeModifier().write(0, type);
+                    } catch (Exception e) {
+                        spawn.getIntegers().write(1, (int) type.getTypeId());
+                    }
+                } else {
+                    try {
+                        spawn.getEntityTypeModifier().write(0, org.bukkit.entity.EntityType.PLAYER);
+                    } catch (Exception e) {
+                        return;
+                    }
+                }
+            } else {
+                try {
+                    spawn.getEntityTypeModifier().write(0, org.bukkit.entity.EntityType.PLAYER);
+                } catch (Exception e) {
+                    return;
+                }
+            }
+
+            manager.sendServerPacket(player, spawn);
+        } catch (Exception ignored) {
         }
     }
 
@@ -270,6 +354,10 @@ public class NicknamesModule extends ZModule {
 
     public boolean isSelfView() {
         return this.selfView;
+    }
+
+    public boolean isHideFromTab() {
+        return this.hideFromTab;
     }
 
     public boolean isBlockStaff() {

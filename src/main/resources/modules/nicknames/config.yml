@@ -35,6 +35,9 @@ disguise:
   # Whether the disguised player sees their own disguise in F5/third-person view
   self-view: false
 
+  # Remove mob-disguised players from the tab list (LibsDisguises-style)
+  hide-from-tab: true
+
   # Cooldown between disguise changes (seconds)
   cooldown-seconds: 120
 

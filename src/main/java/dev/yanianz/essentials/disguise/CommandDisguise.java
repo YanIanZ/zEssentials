@@ -26,9 +26,18 @@ public class CommandDisguise extends VCommand {
         this.setModule(NicknamesModule.class);
         this.setPermission(Permission.ESSENTIALS_DISGUISE_USE);
         this.setDescription(Message.DESCRIPTION_DISGUISE);
-        this.addOptionalArg("action", (sender, args) -> List.of("off", "random", "skin", "mob", "list"));
+        this.addOptionalArg("action", (sender, args) -> completions());
         this.setExtendedArgs(true);
         this.onlyPlayers();
+    }
+
+    private List<String> completions() {
+        NicknamesModule module = plugin.getModuleManager().getModule(NicknamesModule.class);
+        List<String> out = new ArrayList<>(List.of("off", "random", "skin", "player", "mob", "list"));
+        if (module != null) {
+            out.addAll(module.getAllowedMobs().stream().map(String::toLowerCase).toList());
+        }
+        return out;
     }
 
     @Override
@@ -144,17 +153,50 @@ public class CommandDisguise extends VCommand {
                     mobType = this.argAsString(2);
                 }
             }
-            try {
-                org.bukkit.entity.EntityType.valueOf(mobType.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                message(sender, Message.DISGUISE_INVALID_MOB, "%type%", mobType);
-                return CommandResultType.SUCCESS;
-            }
-            if (!module.getAllowedMobs().isEmpty() && !module.getAllowedMobs().contains(mobType.toUpperCase())) {
+            if (!isValidMob(module, mobType)) {
                 message(sender, Message.DISGUISE_INVALID_MOB, "%type%", mobType);
                 return CommandResultType.SUCCESS;
             }
             applyMobDisguise(module, target, mobType);
+            return CommandResultType.SUCCESS;
+        }
+
+        if (firstArg.equalsIgnoreCase("player")) {
+            if (this.args.length < 2) {
+                message(sender, Message.DISGUISE_USAGE);
+                return CommandResultType.SUCCESS;
+            }
+            String skinName = this.argAsString(1);
+            if (this.args.length >= 3 && hasPermission(sender, Permission.ESSENTIALS_DISGUISE_OTHER)) {
+                Player other = Bukkit.getPlayerExact(this.argAsString(1));
+                if (other != null) {
+                    target = other;
+                    skinName = this.argAsString(2);
+                }
+            }
+            if (target != this.player && !hasPermission(sender, Permission.ESSENTIALS_DISGUISE_OTHER)) {
+                return CommandResultType.NO_PERMISSION;
+            }
+            boolean bypass = hasPermission(sender, Permission.ESSENTIALS_DISGUISE_BYPASS_COOLDOWN);
+            if (target.equals(this.player) && module.isDisguiseCooldown(target.getUniqueId()) && !bypass) {
+                message(sender, Message.DISGUISE_COOLDOWN, "%seconds%", String.valueOf(module.getDisguiseRemainingCooldown(target.getUniqueId())));
+                return CommandResultType.SUCCESS;
+            }
+            message(sender, Message.DISGUISE_FETCHING);
+            fetchAndApplyDisguise(module, target, skinName, skinName, target.equals(this.player));
+            return CommandResultType.SUCCESS;
+        }
+
+        if (isValidMob(module, firstArg)) {
+            if (target != this.player && !hasPermission(sender, Permission.ESSENTIALS_DISGUISE_OTHER)) {
+                return CommandResultType.NO_PERMISSION;
+            }
+            boolean bypass = hasPermission(sender, Permission.ESSENTIALS_DISGUISE_BYPASS_COOLDOWN);
+            if (target.equals(this.player) && module.isDisguiseCooldown(target.getUniqueId()) && !bypass) {
+                message(sender, Message.DISGUISE_COOLDOWN, "%seconds%", String.valueOf(module.getDisguiseRemainingCooldown(target.getUniqueId())));
+                return CommandResultType.SUCCESS;
+            }
+            applyMobDisguise(module, target, firstArg);
             return CommandResultType.SUCCESS;
         }
 
@@ -198,6 +240,17 @@ public class CommandDisguise extends VCommand {
             message(sender, Message.DISGUISE_SKIN_SET_OTHER, "%player%", target.getName());
             message(target, Message.DISGUISE_SKIN_SET);
         }
+    }
+
+    private boolean isValidMob(NicknamesModule module, String mobType) {
+        if (mobType == null || mobType.isEmpty()) return false;
+        try {
+            org.bukkit.entity.EntityType type = org.bukkit.entity.EntityType.valueOf(mobType.toUpperCase());
+            if (!type.isAlive() || type == org.bukkit.entity.EntityType.PLAYER) return false;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        return module.getAllowedMobs().isEmpty() || module.getAllowedMobs().contains(mobType.toUpperCase());
     }
 
     private void applyMobDisguise(NicknamesModule module, Player target, String mobType) {
