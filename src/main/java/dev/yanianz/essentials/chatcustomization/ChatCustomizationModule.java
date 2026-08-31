@@ -135,7 +135,7 @@ public class ChatCustomizationModule extends ZModule {
      * Legacy text of the selected tag of a player, empty when none is chosen.
      */
     public String resolveTagText(UUID uniqueId) {
-        return getPreference(uniqueId).tagText();
+        return sanitizeTagText(getPreference(uniqueId).tagText());
     }
 
     /* ── Color gui ─────────────────────────────────────────── */
@@ -377,7 +377,30 @@ public class ChatCustomizationModule extends ZModule {
 
     private void save(Player player, String colorCode, List<String> decorations, String tagText) {
         this.preferences.put(player.getUniqueId(),
-                new Preference(colorCode, List.copyOf(decorations), tagText));
+                new Preference(colorCode, List.copyOf(decorations), sanitizeTagText(tagText)));
+    }
+
+    /**
+     * Removes orphan ampersands from tag text: an orphan color prefix that
+     * is not followed by a valid legacy code character (or hash / x for
+     * hex) would render literally in chat.
+     */
+    public static String sanitizeTagText(String text) {
+        if (text == null || text.isEmpty()) return "";
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if ((c == '&' || c == '§') && i + 1 < text.length()) {
+                char next = Character.toLowerCase(text.charAt(i + 1));
+                if (next == '#' || next == 'x' || "0123456789abcdefklmnor".indexOf(next) >= 0) {
+                    out.append(c);
+                    continue;
+                }
+                continue;
+            }
+            out.append(c);
+        }
+        return out.toString();
     }
 
     /* ── persistence ──────────────────────────────────────── */

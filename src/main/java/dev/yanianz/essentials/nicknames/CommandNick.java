@@ -182,27 +182,50 @@ public class CommandNick extends VCommand {
                 return null;
             }
         }).thenAccept(textures -> {
+            String[] effectiveTextures = textures;
+            boolean usedOwnSkin = false;
+            if (effectiveTextures == null && module.isFallbackOwnSkin()) {
+                effectiveTextures = ownTextures(target);
+                usedOwnSkin = effectiveTextures != null;
+            }
+            final String[] skin = effectiveTextures;
+            final boolean skinFallback = usedOwnSkin;
             this.plugin.getScheduler().runAtEntity(target, w -> {
                 DisguiseData data = new DisguiseData();
                 data.setDisguiseName(nickName);
-                if (textures != null) {
-                    data.setTextureValue(textures[0]);
-                    data.setTextureSignature(textures[1]);
+                if (skin != null) {
+                    data.setTextureValue(skin[0]);
+                    data.setTextureSignature(skin[1]);
                 }
                 module.applyDisguise(target, data);
-                module.setNickname(target.getUniqueId(), null);
 
                 if (self) {
                     module.markChanged(target.getUniqueId());
-                    if (textures == null) {
+                    if (skin == null) {
                         message(sender, Message.NICK_FETCH_FAILED, "%player%", nickName);
+                        message(sender, Message.NICK_SET_NO_SKIN, "%nickname%", nickName);
+                    } else if (skinFallback) {
+                        message(sender, Message.NICK_HYPIXEL_SET, "%nickname%", nickName);
+                    } else {
+                        message(sender, Message.NICK_HYPIXEL_SET, "%nickname%", nickName);
                     }
-                    message(sender, Message.NICK_HYPIXEL_SET, "%nickname%", nickName);
                 } else {
                     message(sender, Message.NICK_HYPIXEL_SET_OTHER, "%player%", target.getName(), "%nickname%", nickName);
                     message(target, Message.NICK_HYPIXEL_SET, "%nickname%", nickName);
                 }
             });
         });
+    }
+
+    private String[] ownTextures(Player player) {
+        try {
+            for (var property : player.getPlayerProfile().getProperties()) {
+                if ("textures".equals(property.getName())) {
+                    return new String[]{property.getValue(), property.getSignature()};
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }

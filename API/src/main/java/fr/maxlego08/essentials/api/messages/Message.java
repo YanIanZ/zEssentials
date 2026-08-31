@@ -788,6 +788,7 @@ public enum Message {
     NICK_INVALID("<error>Invalid nickname&7: &f%error%"),
     NICK_USAGE("<error>Usage&7: &f/nick <nickname|clear> &7or &f/nick <player> <nickname|clear>"),
     NICK_HYPIXEL_SET("<success>Your nickname is now &f%nickname% <success>with a matching skin."),
+    NICK_SET_NO_SKIN("<success>Your nickname is now &f%nickname%<success>. &7(The skin could not be fetched)"),
     NICK_HYPIXEL_SET_OTHER("<success>Nickname of &f%player% <success>is now &f%nickname% <success>with a matching skin."),
     NICK_RANDOMIZING("#656665Randomizing your identity&8..."),
     NICK_RANDOM_EMPTY("<error>The random nick pool is empty."),

@@ -64,6 +64,10 @@ disguise:
   # Remove mob-disguised players from the tab list (LibsDisguises-style)
   hide-from-tab: true
 
+  # When the Mojang skin fetch fails, apply the player's own skin instead
+  # of leaving the nickname skinless
+  fallback-own-skin: true
+
   # Cooldown between disguise changes (seconds)
   cooldown-seconds: 120
 

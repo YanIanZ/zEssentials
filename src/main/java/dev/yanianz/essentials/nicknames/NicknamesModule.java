@@ -43,6 +43,7 @@ public class NicknamesModule extends ZModule {
     private boolean disguiseEnabled;
     private boolean selfView;
     private boolean hideFromTab;
+    private boolean fallbackOwnSkin;
     private int disguiseCooldownSeconds;
     private int skinCacheHours;
     private boolean blockStaff;
@@ -89,6 +90,7 @@ public class NicknamesModule extends ZModule {
         this.disguiseEnabled = config.getBoolean("disguise.enable", true);
         this.selfView = config.getBoolean("disguise.self-view", false);
         this.hideFromTab = config.getBoolean("disguise.hide-from-tab", true);
+        this.fallbackOwnSkin = config.getBoolean("disguise.fallback-own-skin", true);
         this.disguiseCooldownSeconds = Math.max(0, config.getInt("disguise.cooldown-seconds", 120));
         this.skinCacheHours = Math.max(1, config.getInt("disguise.skin-cache-hours", 24));
         this.blockStaff = config.getBoolean("disguise.block-staff", false);
@@ -187,6 +189,13 @@ public class NicknamesModule extends ZModule {
 
         Player player = Bukkit.getPlayer(uniqueId);
         if (player != null) {
+            if (isDisguised(uniqueId)) {
+                DisguiseData disguise = getDisguise(uniqueId);
+                if (disguise != null && disguise.getDisguiseName() != null) {
+                    applyDisplayName(player, disguise.getDisguiseName());
+                    return;
+                }
+            }
             if (nickname == null) {
                 applyDisplayName(player, player.getName());
             } else {
@@ -365,6 +374,10 @@ public class NicknamesModule extends ZModule {
 
     public boolean isHideFromTab() {
         return this.hideFromTab;
+    }
+
+    public boolean isFallbackOwnSkin() {
+        return this.fallbackOwnSkin;
     }
 
     public boolean isBlockStaff() {
