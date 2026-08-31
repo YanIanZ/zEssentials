@@ -13,6 +13,13 @@
 
 Sorted by priority:
 
+## Next steps (open)
+- [ ] Cross-server storage: migrate disguises, enderchest, reports, notes, reputations and chat preferences from JSON files to IStorage (MYSQL/MONGO) so player data syncs across the proxy network
+- [ ] Velocity-native proxy plugin (currently only BungeeCord relay in target-proxy/)
+- [ ] Disguise: per-mob metadata polish (baby variants, villager professions) and bundled spawn packets to remove viewer flicker on refresh
+- [ ] Craft/enderchest zMenu GUIs: pattern support + configurable slot layouts beyond the Hypixel default
+- [ ] Global chat: message deletion sync across servers via the proxy relay
+
 ## Fixes
 - [x] Compile against paper-api 26.2 with adventure 5 compatibility (ClickEvent payload/action)
 - [x] Duration parser: 1s/15m/12h/7d/2w/6mo/3y and combinations like 1d12h30m (/fly add, bans...)
