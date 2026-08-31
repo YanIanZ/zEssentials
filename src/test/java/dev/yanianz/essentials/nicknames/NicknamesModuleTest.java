@@ -1,5 +1,6 @@
 package dev.yanianz.essentials.nicknames;
 
+import dev.yanianz.essentials.disguise.DisguiseData;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -75,5 +76,54 @@ class NicknamesModuleTest {
 
         setField("cooldownSeconds", 0);
         assertFalse(module.isOnCooldown(id), "zero-second cooldown should never be active");
+    }
+
+    @Test
+    @DisplayName("getDisplayName returns null for undisguised player")
+    void testGetDisplayNameNull() {
+        assertNull(module.getDisplayName(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("isDisguised returns false for unknown uuid")
+    void testIsDisguisedUnknown() {
+        assertFalse(module.isDisguised(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("getDisguise returns null for unknown uuid")
+    void testGetDisguiseUnknown() {
+        assertNull(module.getDisguise(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("getRandomPool returns empty list by default")
+    void testGetRandomPoolDefault() {
+        assertNotNull(module.getRandomPool());
+        assertTrue(module.getRandomPool().isEmpty());
+    }
+
+    @Test
+    @DisplayName("isDisguiseEnabled returns false by default")
+    void testDisguiseDisabledDefault() {
+        assertFalse(module.isDisguiseEnabled());
+    }
+
+    @Test
+    @DisplayName("isSelfView returns false by default")
+    void testSelfViewDefault() {
+        assertFalse(module.isSelfView());
+    }
+
+    @Test
+    @DisplayName("disguise cooldown works")
+    void testDisguiseCooldown() throws Exception {
+        setField("disguiseCooldownSeconds", 60);
+        UUID id = UUID.randomUUID();
+        assertFalse(module.isDisguiseCooldown(id));
+        module.markDisguiseChanged(id);
+        assertTrue(module.isDisguiseCooldown(id));
+        setField("disguiseCooldownSeconds", 0);
+        assertFalse(module.isDisguiseCooldown(id));
     }
 }
