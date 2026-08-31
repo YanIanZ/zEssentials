@@ -17,6 +17,18 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.2.1.0
 
+## Chat upgrade — LPC reference (https://github.com/ThePM2/LPC-Pro-Wiki)
+
+- **`%prefix%` / `%suffix%` placeholders** — resolved through configurable PlaceholderAPI keys (`lpc.prefix-placeholder` / `lpc.suffix-placeholder`, LuckPerms by default); unresolved placeholders degrade to empty instead of leaking raw
+- **`%name-color%` placeholder** — permission-based name colors (`lpc.name-colors`: red/gold/aqua/green defaults) with `default-name-color` fallback
+- **Per-world chat formats** — new `world-chat-formats` section overrides group formats in listed worlds
+
+## Folia threading + performance
+
+- **Removed every raw `Bukkit.getScheduler()` usage** — StepModule step create/finish, public homes inventory, hologram event updates and kick now run on the player's region thread (`runAtEntity`); stash picker listener registration, warning escalation commands and the dependency auto-restart moved to Folia-safe schedulers (`runNextTick` / `Bukkit.getAsyncScheduler()` with daemon-thread fallback)
+- **Entity-id lookup cache** — `PacketMobDisguiseListener` cached entity-id → UUID map (rebuilt every 5s or on miss) replaces the per-packet O(n) online-player scan for every `ENTITY_METADATA`/`ENTITY_EQUIPMENT` packet
+- **SkinCache eviction** — expired entries are removed every 10 minutes instead of lingering until accessed (memory leak)
+
 ## zMenu GUI — Crafting & Enderchest rebuilt
 
 - **Crafting GUI on zMenu** — new `ZESSENTIALS_CRAFT_INTERACTIVE` button owns every interactive slot of the Hypixel layout (3x3 grid, result, quick-craft, close); grid clicks implement vanilla semantics (place-all / place-one / pickup / merge / swap) through cursor handling; result computed through the shared recipe matcher; shift-click = craft multiple; `modules/crafting/crafting.yml` config-driven

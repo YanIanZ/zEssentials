@@ -289,6 +289,26 @@
 | TL4 | Per-group header/footer (groups section) | Permission-based, group menang atas world |
 | TL5 | %anim_% di header | Animasi frame berputar per refresh |
 
+## 18b. Chat LPC
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| LP1 | Install LuckPerms + PAPI, set prefix group, chat dengan `%prefix%` di format | Prefix muncul di chat |
+| LP2 | Beri perm `essentials.chat.color.red`, format pakai `%name-color%` | Nama berwarna merah |
+| LP3 | Tanpa perm color | Nama pakai default-name-color |
+| LP4 | Tambah `world-chat-formats: {<world>: format}`, masuk world itu | Format world dipakai, menimpa group format |
+| LP5 | Tanpa LuckPerms terpasang, `%prefix%` di format | Placeholder hilang (empty), tidak bocor mentah |
+
+## 18c. Folia & perf
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| FP1 | Folia: step module terpicu (playtime milestone) | Tidak ada thread violation |
+| FP2 | Folia: publichomes INVENTORY mode | GUI terbuka tanpa error |
+| FP3 | Folia: warning escalation terpicu | Console command jalan via global scheduler |
+| FP4 | 20 player + mob disguise aktif, cek MSPT | Tidak ada lag dari ENTITY_METADATA scan |
+| FP5 | Banyak /nick random, tunggu 10 menit | SkinCache size turun (eviction jalan) |
+
 ---
 
 ## 19. Proxy relay (BungeeCord/Velocity)
