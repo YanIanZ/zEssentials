@@ -308,10 +308,10 @@ public abstract class ZUtils extends MessageUtils {
                 String configKey = paramName.replaceAll("([A-Z])", "-$1").toLowerCase();
 
                 Object value = map.containsKey(paramName) ? map.get(paramName) : map.get(configKey);
-                if (value == null && Number.class.isAssignableFrom(paramType)) {
+                if (value == null && (Number.class.isAssignableFrom(paramType) || paramType == int.class || paramType == long.class || paramType == double.class || paramType == float.class || paramType == short.class || paramType == byte.class)) {
                     value = 0;
                 }
-                if (value == null && Boolean.class.isAssignableFrom(paramType)) {
+                if (value == null && (Boolean.class.isAssignableFrom(paramType) || paramType == boolean.class)) {
                     value = false;
                 }
 

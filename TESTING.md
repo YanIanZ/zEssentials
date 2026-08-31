@@ -1,7 +1,7 @@
-op# zEssentials 1.1.0.0 — Checklist Pengujian Lengkap
+# zEssentials 1.2.1.0 — Checklist Pengujian Lengkap
 
 > Server: Paper / fork berbasis 26.2 • Java 21+
-> Gunakan jar `target/zEssentials-1.1.0.0.jar`
+> Gunakan jar `target/zEssentials-1.2.1.0.jar`
 > Laporkan bug: section nomor + console snippet + langkah reproduksi
 
 ---
@@ -9,310 +9,259 @@ op# zEssentials 1.1.0.0 — Checklist Pengujian Lengkap
 ## 0. Persiapan
 
 - [ ] Hapus SEMUA jar lama `zEssentials*.jar` dari `plugins/`
-- [ ] Salin `target/zEssentials-1.1.0.0.jar` ke `plugins/`
-- [ ] Hapus `plugins/zMenu-*.jar` & `plugins/PlaceholderAPI-*.jar` (test auto-install) ATAU biarkan (skip S1–S3)
+- [ ] Salin `target/zEssentials-1.2.1.0.jar` ke `plugins/`
 - [ ] Hapus folder `plugins/zEssentials` untuk fresh install ATAU backup & biarkan (test config update)
 
 ---
 
-## 1. Auto Install & Startup
+## 1. Startup & Config
 
-| #   | Aksi                                                                       | Ekspektasi                                                                                                                                                                                                                                |
-|-----|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1.1 | Start TANPA zMenu & PAPI                                                   | Console: "Missing required plugins... trying to install them" → PAPI download dari Hangar & **enable otomatis tanpa restart**; zMenu ter-download dari Modrinth ke `plugins/` tapi **warning "cannot be hot-loaded"** (Paper restriction) |
-| 1.2 | `dependency-loader.auto-restart: true` di `plugins/zEssentials/config.yml` | Setelah install, server shutdown sendiri + broadcast countdown 10s                                                                                                                                                                        |
-| 1.3 | Start kedua                                                                | zMenu load normal dari `plugins/zMenu-*.jar`; tidak ada download ulang                                                                                                                                                                    |
-| 1.4 | Start ketiga                                                               | Banner gradient `zEssentials ◆ 1.1.0.0 » ✔ enabled`; jumlah commands & modules tampil; tidak ada ERROR/WARN                                                                                                                               |
-| 1.5 | `/essentials`                                                              | Command utama terbuka; alias `/ess` & `/zessentials` tetap jalan                                                                                                                                                                          |
-| 1.6 | Stop server                                                                | Banner "✘ disabled" tanpa NPE/crash                                                                                                                                                                                                       |
-
----
-
-## 2. Effects Module
-
-| #   | Aksi                                 | Ekspektasi                                                                                         |
-|-----|--------------------------------------|----------------------------------------------------------------------------------------------------|
-| 2.1 | `/tpa <p>` → target accept           | Ring portal di titik asal & tujuan + suara enderman                                                |
-| 2.2 | `/rtp`                               | Ring portal + suara                                                                                |
-| 2.3 | `/warp <name>`                       | Ring portal + suara                                                                                |
-| 2.4 | `/spawn`                             | Ring portal + suara                                                                                |
-| 2.5 | `/gamemode creative` lalu `survival` | Burst HAPPY_VILLAGER + levelup sound                                                               |
-| 2.6 | `/fly on` lalu `/fly off`            | Burst CLOUD                                                                                        |
-| 2.7 | `/heal <p>`                          | Sparkle TOTEM_OF_UNDYING + levelup                                                                 |
-| 2.8 | `/god <p>` (on saja)                 | Sparkle totem                                                                                      |
-| 2.9 | Console log startup                  | Line `Effects loaded: teleport=PORTAL gamemode=HAPPY_VILLAGER fly=CLOUD blessing=TOTEM_OF_UNDYING` |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| S1 | Start server fresh (no plugins/zEssentials folder) | Plugin enable, buat config.yml + semua module configs |
+| S2 | Cek console untuk error | Tidak ada `Failed to create instance from map` atau `MongoConfiguration` NPE |
+| S3 | Restart server | Config self-heal berjalan, tidak ada error |
+| S4 | Set `storage-type: MONGO` tanpa isi mongo-configuration | Tidak crash — default values (port=0, host=null) |
+| S5 | Set `storage-type: SQLITE` (default) | Plugin enable normal |
 
 ---
 
-## 3. Terms of Service
+## 2. Nicknames Module
 
-| #    | Aksi                           | Ekspektasi                                                              |
-|------|--------------------------------|-------------------------------------------------------------------------|
-| 3.1  | Join dengan player baru        | ±0.3s muncul **dialog Mojang asli** (bukan chest) berisi rules + tombol |
-| 3.2  | ESC untuk tutup dialog         | Dialog terbuka ulang otomatis (masih pending)                           |
-| 3.3  | Ketik command selain `/terms*` | Diblokir + pesan "Accept the terms first"                               |
-| 3.4  | Ketik pesan di chat            | Diblokir                                                                |
-| 3.5  | Klik tombol **ACCEPT**         | Dialog tertutup, pesan "Terms accepted"; tersimpan permanen             |
-| 3.6  | Rejoin setelah accept          | Tidak ada dialog lagi                                                   |
-| 3.7  | Klik tombol **REFUSE**         | Kick dengan layar terms refuse (hex color bekerja)                      |
-| 3.8  | Diam > timeout (default 60s)   | Kick dengan layar timeout                                               |
-| 3.9  | `/terms reset <p>` (console)   | Reset; join berikutnya dapat dialog lagi                                |
-| 3.10 | `/terms reload`                | Config di-reload tanpa restart                                          |
-
----
-
-## 4. Freeze / Unfreeze
-
-| #   | Aksi                                          | Ekspektasi                                                                                                                                  |
-|-----|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| 4.1 | `/freeze <p>`                                 | Target: TIDAK bisa gerak (kepala boleh diputar), glow biru, partikel salju mengorbit (3 level), walk+fly speed = 0, chat & command diblokir |
-| 4.2 | `/freeze <p>` (ulang)                         | Idempotent — tetap frozen, tidak toggle                                                                                                     |
-| 4.3 | `/unfreeze <p>`                               | Bebas gerak, glow hilang, partikel berhenti, walk 0.2 / fly 0.1 dipulihkan                                                                  |
-| 4.4 | Setelah unfreeze: `/fly on` → jalan & terbang | **Regression test**: bebas gerak, tidak stuck                                                                                               |
-| 4.5 | Reconnect (persist=false default)             | Auto-release, tidak stuck                                                                                                                   |
-| 4.6 | GUI sanction tombol freeze                    | Toggle behavior tetap bekerja                                                                                                               |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| N1 | `/nick Steve` | Display name berubah jadi "Steve", pesan konfirmasi |
+| N2 | `/nick off` | Nickname dihapus, kembali ke real name |
+| N3 | `/nick &cRedName` | Nickname berwarna merah (jika allow-colors: true) |
+| N4 | `/nick <player> &bBlue` (admin) | Nickname player lain berubah |
+| N5 | `/nick` tanpa arg | Pesan usage |
+| N6 | Tab-complete `/nick ` | Suggestions: "off" + online player names |
+| N7 | `/nick verylongnamethatiswaytoolong` | Pesan error "too long" (max-length) |
+| N8 | `/nick bad!name` | Pesan error "forbidden characters" |
+| N9 | `/nick` cepat 2x dalam cooldown | Pesan cooldown dengan detik tersisa |
+| N10 | Rejoin setelah /nick | Nickname tetap ada (persisted) |
+| N11 | Cek `/nick` dengan hex color `&#ff0000Red` | Hex color render benar (bukan §#ff0000) |
 
 ---
 
-## 5. Effects — Regression
+## 3. Disguise System
 
-| #   | Aksi                                                     | Ekspektasi                                      |
-|-----|----------------------------------------------------------|-------------------------------------------------|
-| 5.1 | Console startup: tidak ada "An error with loading field" | Semua field @NonLoadable bekerja                |
-| 5.2 | `/fly add <p> 1d12h30m`                                  | Durasi terakumulasi: 1 hari + 12 jam + 30 menit |
-| 5.3 | `/fly add <p> 10d`                                       | 10 hari ditambahkan                             |
-| 5.4 | `/fly info`                                              | Sisa waktu terformat benar                      |
-| 5.5 | `/eco give <p> 1k`                                       | Saldo +1,000                                    |
-| 5.6 | `/eco give <p> 1.5m`                                     | Saldo +1,500,000                                |
-| 5.7 | `/eco give <p> 2b`                                       | Saldo +2,000,000,000                            |
+### 3.1 Basic Disguise
 
----
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| D1 | `/disguise Notch` (Notch online) | Name + skin berubah jadi Notch, pesan konfirmasi |
+| D2 | Lihat skin di F5 (third person) | Jika self-view: false → tetap lihat skin asli. Jika true → lihat skin disguise |
+| D3 | Player lain melihat | Mereka lihat name + skin Notch |
+| D4 | Tab list | Nama berubah jadi Notch |
+| D5 | Name above head (NameTag) | Menampilkan disguise name |
+| D6 | Chat | Name di chat menampilkan disguise name |
+| D7 | `/disguise off` | Disguise dihapus, kembali ke real name + skin |
+| D8 | `/undisguise` | Sama seperti `/disguise off` |
+| D9 | Rejoin setelah disguise | Disguise tetap ada (persisted di disguises.json) |
 
-## 6. Chat Module v2
+### 3.2 Admin Disguise
 
-### 6a. Display Keywords
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| D10 | `/disguise <target> <player>` (admin) | Target di-disguise sebagai player lain |
+| D11 | `/undisguise <player>` (admin) | Disguise player lain dihapus |
+| D12 | `/disguise <target> off` (admin) | Sama seperti /undisguise <target> |
 
-| #    | Ketik di chat              | Ekspektasi                                                          |
-|------|----------------------------|---------------------------------------------------------------------|
-| 6.1  | `[item]` atau `[i]`        | Nama item ×jumlah, hover tooltip item, klik menjalankan `/showitem` |
-| 6.2  | `[inv]` atau `[inventory]` | Badge [INV]; hover = semua item inventory; klik = copy ke clipboard |
-| 6.3  | `[ender]` atau `[ec]`      | Badge [ENDER CHEST]; hover = isi ender chest                        |
-| 6.4  | `[pos]` atau `[position]`  | `[x, y, z]`; klik suggest `/tp x y z`                               |
-| 6.5  | `[health]`                 | `❤ x/y`                                                             |
-| 6.6  | `[food]`                   | `🍖 x/20`                                                           |
-| 6.7  | `[money]`                  | Saldo terformat                                                     |
-| 6.8  | `[coins]`                  | Saldo coins terformat                                               |
-| 6.9  | `[store]`                  | Klik open_url; warna sesuai config                                  |
-| 6.10 | `[ip]`                     | Text server address                                                 |
+### 3.3 Random Disguise
 
-### 6b. Mention
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| D13 | `/disguise random` | Disguise sebagai random dari config pool |
+| D14 | `/disguise list` | Menampilkan list random pool dari config |
+| D15 | Kosongkan random-pool di config, `/disguise random` | Pesan "pool is empty" |
 
-| #    | Aksi                                | Ekspektasi                                                               |
-|------|-------------------------------------|--------------------------------------------------------------------------|
-| 6.11 | A ketik `hai @B`                    | Di layar B: `@B` gold bold + hover "Someone mentioned you!"; sound pling |
-| 6.12 | Di layar A: hover `@B`              | Hover "Click to message them"                                            |
-| 6.13 | Klik `@B` di layar A                | Suggest `/msg B ` di chat box                                            |
-| 6.14 | B punya `/dnd` aktif → A ketik `@B` | Tidak ada sound untuk B, highlight tetap ada                             |
+### 3.4 Custom Skin
 
-### 6c. Emoji & Slowmode
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| D16 | `/disguise skin <texture-value>` | Skin berubah, name tetap |
+| D17 | `/disguise skin <texture> <signature>` | Skin berubah dengan signature |
+| D18 | `/disguise skin <texture>` tanpa perm ESSENTIALS_DISGUISE_SKIN | No permission |
 
-| #    | Aksi                                           | Ekspektasi                          |
-|------|------------------------------------------------|-------------------------------------|
-| 6.15 | Ketik `:heart:`                                | Berubah jadi ❤                      |
-| 6.16 | Ketik `:100:`                                  | Berubah jadi 💯                     |
-| 6.17 | `/chatslowmode 5` → spam 2 pesan               | Pesan ke-2 ditolak dengan countdown |
-| 6.18 | `/chatslowmode 0`                              | Slowmode mati                       |
-| 6.19 | Staff dengan `essentials.chat.bypass.slowmode` | Tidak terkena slowmode              |
+### 3.5 Cooldown
 
-### 6d. Message Deletion
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| D19 | `/disguise` 2x dalam cooldown | Pesan cooldown dengan detik |
+| D20 | Bypass dengan perm ESSENTIALS_DISGUISE_BYPASS_COOLDOWN | Tidak ada cooldown |
 
-| #    | Aksi                           | Ekspektasi                                                            |
-|------|--------------------------------|-----------------------------------------------------------------------|
-| 6.20 | `/chathistory <p>` (moderator) | Tiap baris ada tombol ✖ merah                                         |
-| 6.21 | Klik ✖                         | Pesan hilang dari DB & list, page re-render dengan "resolved" message |
+### 3.6 Offline Player Skin
 
-### 6e. DND
-
-| #    | Aksi                    | Ekspektasi                                |
-|------|-------------------------|-------------------------------------------|
-| 6.22 | `/dnd`                  | "Do not disturb enabled"                  |
-| 6.23 | Orang lain mention Anda | Highlight tetap ada, TAPI tidak ada sound |
-| 6.24 | `/dnd` lagi             | "Do not disturb disabled"                 |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| D21 | `/disguise <offline-player>` | Pesan "Fetching skin...", lalu skin diambil dari Mojang API |
+| D22 | Disconnect internet, `/disguise <offline-player>` | Pesan "Failed to fetch skin" |
+| D23 | `/disguise <offline-player>` 2x (cache hit) | Instan (dari cache, no API call) |
 
 ---
 
-## 7. Chat Customization
+## 4. Storage Migration
 
-### 7a. `/chatcolor`
-
-| #   | Aksi                          | Ekspektasi                                                               |
-|-----|-------------------------------|--------------------------------------------------------------------------|
-| 7.1 | `/chatcolor`                  | GUI 45 slot terbuka: 16 warna di 2 baris + RESET + BOLD + ITALIC + CLOSE |
-| 7.2 | Klik warna (mis. Gold)        | Chat color tersimpan; pesan konfirmasi; berlaku di chat berikutnya       |
-| 7.3 | Klik BOLD                     | Toggle bold ON/OFF (glint saat ON); berlaku di chat                      |
-| 7.4 | Klik ITALIC                   | Toggle italic ON/OFF; berlaku di chat                                    |
-| 7.5 | Klik RESET                    | Semua kembali default                                                    |
-| 7.6 | Player tanpa perm decorations | Slot BOLD/ITALIC tidak berfungsi                                         |
-
-### 7b. `/tags`
-
-| #    | Aksi                  | Ekspektasi                                                              |
-|------|-----------------------|-------------------------------------------------------------------------|
-| 7.7  | `/tags`               | GUI tag terbuka; tag "None" di depan; tag terkunci tampil gray dye      |
-| 7.8  | Klik tag (mis. ✦ PRO) | Tag tersimpan; pesan konfirmasi; muncul sebelum rank di chat berikutnya |
-| 7.9  | Klik "None"           | Tag dihapus                                                             |
-| 7.10 | Rejoin                | Tag masih dipakai (persisted)                                           |
-
-### 7c. Regresi
-
-| #    | Aksi                                     | Ekspektasi                                                                        |
-|------|------------------------------------------|-----------------------------------------------------------------------------------|
-| 7.11 | Nickname aktif + tag aktif + color aktif | Ketiga fitur bekerja BERSAMAAN di chat: `[tag] [rank] NickName: <colored>message` |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| M1 | Punya nicknames.json lama, start server | Migrasi ke disguises.json, nicknames tetap |
+| M2 | Cek file `disguises.json` dibuat | Entry ada dengan disguiseName, textureValue=null |
+| M3 | Hapus nicknames.json, restart | Data tetap dari disguises.json |
 
 ---
 
-## 8. Chat Bubbles
+## 5. Chat Module
 
-| #   | Aksi                                   | Ekspektasi                                                                     |
-|-----|----------------------------------------|--------------------------------------------------------------------------------|
-| 8.1 | Ketik pesan di chat                    | Bubble muncul di atas kepala, mengikuti gerakan player (passenger mount)       |
-| 8.2 | Jalan/lari/terbang dengan bubble aktif | Bubble mengikuti mulus, TIDAK tertinggal, TIDAK error console                  |
-| 8.3 | Kirim 3 pesan berturut-turut           | Bubble tumpuk: pesan TERBARU di bawah (dekat kepala), yang LAMA terdorong NAIK |
-| 8.4 | Tunggu `duration-seconds` (default 6s) | Bubble hilang otomatis; bubble di atasnya turun ke posisi baru                 |
-| 8.5 | Emoji `:heart:` dalam pesan            | Emoji tampil di bubble                                                         |
-| 8.6 | Quit saat bubble aktif                 | Bubble hilang, tidak ada orphan entity                                         |
-
----
-
-## 9. TAB List Parity
-
-### 9a. Header/Footer
-
-| #   | Aksi                                                   | Ekspektasi                                              |
-|-----|--------------------------------------------------------|---------------------------------------------------------|
-| 9.1 | Login                                                  | Header & footer tab list tampil dengan warna hex + PAPI |
-| 9.2 | Tunggu `refresh-seconds` (default 5s)                  | Placeholders seperti `%server_online%` ter-update       |
-| 9.3 | `%anim_gradient-title%` di header (dengan anim config) | Frame berganti tiap refresh                             |
-
-### 9b. Belowname
-
-| #   | Aksi                                       | Ekspektasi                                                              |
-|-----|--------------------------------------------|-------------------------------------------------------------------------|
-| 9.4 | `mode: HEALTH`                             | Angka HP tampil di bawah nametag semua pemain + display name `♥ Health` |
-| 9.5 | `mode: PLACEHOLDER` + `refresh-seconds: 3` | Score dari PAPI placeholder ter-update tiap 3 detik                     |
-
-### 9c. Nametags & Sorting
-
-| #   | Aksi                               | Ekspektasi                                                        |
-|-----|------------------------------------|-------------------------------------------------------------------|
-| 9.6 | Join (dengan LuckPerms grup admin) | Prefix `⚔ ADMIN` muncul di atas kepala & di tab list sebelum nama |
-| 9.7 | Tab list                           | Admin teratas, lalu mod, lalu vip, lalu default (urut priority)   |
-| 9.8 | Player SPECTATOR mode              | Tab name berubah "&8&oSpectator"                                  |
-| 9.9 | Kembali ke survival                | Tab name kembali normal                                           |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| C1 | Type `[item]` in chat | Menampilkan item hover |
+| C2 | Type `[pos]` in chat | Menampilkan koordinat dengan click-to-tp |
+| C3 | `/msg <player> hello` | Private message terkirim |
+| C4 | `/dnd` | DND toggle, ping sound suppressed |
+| C5 | `/chathistory` | Chat history GUI terbuka |
+| C6 | `/poll create <s> Question? | Yes | No` | Poll dibuat dengan clickable options |
+| C7 | `/chatgames start` | Chat game dimulai |
+| C8 | `/nick &cTest` lalu chat | Chat name menampilkan nickname berwarna |
 
 ---
 
-## 10. Nicknames
+## 6. Network & Social
 
-| #    | Aksi                              | Ekspektasi                               |
-|------|-----------------------------------|------------------------------------------|
-| 10.1 | `/nick &b&lSpeedyBoi`             | Tab list name berubah; chat name berubah |
-| 10.2 | `/nick` > 16 chars                | Error TOO LONG                           |
-| 10.3 | Nick sama dengan nama pemain lain | IMPERSONATION error                      |
-| 10.4 | `/nick` ganti lagi ≤ 60s          | Cooldown error                           |
-| 10.5 | `/nick off`                       | Nama asli kembali                        |
-| 10.6 | Rejoin dengan nick aktif          | Nick tetap terpasang (persisted)         |
-
----
-
-## 11. Reports
-
-| #    | Aksi                            | Ekspektasi                                                          |
-|------|---------------------------------|---------------------------------------------------------------------|
-| 11.1 | `/report <p> griefing base`     | Moderator online: alert merah + pling sound, klik teleport          |
-| 11.2 | Report kedua ≤ 60s              | Pesan cooldown + detik tersisa                                      |
-| 11.3 | `/reports`                      | **Screen GUI** terbuka (bukan chat): tiap laporan = paper clickable |
-| 11.4 | Left click paper                | Resolve; screen refresh tanpa report tsb                            |
-| 11.5 | Right click paper               | Teleport ke target (jika online)                                    |
-| 11.6 | Join staff saat ada open report | Reminder count                                                      |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| NW1 | `/g` toggle | Global chat toggle on/off |
+| NW2 | `/friend add <player>` | Friend request terkirim |
+| NW3 | `/friend accept <player>` | Friend ditambah |
+| NW4 | `/friend list` | List friends |
+| NW5 | `/guild create TestGuild` | Guild dibuat, jadi leader |
+| NW6 | `/guild invite <player>` | Invite terkirim |
+| NW7 | `/gc hello` | Guild chat message |
+| NW8 | `/party create` | Party dibuat |
+| NW9 | `/party invite <player>` | Invite terkirim |
+| NW10 | `/pc hello` | Party chat message |
 
 ---
 
-## 12. Polls
+## 7. Enderchest & Stash
 
-| #    | Aksi                              | Ekspektasi                                     |
-|------|-----------------------------------|------------------------------------------------|
-| 12.1 | `/poll create 30 Makanan favorit? | Pizza                                          | Bakso` | Kartu poll broadcast; opsi clickable |
-| 12.2 | Vote pizza                        | Counter +1; ✔ pada pilihan; revote pindah opsi |
-| 12.3 | Tunggu habis 30s                  | Bar hasil % + winner announcement              |
-| 12.4 | `/poll vote 1` (tanpa poll)       | "There is no open poll"                        |
-| 12.5 | `/poll stop`                      | Poll berakhir                                  |
-
-## 13. Reputation
-
-| #    | Aksi                   | Ekspektasi                                     |
-|------|------------------------|------------------------------------------------|
-| 13.1 | `/rep <p2>`            | +1 given; broadcast dengan hex color `#a7ff33` |
-| 13.2 | `/rep <p2>` lagi ≤ 24h | Pesan ALREADY                                  |
-| 13.3 | `/rep <self>`          | Pesan SELF                                     |
-| 13.4 | `/reputation <p2>`     | Skor benar                                     |
-
-## 14. Chat Games
-
-| #    | Aksi                    | Ekspektasi                                                       |
-|------|-------------------------|------------------------------------------------------------------|
-| 14.1 | `/chatgames math`       | Soal matematika broadcast; jawab benar → winner + reward command |
-| 14.2 | `/chatgames scramble`   | Kata diacak; jawab asli                                          |
-| 14.3 | `/chatgames fast-type`  | Kalimat; ketik persis                                            |
-| 14.4 | `/chatgames reverse`    | Kata dibalik; ketik asli                                         |
-| 14.5 | `/chatgames trivia`     | Q&A dari config                                                  |
-| 14.6 | `/chatgames hot-letter` | Ketik kata awalan X ≥ min length                                 |
-| 14.7 | `/chatgames stop`       | Batal + pengumuman                                               |
-| 14.8 | Jawaban salah           | Tidak terjadi apa-apa (message tetap jalan normal)               |
-
-## 15. Staff Notes
-
-| #    | Aksi                           | Ekspektasi                                     |
-|------|--------------------------------|------------------------------------------------|
-| 15.1 | `/note add <p> "Review build"` | Note added                                     |
-| 15.2 | `/notes <p>`                   | Header + tiap note dengan tanggal & staff name |
-| 15.3 | `/notes clear <p>`             | Count removed; list kosong                     |
-
-## 16. Raid Protection
-
-| #    | Aksi                                | Ekspektasi                                                                           |
-|------|-------------------------------------|--------------------------------------------------------------------------------------|
-| 16.1 | 3 pemain ketik pesan sama dalam 10s | Pesan ke-3+ di-cancel; moderator alert ⚠ merah; action command jalan (jika dikonfig) |
-| 16.2 | 1 pemain spam pesan sama            | TIDAK memicu raid (butuh ≥ 2 pemain berbeda)                                         |
-
-## 17. Sleep
-
-| #    | Aksi                            | Ekspektasi                                                          |
-|------|---------------------------------|---------------------------------------------------------------------|
-| 17.1 | Player tidur (50% dari online)  | Broadcast "night is moving faster"; waktu bergeser +100 ticks/detik |
-| 17.2 | Cukup pemain tidur sampai fajar | Broadcast "Good morning"; waktu = pagi; tidak instan                |
-| 17.3 | Player bangun sebelum fajar     | Akselerasi berhenti; waktu freeze di posisi terakhir                |
-| 17.4 | Nether/End tidak terpengaruh    | Hanya overworld                                                     |
-
-## 18. Custom Screens
-
-| #    | Aksi                  | Ekspektasi                                         |
-|------|-----------------------|----------------------------------------------------|
-| 18.1 | `/screen`             | Contoh screen terbuka (dari `screens/example.yml`) |
-| 18.2 | Klik tombol di screen | Aksi berjalan (console_command, message, dsb)      |
-
-## 19. Warnings
-
-| #    | Aksi                 | Ekspektasi                                           |
-|------|----------------------|------------------------------------------------------|
-| 19.1 | `/warn <p> <reason>` | Target terima warning; tersimpan; notify broadcast   |
-| 19.2 | Capai 3 warnings     | Console: escalation command dieksekusi (mis. ban 1d) |
-| 19.3 | `/warnings <p>`      | List semua warnings dengan tanggal & reason          |
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| E1 | `/enderchest` | Enderchest GUI terbuka (54 slot, paginated) |
+| E2 | `/endersee <player>` (admin) | Lihat enderchest player lain (read-only) |
+| E3 | `/stash` | Category picker (Item Stash / Material Stash) |
+| E4 | `/stash item` | Item stash GUI terbuka |
+| E5 | `/stash material` | Material stash GUI terbuka |
 
 ---
 
-## ✅ Selesai Testing
+## 8. Pricing & Tooltips
 
-Jika SEMUA item lulus → rilis **1.1.0.0** siap produksi!
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| P1 | `/pricing` toggle | Price display on/off |
+| P2 | Buka inventory dengan item yang ada di shop | Tooltip menampilkan harga |
+| P3 | Install RoyaleEconomy, cek tooltip | Harga dari RoyaleEconomy muncul |
 
-**Lapor bug:** section nomor + console snippet + langkah reproduksi.
+---
+
+## 9. Crafting
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| CR1 | `/craft` atau buka crafting table | Custom crafting GUI (54 slot) |
+| CR2 | Craft item dengan recipe valid | Item hasil muncul |
+| CR3 | Tutup GUI dengan item di slot | Item kembali ke inventory |
+
+---
+
+## 10. Vanish
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| V1 | `/vanish` | Vanish toggle, fake quit message |
+| V2 | `/vanish <player>` (admin) | Toggle vanish player lain |
+| V3 | Cek pickup items saat vanish | Tidak bisa pickup |
+| V4 | `/vanish` lagi | Unvanish, fake join message |
+
+---
+
+## 11. Effects & Visuals
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| EF1 | `/tpa <player>`, accept | Particle ring effect di lokasi asal & tujuan |
+| EF2 | `/warp <name>` | Particle ring effect |
+| EF3 | `/fly` | Particle effect |
+| EF4 | `/gamemode creative` | Burst effect |
+
+---
+
+## 12. Terms & Rules
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| T1 | Fresh player join | Terms dialog muncul |
+| T2 | Klik Accept | Terms diterima, bisa main |
+| T3 | Klik Deny | Kick |
+| T4 | `/terms reset <player>` (admin) | Terms reset, player harus accept lagi |
+
+---
+
+## 13. Reports & Notes
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| R1 | `/report <player> hacking` | Report terkirim ke staff |
+| R2 | `/reports` (staff) | Reports screen GUI terbuka |
+| R3 | Click teleport di report | Teleport ke reported player |
+| R4 | `/note add <player> <text>` (admin) | Note ditambah |
+| R5 | `/notes <player>` (admin) | List notes |
+
+---
+
+## 14. Hex Color Verification
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| H1 | `/nick &#ff0000Red` | Name merah hex (bukan broken §#ff0000) |
+| H2 | Cek tablist dengan hex color di config | Hex render benar |
+| H3 | Cek nametag dengan hex color | Hex render benar |
+| H4 | Cek poll dengan hex color | Hex render benar |
+| H5 | Cek chat bubbles dengan hex color | Hex render benar |
+
+---
+
+## 15. Config Healer
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| CH1 | Hapus baris dari module config, restart | Config self-heal menambahkan kembali |
+| CH2 | Tambah unknown key di config | Config self-heal tidak hapus |
+| CH3 | Bump config-version di nicknames/config.yml dari 2 → 1 | Config self-heal update ke v2 |
+| CH4 | Cek semua 49 module configs punya config-version | Semua ada config-version: 1 atau 2 |
+
+---
+
+## 16. Performance & Folia
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| F1 | Enable Folia, start server | Plugin enable tanpa error |
+| F2 | `/tpa` di Folia | Teleport berhasil (teleportAsync) |
+| F3 | Disguise di Folia | Skin refresh berhasil |
+| F4 | 20 players online, semua disguise | Tidak ada lag spike |
+| F5 | Toggle vanish di Folia | Scoreboard ops di runNextTick, no crash |
+
+---
+
+## 17. Build & Tests
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| B1 | `./gradlew build -x test --console=plain` | BUILD SUCCESSFUL, jar di target/ |
+| B2 | `./gradlew test --console=plain --no-daemon` | BUILD SUCCESSFUL |
+| B3 | Cek test count | 137+ root tests, 892+ API tests |
+| B4 | `./gradlew :test --tests "dev.yanianz.essentials.disguise.DisguiseDataTest"` | 5 tests pass |
+| B5 | `./gradlew :test --tests "dev.yanianz.essentials.disguise.SkinCacheTest"` | 7 tests pass |
+| B6 | `./gradlew :test --tests "dev.yanianz.essentials.nicknames.NicknamesModuleTest"` | 11 tests pass |

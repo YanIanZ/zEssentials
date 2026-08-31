@@ -99,6 +99,45 @@ Small quality features:
 - [x] DiscordSRV outbound bridge (chat forwarded to the main discord channel via reflection, zero hard dependency)
 - [x] BungeeCord/Velocity chat relay (modules/bungeechat/config.yml): public chat broadcast through the plugin messaging channel, both ends need the module enabled — messages from other servers keep their colors and display the origin server name
 
+## Disguise system
+- [x] `/disguise <player>` — disguise as online player (name + skin at packet level via ProtocolLib)
+- [x] `/disguise random` — random from config pool, skin fetched from Mojang API async
+- [x] `/disguise skin <texture> [signature]` — custom skin from texture string
+- [x] `/disguise off` / `/undisguise [player]` — remove disguise (self or admin)
+- [x] Skin cache with TTL (24h default, configurable)
+- [x] Persistence — disguises.json with migration from old nicknames.json
+- [x] Full sync — NameTag, TabList, chat all use disguise name
+- [x] Self-view config toggle (disguised player sees own disguise or not)
+
+## Storage & database
+- [x] MongoDB backend (MongoStorage + 25 repositories, StorageType.MONGO)
+- [x] Redis activation for cross-server messaging
+- [x] Storage type selection: SQLITE, MYSQL, HIKARICP, MONGO
+
+## Item tooltips & pricing
+- [x] Real-time price tooltips via ProtocolLib packet interception (WINDOW_ITEMS/SET_SLOT)
+- [x] Multi-shop support: RoyaleEconomy, EconomyShopGUI, QuickShop hooks
+- [x] `/pricing` toggle command for per-player price display
+
+## Crafting & stash
+- [x] Custom crafting GUI with Bukkit recipe matching (shaped + shapeless)
+- [x] Quick Crafting for VIP+ permission
+- [x] Item Stash — 16 pages × 45 slots, permission-based pages, JSON persistence
+- [x] Material Stash — unlimited stackable storage, category picker
+
+## Network & social
+- [x] NetworkManager — BungeeCord plugin messaging transport
+- [x] Global chat relay (`/g` toggle)
+- [x] Friends system (`/friend add/accept/decline/remove/list`)
+- [x] Guild system (`/guild create/disband/join/leave/info`, ranks, `/gc` chat)
+- [x] Party system (`/party create/disband/invite/leave/info`, auto leader transfer, `/pc` chat)
+
+## Polish & fixes
+- [x] Fixed hex color rendering in 17 files (broken `colorize()` → `ColorUtil.sections()`)
+- [x] Nicknames polish — tab completion, cooldown feedback, validation messages
+- [x] Vanish polish — `COMMAND_VANISH_TOGGLED_OTHER` for targeting others
+- [x] Fixed `MongoConfiguration` NPE on empty config (primitive type handling in `createInstanceFromMap`)
+
 - [x] Command /tpaall
 - [x] Command /list
 - [x] Command /itemdb
