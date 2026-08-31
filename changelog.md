@@ -17,6 +17,21 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # 1.2.1.0
 
+## zMenu GUI — Crafting & Enderchest rebuilt
+
+- **Crafting GUI on zMenu** — new `ZESSENTIALS_CRAFT_INTERACTIVE` button owns every interactive slot of the Hypixel layout (3x3 grid, result, quick-craft, close); grid clicks implement vanilla semantics (place-all / place-one / pickup / merge / swap) through cursor handling; result computed through the shared recipe matcher; shift-click = craft multiple; `modules/crafting/crafting.yml` config-driven
+- **Quick Craft** — quick-craft slot renders for players with `essentials.crafting.quickcraft`; clicking repeats craft-all until the grid is exhausted
+- **Enderchest GUI on zMenu** — `ZESSENTIALS_ENDERCHEST_CONTENT` PaginateButton paginates the flat content (pages × 45) over the content slots with native `pagination_previous`/`pagination_next` buttons + `%openInventory.getPage%`/`%openInventory.getMaxPage%` indicator; every interaction writes through to `EnderChestData` (cross-page persistence); read-only enforced for `/endersee`
+- **Enderchest overview on zMenu** — `ZESSENTIALS_ENDERCHEST_OVERVIEW` page selector with locked pages grayed out; page click opens the chest on that page
+- **Per-player session state** — `CraftingSession` (grid + quick-craft permission) and `EnderChestSession` (target, page, read-only, visible/allowed pages)
+- **Removed Bukkit GUI stack** — CraftingGui/Holder/Listener and EnderChestGui/Holder/Listener deleted; block right-click, `/craft`, `/enderchest`, `/endersee` and the ProtocolLib OPEN_WINDOW interception all open the zMenu inventories now
+
+## Chat & identity bug fixes
+
+- **Fixed nick never showing in chat** — `setNickname(uuid, null)` overwrote the display name back to the real name immediately after `applyDisguise` set the nickname; `setNickname` now respects an active disguise and the `/nick` apply path no longer calls it (the disguise map is the single source of truth)
+- **Fixed tag rendering literally (`&⚔`)** — tag text from config with an orphan color prefix rendered raw in chat; `sanitizeTagText()` strips orphan ampersands/section signs, applied when saving and when resolving
+- **Honest skin messages** — new `nick-set-no-skin` message instead of the misleading "with a matching skin" when the Mojang fetch fails; `disguise.fallback-own-skin` (default true) applies the player's own skin as fallback
+
 ## Bug fixes
 
 - **Fixed** `MongoConfiguration` NPE on startup — `createInstanceFromMap` in `ZUtils` used `Number.class.isAssignableFrom()` which returns `false` for primitive types (`int.class`, `long.class`, etc.), so empty config maps caused `null` to be passed for primitive `int port`, triggering `NullPointerException` on unbox. Now handles all primitive types explicitly.

@@ -41,6 +41,24 @@ public class ButtonCraft extends Button {
     }
 
     @Override
+    public void onInventoryClose(Player player, InventoryEngine inventory) {
+        CraftingModule module = module();
+        if (module == null) return;
+        CraftingSession session = module.getSession(player);
+        for (int i = 0; i < 9; i++) {
+            ItemStack item = session.getGrid(i);
+            if (item != null) {
+                Map<Integer, ItemStack> overflow = player.getInventory().addItem(item);
+                for (ItemStack drop : overflow.values()) {
+                    player.getWorld().dropItemNaturally(player.getLocation(), drop);
+                }
+                session.setGrid(i, null);
+            }
+        }
+        module.clearSession(player);
+    }
+
+    @Override
     public void onRender(Player player, InventoryEngine inventory) {
         CraftingModule module = module();
         CraftingSession session = module == null ? null : module.getSession(player);

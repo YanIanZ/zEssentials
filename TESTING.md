@@ -135,13 +135,19 @@
 | C7 | Right-click enderchest | Ender chest overview terbuka (page selector ala Hypixel) |
 | C8 | Sneak + right-click enderchest | Vanilla enderchest (bypass) |
 | C9 | Disable enderchest module, right-click enderchest | Pesan "module disabled", no vanilla GUI |
-| C10 | `/enderchest` | Overview page selector terbuka |
+| C10 | `/enderchest` | Overview page selector terbuka (zMenu) |
 | C11 | Click page button (unlocked) | Page view terbuka dengan konten page itu |
 | C12 | Click locked page button | Tidak terjadi apa-apa (locked) |
-| C13 | Nav: click « First | Kembali ke page 1 |
-| C14 | Nav: click Last » | Lompat ke page terakhir |
-| C15 | Nav: ← Prev / Next → | Pindah page satu-satu |
-| C16 | `/endersee <player>` (admin) | Lihat enderchest player lain (read-only) |
+| C13 | Nav: click ← Previous / Next → | Pagination zMenu, indikator %page%/%max% update |
+| C14 | Letakkan item dari inventory ke slot content | Item pindah, persist ke file JSON |
+| C15 | Ambil item dari slot content | Item kembali ke cursor/inventory |
+| C16 | `/endersee <player>` (admin, read-only) | Semua click di-cancel, tidak bisa ambil/letak |
+| C17 | `/craft` — klik grid slot dengan item di cursor | Item terletak (LEFT=all, RIGHT=1), hasil muncul di slot result |
+| C18 | `/craft` — klik result dengan item | Item hasil ke inventory, bahan berkurang 1 |
+| C19 | `/craft` — shift-click result | Craft multiple |
+| C20 | `/craft` dengan perm quickcraft | Tombol quick craft tampil; klik = craft semua |
+| C21 | `/craft` tanpa perm quickcraft | Slot quick craft kosong (tidak ada tombol) |
+| C22 | Close crafting dengan item di grid | Item di grid kembali ke inventory (via relog/session — cek tidak duplikat) |
 
 ---
 
