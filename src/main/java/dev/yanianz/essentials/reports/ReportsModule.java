@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dev.yanianz.essentials.util.ColorUtil;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
+import fr.maxlego08.essentials.api.dto.ReportDTO;
 import fr.maxlego08.essentials.module.ZModule;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -16,7 +17,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +80,7 @@ public class ReportsModule extends ZModule {
 
         this.reports.clear();
         this.idCounter.set(1);
+        migrateOldStorage();
         loadStorage();
     }
 
@@ -124,7 +125,7 @@ public class ReportsModule extends ZModule {
         Report report = new Report(id, reporterUuid, reporter.getName(), targetUuid, targetName, reason, now);
         this.reports.put(id, report);
         this.lastReportAt.put(reporterUuid, now);
-        saveStorage();
+        getStorage().upsertReport(new ReportDTO(id, reporterUuid, reporter.getName(), targetUuid, targetName, reason, now, false));
 
         // Clean up old resolved reports above the history limit
         List<Report> resolvedReports = this.reports.values().stream()
@@ -132,7 +133,9 @@ public class ReportsModule extends ZModule {
                 .sorted((a, b) -> Long.compare(b.createdAt, a.createdAt))
                 .toList();
         for (int index = resolvedHistory; index < resolvedReports.size(); index++) {
-            this.reports.remove(resolvedReports.get(index).id);
+            int reportId = resolvedReports.get(index).id;
+            this.reports.remove(reportId);
+            getStorage().deleteReport(reportId);
         }
 
         // Alert every moderator online with a clickable teleport action
@@ -177,7 +180,8 @@ public class ReportsModule extends ZModule {
         Report report = this.reports.get(id);
         if (report != null) {
             report.resolved = resolved;
-            saveStorage();
+            getStorage().upsertReport(new ReportDTO(report.id, report.reporterUuid, report.reporterName,
+                    report.targetUuid, report.targetName, report.reason, report.createdAt, resolved));
         }
     }
 
@@ -194,63 +198,42 @@ public class ReportsModule extends ZModule {
     }
 
     private void loadStorage() {
+        List<ReportDTO> dtos = getStorage().getReports();
+        for (ReportDTO dto : dtos) {
+            Report report = new Report(dto.id(), dto.reporterUuid(), dto.reporterName(),
+                    dto.targetUuid(), dto.targetName(), dto.reason(), dto.createdAt());
+            report.resolved = dto.resolved();
+            this.reports.put(dto.id(), report);
+            if (dto.id() >= this.idCounter.get()) {
+                this.idCounter.set(dto.id() + 1);
+            }
+        }
+    }
 
+    private void migrateOldStorage() {
         File file = getStorageFile();
         if (!file.exists()) return;
-
         try {
             String json = Files.readString(file.toPath());
             RawStorage raw = this.gson.fromJson(json, RawStorage.class);
-            if (raw == null || raw.entries == null) return;
-
-            for (RawReport rawReport : raw.entries) {
-                try {
-                    Report report = new Report(rawReport.id,
-                            UUID.fromString(rawReport.reporter_uuid), rawReport.reporter_name,
-                            UUID.fromString(rawReport.target_uuid), rawReport.target_name,
-                            rawReport.reason, rawReport.created_at);
-                    report.resolved = rawReport.resolved;
-                    this.reports.put(rawReport.id, report);
-                    if (rawReport.id >= this.idCounter.get()) {
-                        this.idCounter.set(rawReport.id + 1);
+            if (raw != null && raw.entries != null) {
+                for (RawReport rawReport : raw.entries) {
+                    try {
+                        getStorage().upsertReport(new ReportDTO(rawReport.id,
+                                UUID.fromString(rawReport.reporter_uuid), rawReport.reporter_name,
+                                UUID.fromString(rawReport.target_uuid), rawReport.target_name,
+                                rawReport.reason, rawReport.created_at, rawReport.resolved));
+                    } catch (IllegalArgumentException ignored) {
                     }
-                } catch (IllegalArgumentException ignored) {
                 }
+            }
+            File migrated = new File(getFolder(), "reports.json.migrated");
+            if (!file.renameTo(migrated)) {
+                file.delete();
             }
         } catch (IOException | RuntimeException exception) {
             exception.printStackTrace();
         }
-    }
-
-    private void saveStorage() {
-
-        RawStorage raw = new RawStorage();
-        var list = new ArrayList<RawReport>();
-        for (Report report : getOpenReportsIncludingResolved()) {
-            RawReport rawReport = new RawReport();
-            rawReport.id = report.id;
-            rawReport.reporter_uuid = report.reporterUuid.toString();
-            rawReport.reporter_name = report.reporterName;
-            rawReport.target_uuid = report.targetUuid.toString();
-            rawReport.target_name = report.targetName;
-            rawReport.reason = report.reason;
-            rawReport.created_at = report.createdAt;
-            rawReport.resolved = report.resolved;
-            list.add(rawReport);
-        }
-        raw.entries = list.toArray(new RawReport[0]);
-
-        try {
-            Files.writeString(getStorageFile().toPath(), this.gson.toJson(raw));
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private List<Report> getOpenReportsIncludingResolved() {
-        return this.reports.values().stream()
-                .sorted((a, b) -> Integer.compare(a.id, b.id))
-                .toList();
     }
 
     private static final class RawStorage {

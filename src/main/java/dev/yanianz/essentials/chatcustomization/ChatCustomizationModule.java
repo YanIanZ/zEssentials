@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,6 +123,7 @@ public class ChatCustomizationModule extends ZModule {
                     permObj == null ? "" : String.valueOf(permObj)));
         }
 
+        migratePreferencesJsonToStorage();
         loadStorage();
     }
 
@@ -374,8 +376,9 @@ public class ChatCustomizationModule extends ZModule {
     }
 
     private void save(Player player, String colorCode, List<String> decorations, String tagText) {
-        this.preferences.put(player.getUniqueId(),
-                new Preference(colorCode, List.copyOf(decorations), sanitizeTagText(tagText)));
+        Preference preference = new Preference(colorCode, List.copyOf(decorations), sanitizeTagText(tagText));
+        this.preferences.put(player.getUniqueId(), preference);
+        this.plugin.getStorageManager().getStorage().upsertChatPreference(player.getUniqueId(), this.gson.toJson(preference));
     }
 
     /**
@@ -403,51 +406,40 @@ public class ChatCustomizationModule extends ZModule {
 
     /* ── persistence ──────────────────────────────────────── */
 
-    private File getStorageFile() {
-        return new File(getFolder(), "preferences.json");
-    }
-
-    @Override
-    public void onDisable() {
-        super.onDisable();
-        saveStorage();
-    }
-
     private void loadStorage() {
-        File file = getStorageFile();
+        Map<UUID, String> raw = this.plugin.getStorageManager().getStorage().getAllChatPreferences();
+        for (Map.Entry<UUID, String> entry : raw.entrySet()) {
+            try {
+                this.preferences.put(entry.getKey(), this.gson.fromJson(entry.getValue(), Preference.class));
+            } catch (RuntimeException ignored) {
+            }
+        }
+    }
+
+    private void migratePreferencesJsonToStorage() {
+        File file = new File(getFolder(), "preferences.json");
         if (!file.exists()) return;
         try {
             String json = Files.readString(file.toPath());
             Storage storage = this.gson.fromJson(json, Storage.class);
-            if (storage == null || storage.entries == null) return;
-
-            for (StorageEntry entry : storage.entries) {
-                try {
-                    this.preferences.put(UUID.fromString(entry.uuid),
-                            new Preference(entry.color == null ? "" : entry.color,
-                                    entry.decorations == null ? List.<String>of() : java.util.Arrays.asList(entry.decorations),
-                                    entry.tag == null ? "" : entry.tag));
-                } catch (IllegalArgumentException ignored) {
+            int count = 0;
+            if (storage != null && storage.entries != null) {
+                for (StorageEntry entry : storage.entries) {
+                    try {
+                        UUID uuid = UUID.fromString(entry.uuid);
+                        Preference preference = new Preference(
+                                entry.color == null ? "" : entry.color,
+                                entry.decorations == null ? List.<String>of() : java.util.Arrays.asList(entry.decorations),
+                                entry.tag == null ? "" : entry.tag);
+                        this.plugin.getStorageManager().getStorage().upsertChatPreference(uuid, this.gson.toJson(preference));
+                        count++;
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
             }
+            Files.move(file.toPath(), file.toPath().resolveSibling("preferences.json.migrated"), StandardCopyOption.REPLACE_EXISTING);
+            this.plugin.getLogger().info("Migrated " + count + " chat preferences from JSON to database");
         } catch (IOException | RuntimeException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private void saveStorage() {
-        Storage storage = new Storage();
-        for (Map.Entry<UUID, Preference> entry : this.preferences.entrySet()) {
-            StorageEntry storageEntry = new StorageEntry();
-            storageEntry.uuid = entry.getKey().toString();
-            storageEntry.color = entry.getValue().colorCode();
-            storageEntry.decorations = entry.getValue().decorations().toArray(new String[0]);
-            storageEntry.tag = entry.getValue().tagText();
-            storage.entries.add(storageEntry);
-        }
-        try {
-            Files.writeString(getStorageFile().toPath(), this.gson.toJson(storage));
-        } catch (IOException exception) {
             exception.printStackTrace();
         }
     }

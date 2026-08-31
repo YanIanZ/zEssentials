@@ -42,6 +42,8 @@ public class StashModule extends ZModule {
         this.materialTitle = config.getString("material-title", "&e&lMaterial Stash");
         this.pickerTitle = config.getString("picker-title", "&6&lStash");
         this.migrateFromVanilla = config.getBoolean("migrate-from-vanilla-inventory", true);
+
+        migrateJsonToDatabase();
     }
 
     public int getAllowedItemPages(Player player) {
@@ -77,10 +79,9 @@ public class StashModule extends ZModule {
 
     public ItemStashData getItemData(UUID playerId) {
         return itemDataCache.computeIfAbsent(playerId, id -> {
-            File file = getItemFile(id);
-            if (file.exists()) {
-                ItemStashData loaded = dev.yanianz.essentials.stash.ItemStashSerializer.deserialize(
-                        readFile(file), id);
+            String json = getStorage().getItemStash(id);
+            if (json != null) {
+                ItemStashData loaded = dev.yanianz.essentials.stash.ItemStashSerializer.deserialize(json, id);
                 if (loaded != null) return loaded;
             }
             ItemStashData data = new ItemStashData(id, maxItemPages);
@@ -106,15 +107,14 @@ public class StashModule extends ZModule {
     public void saveItemData(UUID playerId) {
         ItemStashData data = itemDataCache.get(playerId);
         if (data == null) return;
-        writeFile(getItemFile(playerId), dev.yanianz.essentials.stash.ItemStashSerializer.serialize(data));
+        getStorage().upsertItemStash(playerId, dev.yanianz.essentials.stash.ItemStashSerializer.serialize(data));
     }
 
     public MaterialStashData getMaterialData(UUID playerId) {
         return materialDataCache.computeIfAbsent(playerId, id -> {
-            File file = getMaterialFile(id);
-            if (file.exists()) {
-                MaterialStashData loaded = dev.yanianz.essentials.stash.MaterialStashSerializer.deserialize(
-                        readFile(file), id);
+            String json = getStorage().getMaterialStash(id);
+            if (json != null) {
+                MaterialStashData loaded = dev.yanianz.essentials.stash.MaterialStashSerializer.deserialize(json, id);
                 if (loaded != null) return loaded;
             }
             return new MaterialStashData(id);
@@ -124,29 +124,42 @@ public class StashModule extends ZModule {
     public void saveMaterialData(UUID playerId) {
         MaterialStashData data = materialDataCache.get(playerId);
         if (data == null) return;
-        writeFile(getMaterialFile(playerId), dev.yanianz.essentials.stash.MaterialStashSerializer.serialize(data));
+        getStorage().upsertMaterialStash(playerId, dev.yanianz.essentials.stash.MaterialStashSerializer.serialize(data));
     }
 
-    private File getItemFile(UUID playerId) {
-        File dir = new File(getFolder(), "data/items");
-        if (!dir.exists()) dir.mkdirs();
-        return new File(dir, playerId + ".json");
+    private void migrateJsonToDatabase() {
+        migrateJsonDir(new File(getFolder(), "data/items"), "item stash",
+                (uuid, json) -> getStorage().upsertItemStash(uuid,
+                        dev.yanianz.essentials.stash.ItemStashSerializer.serialize(
+                                dev.yanianz.essentials.stash.ItemStashSerializer.deserialize(json, uuid))));
+        migrateJsonDir(new File(getFolder(), "data/materials"), "material stash",
+                (uuid, json) -> getStorage().upsertMaterialStash(uuid,
+                        dev.yanianz.essentials.stash.MaterialStashSerializer.serialize(
+                                dev.yanianz.essentials.stash.MaterialStashSerializer.deserialize(json, uuid))));
     }
 
-    private File getMaterialFile(UUID playerId) {
-        File dir = new File(getFolder(), "data/materials");
-        if (!dir.exists()) dir.mkdirs();
-        return new File(dir, playerId + ".json");
-    }
-
-    private String readFile(File file) {
-        try { return new String(java.nio.file.Files.readAllBytes(file.toPath())); }
-        catch (Exception e) { return ""; }
-    }
-
-    private void writeFile(File file, String content) {
-        try { java.nio.file.Files.writeString(file.toPath(), content); }
-        catch (Exception e) { e.printStackTrace(); }
+    private void migrateJsonDir(File dir, String label, java.util.function.BiConsumer<UUID, String> upserter) {
+        if (!dir.exists() || !dir.isDirectory()) return;
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".json"));
+        if (files == null || files.length == 0) return;
+        int count = 0;
+        for (File file : files) {
+            String fileName = file.getName();
+            String uuidStr = fileName.substring(0, fileName.length() - ".json".length());
+            try {
+                UUID uuid = UUID.fromString(uuidStr);
+                String json = new String(java.nio.file.Files.readAllBytes(file.toPath()));
+                upserter.accept(uuid, json);
+                File migrated = new File(dir, fileName + ".migrated");
+                file.renameTo(migrated);
+                count++;
+            } catch (Exception e) {
+                this.plugin.getLogger().warning("Failed to migrate " + label + " data for " + uuidStr + ": " + e.getMessage());
+            }
+        }
+        if (count > 0) {
+            this.plugin.getLogger().info("Migrated " + label + " data for " + count + " players from JSON to database");
+        }
     }
 
     public boolean isEnabled() { return enabled && isEnable; }

@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Simple reputation system: players give +1 points to each other with a
- * per target cooldown, the scores are stored in a small json file.
+ * per target cooldown, the scores are stored via IStorage.
  */
 public class ReputationModule extends ZModule {
 
@@ -44,6 +44,7 @@ public class ReputationModule extends ZModule {
         this.broadcastLine = config.getString("broadcast", "");
 
         this.reputations.clear();
+        migrateOldStorage();
         loadStorage();
     }
 
@@ -69,7 +70,7 @@ public class ReputationModule extends ZModule {
         }
 
         reputation.score++;
-        saveStorage();
+        getStorage().upsertReputation(target, gson.toJson(reputation));
         return Result.SUCCESS;
     }
 
@@ -95,48 +96,45 @@ public class ReputationModule extends ZModule {
     }
 
     private void loadStorage() {
-
-        File file = getStorageFile();
-        if (!file.exists()) return;
-
-        try {
-            String json = Files.readString(file.toPath());
-            RawStorage raw = this.gson.fromJson(json, RawStorage.class);
-            if (raw == null || raw.entries == null) return;
-
-            for (Map.Entry<String, RawEntry> entry : raw.entries.entrySet()) {
-                try {
-                    UUID uniqueId = UUID.fromString(entry.getKey());
-                    PlayerReputation reputation = new PlayerReputation();
-                    reputation.score = entry.getValue().score;
-                    if (entry.getValue().last_given_by != null) {
-                        for (Map.Entry<String, Long> giverEntry : entry.getValue().last_given_by.entrySet()) {
-                            reputation.lastGivenBy.put(UUID.fromString(giverEntry.getKey()), giverEntry.getValue());
-                        }
-                    }
-                    this.reputations.put(uniqueId, reputation);
-                } catch (IllegalArgumentException ignored) {
+        Map<UUID, String> all = getStorage().getAllReputations();
+        for (Map.Entry<UUID, String> entry : all.entrySet()) {
+            try {
+                PlayerReputation reputation = gson.fromJson(entry.getValue(), PlayerReputation.class);
+                if (reputation != null) {
+                    this.reputations.put(entry.getKey(), reputation);
                 }
+            } catch (RuntimeException ignored) {
             }
-        } catch (IOException | RuntimeException exception) {
-            exception.printStackTrace();
         }
     }
 
-    private void saveStorage() {
-
-        RawStorage raw = new RawStorage();
-        for (Map.Entry<UUID, PlayerReputation> entry : this.reputations.entrySet()) {
-            RawEntry rawEntry = new RawEntry();
-            rawEntry.score = entry.getValue().score;
-            rawEntry.last_given_by = new HashMap<>();
-            entry.getValue().lastGivenBy.forEach((uuid, millis) -> rawEntry.last_given_by.put(uuid.toString(), millis));
-            raw.entries.put(entry.getKey().toString(), rawEntry);
-        }
-
+    private void migrateOldStorage() {
+        File file = getStorageFile();
+        if (!file.exists()) return;
         try {
-            Files.writeString(getStorageFile().toPath(), this.gson.toJson(raw));
-        } catch (IOException exception) {
+            String json = Files.readString(file.toPath());
+            RawStorage raw = this.gson.fromJson(json, RawStorage.class);
+            if (raw != null && raw.entries != null) {
+                for (Map.Entry<String, RawEntry> entry : raw.entries.entrySet()) {
+                    try {
+                        UUID uniqueId = UUID.fromString(entry.getKey());
+                        PlayerReputation reputation = new PlayerReputation();
+                        reputation.score = entry.getValue().score;
+                        if (entry.getValue().last_given_by != null) {
+                            for (Map.Entry<String, Long> giverEntry : entry.getValue().last_given_by.entrySet()) {
+                                reputation.lastGivenBy.put(UUID.fromString(giverEntry.getKey()), giverEntry.getValue());
+                            }
+                        }
+                        getStorage().upsertReputation(uniqueId, gson.toJson(reputation));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+            }
+            File migrated = new File(getFolder(), "reputations.json.migrated");
+            if (!file.renameTo(migrated)) {
+                file.delete();
+            }
+        } catch (IOException | RuntimeException exception) {
             exception.printStackTrace();
         }
     }

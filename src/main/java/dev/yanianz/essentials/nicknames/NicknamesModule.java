@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,12 +109,16 @@ public class NicknamesModule extends ZModule {
         }
         this.skinCacheEvictTask = this.plugin.getScheduler().runTimer(this.skinCache::evictExpired, 600L * 20L, 600L * 20L);
 
+        migrateNicknamesJsonToStorage();
+        migrateDisguisesJsonToStorage();
+
         this.disguises.clear();
         loadDisguiseStorage();
-        migrateOldStorage();
 
         this.nicknames.clear();
         loadStorage();
+
+        migrateOldStorage();
     }
 
     /**
@@ -188,10 +193,11 @@ public class NicknamesModule extends ZModule {
 
         if (nickname == null || nickname.isBlank()) {
             this.nicknames.remove(uniqueId);
+            this.plugin.getStorageManager().getStorage().deleteNickname(uniqueId);
         } else {
             this.nicknames.put(uniqueId, nickname);
+            this.plugin.getStorageManager().getStorage().upsertNickname(uniqueId, nickname);
         }
-        saveStorage();
 
         Player player = Bukkit.getPlayer(uniqueId);
         if (player != null) {
@@ -258,7 +264,7 @@ public class NicknamesModule extends ZModule {
         data.setAppliedAt(System.currentTimeMillis());
         data.setActive(true);
         this.disguises.put(player.getUniqueId(), data);
-        saveDisguiseStorage();
+        this.plugin.getStorageManager().getStorage().upsertDisguise(player.getUniqueId(), this.gson.toJson(data));
 
         if (data.getDisguiseName() != null) {
             applyDisplayName(player, data.getDisguiseName());
@@ -268,7 +274,7 @@ public class NicknamesModule extends ZModule {
 
     public void removeDisguise(UUID uuid) {
         this.disguises.remove(uuid);
-        saveDisguiseStorage();
+        this.plugin.getStorageManager().getStorage().deleteDisguise(uuid);
 
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
@@ -421,102 +427,85 @@ public class NicknamesModule extends ZModule {
         IMPERSONATION
     }
 
-    private File getStorageFile() {
-        return new File(getFolder(), "nicknames.json");
+    private void loadStorage() {
+        this.nicknames.putAll(this.plugin.getStorageManager().getStorage().getAllNicknames());
     }
 
-    private void loadStorage() {
-        File file = getStorageFile();
+    private void loadDisguiseStorage() {
+        Map<UUID, String> raw = this.plugin.getStorageManager().getStorage().getAllDisguises();
+        for (Map.Entry<UUID, String> entry : raw.entrySet()) {
+            try {
+                this.disguises.put(entry.getKey(), this.gson.fromJson(entry.getValue(), DisguiseData.class));
+            } catch (RuntimeException ignored) {
+            }
+        }
+    }
+
+    private void migrateOldStorage() {
+        if (!this.disguises.isEmpty()) return;
+        for (Map.Entry<UUID, String> entry : this.nicknames.entrySet()) {
+            UUID uuid = entry.getKey();
+            if (this.disguises.containsKey(uuid)) continue;
+            DisguiseData data = new DisguiseData();
+            data.setPlayerId(uuid);
+            data.setDisguiseName(entry.getValue());
+            data.setAppliedAt(0);
+            data.setActive(true);
+            this.disguises.put(uuid, data);
+            this.plugin.getStorageManager().getStorage().upsertDisguise(uuid, this.gson.toJson(data));
+        }
+    }
+
+    private void migrateNicknamesJsonToStorage() {
+        File file = new File(getFolder(), "nicknames.json");
         if (!file.exists()) return;
         try {
             String json = Files.readString(file.toPath());
             Storage storage = this.gson.fromJson(json, Storage.class);
+            int count = 0;
             if (storage != null && storage.entries != null) {
                 for (Map.Entry<String, String> entry : storage.entries.entrySet()) {
                     try {
-                        this.nicknames.put(UUID.fromString(entry.getKey()), entry.getValue());
+                        UUID uuid = UUID.fromString(entry.getKey());
+                        this.plugin.getStorageManager().getStorage().upsertNickname(uuid, entry.getValue());
+                        count++;
                     } catch (IllegalArgumentException ignored) {
                     }
                 }
             }
+            Files.move(file.toPath(), file.toPath().resolveSibling("nicknames.json.migrated"), StandardCopyOption.REPLACE_EXISTING);
+            this.plugin.getLogger().info("Migrated " + count + " nicknames from JSON to database");
         } catch (IOException | RuntimeException exception) {
             exception.printStackTrace();
         }
     }
 
-    private void saveStorage() {
-        Storage storage = new Storage();
-        this.nicknames.forEach((uuid, nickname) -> storage.entries.put(uuid.toString(), nickname));
+    private void migrateDisguisesJsonToStorage() {
+        File file = new File(getFolder(), "disguises.json");
+        if (!file.exists()) return;
         try {
-            Files.writeString(getStorageFile().toPath(), this.gson.toJson(storage));
-        } catch (IOException exception) {
+            String json = Files.readString(file.toPath());
+            DisguiseStorage storage = this.gson.fromJson(json, DisguiseStorage.class);
+            int count = 0;
+            if (storage != null && storage.entries != null) {
+                for (Map.Entry<String, DisguiseData> entry : storage.entries.entrySet()) {
+                    try {
+                        UUID uuid = UUID.fromString(entry.getKey());
+                        this.plugin.getStorageManager().getStorage().upsertDisguise(uuid, this.gson.toJson(entry.getValue()));
+                        count++;
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+            }
+            Files.move(file.toPath(), file.toPath().resolveSibling("disguises.json.migrated"), StandardCopyOption.REPLACE_EXISTING);
+            this.plugin.getLogger().info("Migrated " + count + " disguises from JSON to database");
+        } catch (IOException | RuntimeException exception) {
             exception.printStackTrace();
         }
     }
 
     private static final class Storage {
         Map<String, String> entries = new HashMap<>();
-    }
-
-    private File getDisguiseStorageFile() {
-        return new File(getFolder(), "disguises.json");
-    }
-
-    @SuppressWarnings("unchecked")
-    private void loadDisguiseStorage() {
-        File file = getDisguiseStorageFile();
-        if (!file.exists()) return;
-        try {
-            String json = Files.readString(file.toPath());
-            DisguiseStorage storage = this.gson.fromJson(json, DisguiseStorage.class);
-            if (storage != null && storage.entries != null) {
-                for (Map.Entry<String, DisguiseData> entry : storage.entries.entrySet()) {
-                    try {
-                        this.disguises.put(UUID.fromString(entry.getKey()), entry.getValue());
-                    } catch (IllegalArgumentException ignored) {
-                    }
-                }
-            }
-        } catch (IOException | RuntimeException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private void saveDisguiseStorage() {
-        DisguiseStorage storage = new DisguiseStorage();
-        this.disguises.forEach((uuid, data) -> storage.entries.put(uuid.toString(), data));
-        try {
-            Files.writeString(getDisguiseStorageFile().toPath(), this.gson.toJson(storage));
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private void migrateOldStorage() {
-        File oldFile = getStorageFile();
-        if (!oldFile.exists()) return;
-        if (getDisguiseStorageFile().exists()) return;
-        try {
-            String json = Files.readString(oldFile.toPath());
-            Storage oldStorage = this.gson.fromJson(json, Storage.class);
-            if (oldStorage != null && oldStorage.entries != null) {
-                for (Map.Entry<String, String> entry : oldStorage.entries.entrySet()) {
-                    try {
-                        UUID uuid = UUID.fromString(entry.getKey());
-                        if (this.disguises.containsKey(uuid)) continue;
-                        DisguiseData data = new DisguiseData();
-                        data.setPlayerId(uuid);
-                        data.setDisguiseName(entry.getValue());
-                        data.setAppliedAt(0);
-                        data.setActive(true);
-                        this.disguises.put(uuid, data);
-                    } catch (IllegalArgumentException ignored) {
-                    }
-                }
-                saveDisguiseStorage();
-            }
-        } catch (IOException | RuntimeException ignored) {
-        }
     }
 
     private static final class DisguiseStorage {

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
+import fr.maxlego08.essentials.api.dto.NoteDTO;
 import fr.maxlego08.essentials.module.ZModule;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Private staff notes attached to players, persisted in a json file.
+ * Private staff notes attached to players, persisted via IStorage.
  */
 public class NotesModule extends ZModule {
 
@@ -34,20 +35,28 @@ public class NotesModule extends ZModule {
     public void loadConfiguration() {
         super.loadConfiguration();
         this.notes.clear();
-        loadStorage();
+        migrateOldStorage();
+        // Notes are loaded lazily per-player via getNotes()
     }
 
     /**
      * Adds a note to a player, written by a staff member.
      */
     public void addNote(UUID staffUuid, String staffName, UUID target, String content) {
+        long now = System.currentTimeMillis();
         this.notes.computeIfAbsent(target, k -> new ArrayList<>())
-                .add(new StaffNote(staffUuid, staffName, System.currentTimeMillis(), content));
-        saveStorage();
+                .add(new StaffNote(staffUuid, staffName, now, content));
+        getStorage().upsertNote(new NoteDTO(target, staffUuid, staffName, now, content));
     }
 
     public List<StaffNote> getNotes(UUID target) {
-        return new ArrayList<>(this.notes.getOrDefault(target, new ArrayList<>()));
+        return new ArrayList<>(this.notes.computeIfAbsent(target, k -> {
+            List<StaffNote> list = new ArrayList<>();
+            for (NoteDTO dto : getStorage().getNotes(target)) {
+                list.add(new StaffNote(dto.staffUuid(), dto.staffName(), dto.createdAt(), dto.content()));
+            }
+            return list;
+        }));
     }
 
     /**
@@ -57,59 +66,39 @@ public class NotesModule extends ZModule {
      */
     public int clearNotes(UUID target) {
         List<StaffNote> removed = this.notes.remove(target);
-        if (removed != null && !removed.isEmpty()) {
-            saveStorage();
-            return removed.size();
-        }
-        return 0;
+        int count = removed != null ? removed.size() : 0;
+        getStorage().clearNotes(target);
+        return count;
     }
 
     private File getStorageFile() {
         return new File(getFolder(), "notes.json");
     }
 
-    private void loadStorage() {
+    private void migrateOldStorage() {
         File file = getStorageFile();
         if (!file.exists()) return;
         try {
             String json = Files.readString(file.toPath());
             RawStorage raw = this.gson.fromJson(json, RawStorage.class);
-            if (raw == null || raw.entries == null) return;
-
-            for (Map.Entry<String, List<RawNote>> entry : raw.entries.entrySet()) {
-                try {
-                    UUID uniqueId = UUID.fromString(entry.getKey());
-                    List<StaffNote> list = new ArrayList<>();
-                    for (RawNote rawNote : entry.getValue()) {
-                        list.add(new StaffNote(UUID.fromString(rawNote.staff_uuid),
-                                rawNote.staff_name, rawNote.created_at, rawNote.content));
+            if (raw != null && raw.entries != null) {
+                for (Map.Entry<String, List<RawNote>> entry : raw.entries.entrySet()) {
+                    try {
+                        UUID playerUuid = UUID.fromString(entry.getKey());
+                        for (RawNote rawNote : entry.getValue()) {
+                            getStorage().upsertNote(new NoteDTO(playerUuid,
+                                    UUID.fromString(rawNote.staff_uuid), rawNote.staff_name,
+                                    rawNote.created_at, rawNote.content));
+                        }
+                    } catch (IllegalArgumentException ignored) {
                     }
-                    this.notes.put(uniqueId, list);
-                } catch (IllegalArgumentException ignored) {
                 }
             }
-        } catch (IOException | RuntimeException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private void saveStorage() {
-        RawStorage raw = new RawStorage();
-        for (Map.Entry<UUID, List<StaffNote>> entry : this.notes.entrySet()) {
-            List<RawNote> list = new ArrayList<>();
-            for (StaffNote note : entry.getValue()) {
-                RawNote rawNote = new RawNote();
-                rawNote.staff_uuid = note.staffUuid().toString();
-                rawNote.staff_name = note.staffName();
-                rawNote.created_at = note.createdAt();
-                rawNote.content = note.content();
-                list.add(rawNote);
+            File migrated = new File(getFolder(), "notes.json.migrated");
+            if (!file.renameTo(migrated)) {
+                file.delete();
             }
-            raw.entries.put(entry.getKey().toString(), list);
-        }
-        try {
-            Files.writeString(getStorageFile().toPath(), this.gson.toJson(raw));
-        } catch (IOException exception) {
+        } catch (IOException | RuntimeException exception) {
             exception.printStackTrace();
         }
     }

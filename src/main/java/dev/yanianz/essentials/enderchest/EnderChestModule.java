@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.UUID;
@@ -103,6 +102,8 @@ public class EnderChestModule extends ZModule {
 
         this.loadInventory("enderchest");
         this.loadInventory("enderchest_overview");
+
+        migrateJsonToDatabase();
     }
 
     public EnderChestSession getSession(Player viewer) {
@@ -143,9 +144,9 @@ public class EnderChestModule extends ZModule {
         EnderChestData data = dataCache.get(playerId);
         if (data != null) return data;
 
-        File file = getDataFile(playerId);
-        if (file.exists()) {
-            data = loadFromFile(file, playerId);
+        String json = getStorage().getEnderChest(playerId);
+        if (json != null) {
+            data = EnderChestSerializer.deserialize(json, playerId);
         }
         if (data == null) {
             data = new EnderChestData(playerId, maxPages);
@@ -153,7 +154,7 @@ public class EnderChestModule extends ZModule {
                 Player online = Bukkit.getPlayer(playerId);
                 if (online != null) {
                     migrateFromVanilla(data, online);
-                    saveToFile(data);
+                    getStorage().upsertEnderChest(playerId, EnderChestSerializer.serialize(data));
                 }
             }
         }
@@ -174,31 +175,34 @@ public class EnderChestModule extends ZModule {
     public void saveData(UUID playerId) {
         EnderChestData data = dataCache.get(playerId);
         if (data == null) return;
-        saveToFile(data);
+        getStorage().upsertEnderChest(playerId, EnderChestSerializer.serialize(data));
     }
 
-    private File getDataFile(UUID playerId) {
+    private void migrateJsonToDatabase() {
         File dir = new File(getFolder(), "data");
-        if (!dir.exists()) dir.mkdirs();
-        return new File(dir, playerId + ".json");
-    }
-
-    private EnderChestData loadFromFile(File file, UUID playerId) {
-        try {
-            String json = Files.readString(file.toPath());
-            return EnderChestSerializer.deserialize(json, playerId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        if (!dir.exists() || !dir.isDirectory()) return;
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".json"));
+        if (files == null || files.length == 0) return;
+        int count = 0;
+        for (File file : files) {
+            String fileName = file.getName();
+            String uuidStr = fileName.substring(0, fileName.length() - ".json".length());
+            try {
+                UUID uuid = UUID.fromString(uuidStr);
+                String json = Files.readString(file.toPath());
+                EnderChestData data = EnderChestSerializer.deserialize(json, uuid);
+                if (data != null) {
+                    getStorage().upsertEnderChest(uuid, EnderChestSerializer.serialize(data));
+                    File migrated = new File(dir, fileName + ".migrated");
+                    file.renameTo(migrated);
+                    count++;
+                }
+            } catch (Exception e) {
+                this.plugin.getLogger().warning("Failed to migrate enderchest data for " + uuidStr + ": " + e.getMessage());
+            }
         }
-    }
-
-    private void saveToFile(EnderChestData data) {
-        try {
-            String json = EnderChestSerializer.serialize(data);
-            Files.writeString(getDataFile(data.getPlayerId()).toPath(), json);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (count > 0) {
+            this.plugin.getLogger().info("Migrated enderchest data for " + count + " players from JSON to database");
         }
     }
 
