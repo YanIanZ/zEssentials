@@ -51,7 +51,9 @@
 | N18 | `/nick clear` | Nick + skin hilang, kembali normal |
 | N19 | `/nick Notch` | Nama + skin Notch (matching skin) |
 | N20 | Kosongkan random-nick-pool, `/nick` | Pesan "random nick pool is empty" |
-| N21 | Matikan internet, `/nick OfflineName` | Pesan fetch failed |
+| N21 | Matikan internet, `/nick OfflineName` | Pesan fetch failed TAPI nick tetap terpasang name-only |
+| N22 | `/nick` dengan pool default | "Randomizing your identity..." tampil hex abu (#656665), TIDAK ada tag `<7>` literal |
+| N23 | `/realname` pada player dengan nick | Pesan hex abu, real name ter-reveal |
 
 ---
 

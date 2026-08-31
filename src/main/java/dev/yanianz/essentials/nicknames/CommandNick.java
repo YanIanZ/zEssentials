@@ -183,21 +183,20 @@ public class CommandNick extends VCommand {
             }
         }).thenAccept(textures -> {
             this.plugin.getScheduler().runAtEntity(target, w -> {
-                if (textures == null) {
-                    if (self) {
-                        message(sender, Message.NICK_FETCH_FAILED, "%player%", nickName);
-                    }
-                    return;
-                }
                 DisguiseData data = new DisguiseData();
                 data.setDisguiseName(nickName);
-                data.setTextureValue(textures[0]);
-                data.setTextureSignature(textures[1]);
+                if (textures != null) {
+                    data.setTextureValue(textures[0]);
+                    data.setTextureSignature(textures[1]);
+                }
                 module.applyDisguise(target, data);
-                module.setNickname(targetUuidQuiet(target), null);
+                module.setNickname(target.getUniqueId(), null);
 
                 if (self) {
                     module.markChanged(target.getUniqueId());
+                    if (textures == null) {
+                        message(sender, Message.NICK_FETCH_FAILED, "%player%", nickName);
+                    }
                     message(sender, Message.NICK_HYPIXEL_SET, "%nickname%", nickName);
                 } else {
                     message(sender, Message.NICK_HYPIXEL_SET_OTHER, "%player%", target.getName(), "%nickname%", nickName);
@@ -205,9 +204,5 @@ public class CommandNick extends VCommand {
                 }
             });
         });
-    }
-
-    private UUID targetUuidQuiet(Player target) {
-        return target.getUniqueId();
     }
 }
