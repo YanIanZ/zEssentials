@@ -28,6 +28,7 @@ public class TabListModule extends ZModule {
 
     private long refreshSeconds;
     private Map<String, List<String>> worldEntries = new HashMap<>();
+    private List<String> disabledWorlds = new java.util.ArrayList<>();
     private List<GroupHeaderFooter> groupEntries = new ArrayList<>();
     private boolean layoutEnabled;
     private int layoutSlots = 80;
@@ -54,6 +55,7 @@ public class TabListModule extends ZModule {
 
         var config = getConfiguration();
         this.refreshSeconds = Math.max(1, config.getInt("refresh-seconds", 5));
+        this.disabledWorlds = config.getStringList("disable-in-worlds");
 
         this.worldEntries.clear();
         var worldsSection = config.getConfigurationSection("worlds");
@@ -152,6 +154,13 @@ public class TabListModule extends ZModule {
 
         List<String> headerLines = null;
         List<String> footerLines = null;
+
+        String currentWorld = player.getWorld().getName().toLowerCase(Locale.ROOT);
+        if (this.disabledWorlds.stream().anyMatch(w -> w.toLowerCase(Locale.ROOT).equals(currentWorld))) {
+            player.sendPlayerListHeader(net.kyori.adventure.text.Component.empty());
+            player.sendPlayerListFooter(net.kyori.adventure.text.Component.empty());
+            return;
+        }
 
         for (GroupHeaderFooter group : this.groupEntries) {
             if (player.hasPermission(group.permission())) {

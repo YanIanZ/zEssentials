@@ -58,4 +58,12 @@ public interface EssentialsScoreboard {
      * @param eventName   the name of the event that triggered the update
      */
     void update(PlayerBoard playerBoard, String eventName);
+
+    /**
+     * Enable TAB-style dynamic lines: rendered lines whose text is empty
+     * are removed instead of shown as blanks.
+     *
+     * @param dynamicLines true to enable dynamic lines
+     */
+    void setDynamicLines(boolean dynamicLines);
 }

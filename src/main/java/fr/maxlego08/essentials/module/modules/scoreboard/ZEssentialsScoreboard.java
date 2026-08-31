@@ -21,6 +21,7 @@ public class ZEssentialsScoreboard extends ZUtils implements EssentialsScoreboar
     private final boolean isDefault;
     private final String title;
     private final List<ScoreboardLine> lines = new ArrayList<>();
+    private boolean dynamicLines;
 
     public ZEssentialsScoreboard(String name, boolean isDefault, String title, List<ScoreboardLine> lines) {
         this.name = name;
@@ -103,6 +104,16 @@ public class ZEssentialsScoreboard extends ZUtils implements EssentialsScoreboar
         for (ScoreboardLine scoreboardLine : this.lines) {
             String text = papi(scoreboardLine.getText(), playerBoard.getPlayer());
             String[] split = text.split("\n");
+            if (this.dynamicLines) {
+                boolean allBlank = true;
+                for (String s : split) {
+                    if (s != null && !s.isBlank()) {
+                        allBlank = false;
+                        break;
+                    }
+                }
+                if (allBlank) continue;
+            }
             for (String s : split) {
                 lines.add(line, s);
                 line++;
@@ -111,6 +122,11 @@ public class ZEssentialsScoreboard extends ZUtils implements EssentialsScoreboar
         }
 
         playerBoard.updateLines(lines);
+    }
+
+    @Override
+    public void setDynamicLines(boolean dynamicLines) {
+        this.dynamicLines = dynamicLines;
     }
 
     @Override

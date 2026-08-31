@@ -17,6 +17,22 @@ config-version: 1
 
 enable: true
 
+# TAB-style options (https://github.com/NEZNAMY/TAB)
+# Hide the score numbers on the right side (1.20.3+ servers only)
+hidden-numbers: false
+
+# Lines whose placeholders resolve to empty text are removed
+dynamic-lines: false
+
+# Players in these worlds get no scoreboard at all
+disabled-worlds: []
+
+# Force a specific scoreboard per world (scoreboard names from the
+# scoreboards section below). Overrides join/task conditions.
+per-world:
+#  lobby: default
+#  event_world: event
+
 # The conditions when connecting the player to choose the scoreboard
 # When connecting the scoreboard displayed will be the one with the highest priority and or the player to all requirements
 join-conditions:

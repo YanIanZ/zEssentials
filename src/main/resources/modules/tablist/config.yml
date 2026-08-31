@@ -26,6 +26,10 @@ worlds:
       - "&7Online&8: &f%server_online% &8• &7Ping&8: &f%player_ping%ms"
       - "&#00d4ffstore.yourserver.com"
 
+# Worlds where the header/footer are removed entirely (TAB disable-in-worlds)
+disable-in-worlds: []
+#  - "some_world"
+
 # Per group header and footer, checked by permission before world entries.
 # The first matching group wins. Remove or comment out if not needed.
 # groups:

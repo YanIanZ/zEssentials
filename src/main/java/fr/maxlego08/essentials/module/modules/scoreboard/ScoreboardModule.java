@@ -50,6 +50,11 @@ public class ScoreboardModule extends ZModule implements ScoreboardManager {
     private EssentialsScoreboard defaultScoreboard;
     private WrappedTask wrappedTask;
 
+    private boolean hiddenNumbers;
+    private boolean dynamicLines;
+    private List<String> disabledWorlds = new ArrayList<>();
+    private final Map<String, String> perWorld = new HashMap<>();
+
     public ScoreboardModule(ZEssentialsPlugin plugin) {
         super(plugin, "scoreboard");
         this.isRegisterEvent = false;
@@ -82,6 +87,18 @@ public class ScoreboardModule extends ZModule implements ScoreboardManager {
 
         loadJoinConditions(configuration);
         loadTaskConditions(configuration);
+
+        this.hiddenNumbers = configuration.getBoolean("hidden-numbers", false);
+        this.dynamicLines = configuration.getBoolean("dynamic-lines", false);
+        this.disabledWorlds = configuration.getStringList("disabled-worlds");
+        this.perWorld.clear();
+        ConfigurationSection worldSection = configuration.getConfigurationSection("per-world");
+        if (worldSection != null) {
+            for (String key : worldSection.getKeys(false)) {
+                this.perWorld.put(key.toLowerCase(java.util.Locale.ROOT), worldSection.getString(key));
+            }
+        }
+        this.essentialsScoreboards.forEach(sb -> sb.setDynamicLines(this.dynamicLines));
 
         HandlerList.unregisterAll(this);
 
@@ -178,13 +195,70 @@ public class ScoreboardModule extends ZModule implements ScoreboardManager {
         if (user != null && user.getOption(Option.DISABLE_SCOREBOARD)) return;
 
         Player player = event.getPlayer();
-        EssentialsScoreboard essentialsScoreboard = getJoinScoreboard(player);
+        EssentialsScoreboard essentialsScoreboard = getEffectiveScoreboard(player);
+        if (essentialsScoreboard == null) return;
         this.createScoreboard(player, essentialsScoreboard);
+        applyHiddenNumbers(player);
+    }
+
+    @EventHandler
+    public void onWorldChange(org.bukkit.event.player.PlayerChangedWorldEvent event) {
+        if (this.defaultScoreboard == null) return;
+        Player player = event.getPlayer();
+        User user = plugin.getUser(player.getUniqueId());
+        if (user != null && user.getOption(Option.DISABLE_SCOREBOARD)) return;
+
+        EssentialsScoreboard target = getEffectiveScoreboard(player);
+        PlayerBoard board = this.boards.get(player.getUniqueId());
+        if (target == null) {
+            if (board != null) this.deleteBoard(player);
+            return;
+        }
+        if (board == null) {
+            this.createScoreboard(player, target);
+        } else if (!board.getScoreboard().getName().equalsIgnoreCase(target.getName())) {
+            this.deleteBoard(player);
+            this.createScoreboard(player, target);
+        }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         this.deleteBoard(event.getPlayer());
+    }
+
+    /**
+     * TAB-style resolution: disabled-worlds remove the board entirely,
+     * per-world mappings win over join/task conditions.
+     */
+    public EssentialsScoreboard getEffectiveScoreboard(Player player) {
+        String world = player.getWorld().getName().toLowerCase(java.util.Locale.ROOT);
+        if (this.disabledWorlds.stream().anyMatch(w -> w.toLowerCase(java.util.Locale.ROOT).equals(world))) {
+            return null;
+        }
+        String worldScoreboard = this.perWorld.get(world);
+        if (worldScoreboard != null) {
+            return this.getScoreboard(worldScoreboard).orElse(this.defaultScoreboard);
+        }
+        return getTaskScoreboard(player);
+    }
+
+    /**
+     * TAB hidden-numbers: sets the right-side score display to empty on
+     * 1.20.3+ servers through FastBoard custom scores.
+     */
+    private void applyHiddenNumbers(Player player) {
+        if (!this.hiddenNumbers) return;
+        PlayerBoard board = this.boards.get(player.getUniqueId());
+        if (board == null || !board.customScoresSupported()) return;
+        try {
+            java.util.List<net.kyori.adventure.text.Component> empty = new java.util.ArrayList<>();
+            for (int i = 0; i < board.size(); i++) empty.add(net.kyori.adventure.text.Component.empty());
+            if (board instanceof fr.maxlego08.essentials.module.modules.scoreboard.board.ComponentBoard componentBoard) {
+                componentBoard.updateScores(empty.toArray(new net.kyori.adventure.text.Component[0]));
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -286,6 +360,7 @@ public class ScoreboardModule extends ZModule implements ScoreboardManager {
 
             EssentialsScoreboard essentialsScoreboard = getTaskScoreboard(player);
             essentialsScoreboard.update(playerBoard);
+            applyHiddenNumbers(player);
         });
     }
 }

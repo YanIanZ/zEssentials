@@ -34,6 +34,16 @@ Every change lands in this changelog immediately under its bumped heading.
 - **5 new permissions** — `ESSENTIALS_DISGUISE_USE`, `ESSENTIALS_DISGUISE_OTHER`, `ESSENTIALS_DISGUISE_RANDOM`, `ESSENTIALS_DISGUISE_SKIN`, `ESSENTIALS_DISGUISE_BYPASS_COOLDOWN`
 - **12 new tests** — DisguiseData (5), SkinCache (7)
 
+## Scoreboard & TabList — TAB parity (https://github.com/NEZNAMY/TAB)
+
+- **`hidden-numbers`** — hides the score numbers on the right side of the scoreboard (TAB feature); implemented through FastBoard custom scores on 1.20.3+ servers, applied on board create and every update
+- **`dynamic-lines`** — scoreboard lines whose placeholders resolve to empty text are removed entirely instead of shown as blanks (TAB dynamic lines)
+- **`disabled-worlds`** — players in listed worlds get no scoreboard; board is removed/re-created on world change (TAB disable-in-worlds for scoreboards)
+- **`per-world` scoreboard mapping** — force a specific scoreboard per world, overriding join/task conditions (TAB per-world scoreboards)
+- **World change handling** — `PlayerChangedWorldEvent` re-evaluates the scoreboard: swaps to the world's board or removes it in disabled worlds
+- **TabList `disable-in-worlds`** — worlds listed in tablist config get an empty header/footer instead of the default one (TAB disable-in-worlds)
+- **API addition** — `EssentialsScoreboard.setDynamicLines(boolean)`; existing features (toggle /sb with persisted choice, animations, per-group/world header+footer, team sorting, nametags) already cover the rest of the TAB feature set
+
 ## Nick & Enderchest — Hypixel SkyBlock reference
 
 - **Hypixel-style `/nick`** — `/nick` with no arguments now gives a random anonymous identity: random plausible username from `random-nick-pool` (20 defaults) + matching skin fetched from Mojang; identity applies everywhere (chat, tab, name tag, packet skin) via the disguise system; `/nick clear` removes it; `/nick <name>` now applies the matching skin too; `/nick random` re-rolls

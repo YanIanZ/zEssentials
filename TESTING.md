@@ -256,3 +256,27 @@
 | B3 | Cek test count | 137+ root tests |
 | B4 | `./gradlew :test --tests "dev.yanianz.essentials.disguise.*"` | 12 tests pass |
 | B5 | `./gradlew :test --tests "dev.yanianz.essentials.nicknames.*"` | 11 tests pass |
+
+---
+
+## 17. Scoreboard — TAB parity
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| SB1 | Set `hidden-numbers: true`, restart | Angka di kanan scoreboard hilang (1.20.3+) |
+| SB2 | Set `dynamic-lines: true`, buat line dengan placeholder kosong | Line kosong hilang, lines collapse |
+| SB3 | Tambah world di `disabled-worlds`, masuk world itu | Scoreboard hilang |
+| SB4 | Pindah keluar dari disabled world | Scoreboard kembali |
+| SB5 | Set `per-world: {<world>: admin}` lalu masuk world itu | Scoreboard "admin" tampil |
+| SB6 | `/sb` | Scoreboard toggle, tersimpan setelah rejoin (remember choice) |
+| SB7 | Animasi %anim_% di title/lines scoreboard | Frame berputar |
+
+## 18. TabList — TAB parity
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| TL1 | Set `disable-in-worlds: [<world>]`, masuk world itu | Header/footer kosong |
+| TL2 | Pindah keluar world | Header/footer default kembali |
+| TL3 | Per-world header/footer (worlds section) | Header/footer sesuai world |
+| TL4 | Per-group header/footer (groups section) | Permission-based, group menang atas world |
+| TL5 | %anim_% di header | Animasi frame berputar per refresh |
