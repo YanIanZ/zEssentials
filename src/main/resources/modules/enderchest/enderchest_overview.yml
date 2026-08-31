@@ -1,0 +1,14 @@
+name: '#3f3f3fᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ'
+size: 54
+items:
+  decorations:
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: '&e'
+    slots:
+      - 0-8
+      - 18-53
+  pages:
+    type: ZESSENTIALS_ENDERCHEST_OVERVIEW
+    slots:
+      - 9-17

@@ -62,11 +62,6 @@ public class PacketCraftingListener extends PacketAdapter implements PacketRegis
                 } catch (Exception ignored) {
                 }
             });
-
-            var zEssentialsPluginClass = Class.forName("fr.maxlego08.essentials.ZEssentialsPlugin");
-            var listenerClass = Class.forName("dev.yanianz.essentials.crafting.CraftingListener");
-            var ensureMethod = listenerClass.getMethod("ensureRegistered", zEssentialsPluginClass);
-            ensureMethod.invoke(null, plugin);
         } catch (Exception ignored) {
         }
     }

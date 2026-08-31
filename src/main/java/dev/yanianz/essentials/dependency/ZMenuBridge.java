@@ -56,6 +56,9 @@ public final class ZMenuBridge {
         plugin.getButtonManager().register(new ButtonVaultOpenAdminLoader(plugin));
         plugin.getButtonManager().register(new ButtonVaultNoPermissionAdminLoader(plugin));
         plugin.getButtonManager().register(new ButtonOptionLoader(plugin));
+        plugin.getButtonManager().register(new fr.maxlego08.essentials.loader.ButtonCraftLoader(plugin));
+        plugin.getButtonManager().register(new fr.maxlego08.essentials.loader.ButtonEnderChestContentLoader(plugin));
+        plugin.getButtonManager().register(new fr.maxlego08.essentials.loader.ButtonEnderChestOverviewLoader(plugin));
     }
 
     /**

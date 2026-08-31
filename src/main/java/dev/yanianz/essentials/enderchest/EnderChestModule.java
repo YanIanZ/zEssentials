@@ -20,10 +20,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EnderChestModule extends ZModule {
 
-    private static boolean listenerRegistered = false;
-
     @NonLoadable
     private final Map<UUID, EnderChestData> dataCache = new ConcurrentHashMap<>();
+    @NonLoadable
+    private final Map<UUID, EnderChestSession> sessions = new ConcurrentHashMap<>();
     private int defaultPages = 1;
     private int maxPages = 3;
     private String title = "&5&lEnder Chest &8(&f%page%&8/&f%total%&8)";
@@ -56,10 +56,6 @@ public class EnderChestModule extends ZModule {
 
     public EnderChestModule(ZEssentialsPlugin plugin) {
         super(plugin, "enderchest");
-        if (!listenerRegistered) {
-            Bukkit.getPluginManager().registerEvents(new EnderChestListener(plugin), plugin);
-            listenerRegistered = true;
-        }
     }
 
     @Override
@@ -101,9 +97,35 @@ public class EnderChestModule extends ZModule {
             this.overviewPageText = overview.getString("page-text", "&5Ender Chest Page &e%page%");
             this.overviewPageLore = overview.getStringList("page-lore");
             this.overviewLockedMaterial = overview.getString("locked-material", "GRAY_DYE");
-            this.overviewLockedText = overview.getString("locked-text", "&cPage &e%page% &c(locked)");
+            this.overviewLockedText = overview.getString("locked-text", "&cPage &e%page% &8(Locked)");
             this.overviewLockedLore = overview.getStringList("locked-lore");
         }
+
+        this.loadInventory("enderchest");
+        this.loadInventory("enderchest_overview");
+    }
+
+    public EnderChestSession getSession(Player viewer) {
+        EnderChestSession session = this.sessions.get(viewer.getUniqueId());
+        if (session == null) {
+            int allowed = getAllowedPages(viewer);
+            EnderChestData data = getData(viewer.getUniqueId(), true);
+            if (data.getPages() < allowed) data.resize(allowed);
+            int visible = Math.min(data.getPages(), allowed);
+            session = new EnderChestSession(viewer.getUniqueId(), data, false, visible, allowed);
+            this.sessions.put(viewer.getUniqueId(), session);
+        }
+        return session;
+    }
+
+    public EnderChestSession startSession(Player viewer, EnderChestData data, boolean readOnly, int visiblePages, int allowedPages) {
+        EnderChestSession session = new EnderChestSession(viewer.getUniqueId(), data, readOnly, visiblePages, allowedPages);
+        this.sessions.put(viewer.getUniqueId(), session);
+        return session;
+    }
+
+    public void clearSession(Player viewer) {
+        this.sessions.remove(viewer.getUniqueId());
     }
 
     public int getAllowedPages(Player player) {
@@ -187,17 +209,44 @@ public class EnderChestModule extends ZModule {
             data.resize(allowed);
         }
         int visiblePages = Math.min(data.getPages(), allowed);
-        if (this.overviewEnabled) {
-            EnderChestGui.openOverview(this.plugin, player, data, visiblePages, allowed);
-            return;
-        }
-        EnderChestGui.open(this.plugin, player, data, visiblePages, 0, false);
+        startSession(player, data, false, visiblePages, allowed);
+        dev.yanianz.essentials.dependency.ZMenuBridge.openInventory(this.plugin, player, "enderchest_overview");
     }
 
     public void openEnderChestFor(Player viewer, OfflinePlayer target) {
         EnderChestData data = getData(target.getUniqueId(), false);
         int pages = data.getPages();
-        EnderChestGui.open(this.plugin, viewer, data, pages, 0, true);
+        startSession(viewer, data, true, pages, pages);
+        dev.yanianz.essentials.dependency.ZMenuBridge.openInventory(this.plugin, viewer, "enderchest");
+    }
+
+    public org.bukkit.inventory.ItemStack buildOverviewPageItem(int pageNumber, boolean locked) {
+        org.bukkit.Material material = org.bukkit.Material.ENDER_EYE;
+        String name;
+        java.util.List<String> lore;
+        try {
+            material = org.bukkit.Material.valueOf((locked ? overviewLockedMaterial : overviewPageMaterial).toUpperCase());
+        } catch (Exception ignored) {
+        }
+        if (locked) {
+            name = overviewLockedText.replace("%page%", String.valueOf(pageNumber));
+            lore = overviewLockedLore;
+        } else {
+            name = overviewPageText.replace("%page%", String.valueOf(pageNumber));
+            lore = overviewPageLore;
+        }
+        ItemStack item = new ItemStack(material);
+        var meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                    .deserialize(dev.yanianz.essentials.util.ColorUtil.sections(name)));
+            if (lore != null && !lore.isEmpty()) {
+                meta.lore(lore.stream().map(l -> net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                        .legacySection().deserialize(dev.yanianz.essentials.util.ColorUtil.sections(l))).toList());
+            }
+            item.setItemMeta(meta);
+        }
+        return item;
     }
 
     public String getTitle() {

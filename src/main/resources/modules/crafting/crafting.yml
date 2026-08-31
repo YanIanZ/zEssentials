@@ -1,0 +1,25 @@
+name: '#3f3f3fᴄʀᴀꜰᴛɪɴɢ ᴛᴀʙʟᴇ'
+size: 54
+items:
+  decorations:
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: '&e'
+    slots:
+      - 0-9
+      - 13-14
+      - 17
+      - 18
+      - 22
+      - 24-27
+      - 31-33
+      - 35-48
+      - 50-53
+  crafting:
+    type: ZESSENTIALS_CRAFT_INTERACTIVE
+    slots:
+      - 10-12
+      - 15-16
+      - 19-21
+      - 28-30
+      - 49

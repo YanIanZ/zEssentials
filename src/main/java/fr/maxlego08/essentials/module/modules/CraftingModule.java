@@ -1,9 +1,16 @@
 package fr.maxlego08.essentials.module.modules;
 
+import dev.yanianz.essentials.crafting.CraftingSession;
+import dev.yanianz.essentials.dependency.ZMenuBridge;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.module.ZModule;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CraftingModule extends ZModule {
 
@@ -17,6 +24,8 @@ public class CraftingModule extends ZModule {
     private String closeText = "&cClose";
     private String fillerMaterial = "GRAY_STAINED_GLASS_PANE";
     private String fillerColor = "&8";
+
+    private final Map<UUID, CraftingSession> sessions = new ConcurrentHashMap<>();
 
     public CraftingModule(ZEssentialsPlugin plugin) {
         super(plugin, "crafting");
@@ -41,11 +50,26 @@ public class CraftingModule extends ZModule {
             this.quickCraftLore = qc.getStringList("lore");
             this.quickCraftPermission = qc.getString("permission", "essentials.crafting.quickcraft");
         }
+
+        this.loadInventory("crafting");
     }
 
-    public void openCrafting(org.bukkit.entity.Player player) {
+    public void openCrafting(Player player) {
         if (!this.enabled || !this.isEnable) return;
-        dev.yanianz.essentials.crafting.CraftingGui.open(this.plugin, player, this);
+        if (!this.sessions.containsKey(player.getUniqueId())) {
+            this.sessions.put(player.getUniqueId(), new CraftingSession(
+                    player.hasPermission(this.quickCraftPermission)));
+        }
+        ZMenuBridge.openInventory(this.plugin, player, "crafting");
+    }
+
+    public CraftingSession getSession(Player player) {
+        return this.sessions.computeIfAbsent(player.getUniqueId(), uuid -> new CraftingSession(
+                player.hasPermission(this.quickCraftPermission)));
+    }
+
+    public void clearSession(Player player) {
+        this.sessions.remove(player.getUniqueId());
     }
 
     public boolean isEnabled() { return this.enabled && this.isEnable; }

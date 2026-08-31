@@ -276,7 +276,6 @@ public class PlayerListener extends ZUtils implements Listener {
                     this.plugin.getModuleManager().getModule(fr.maxlego08.essentials.module.modules.CraftingModule.class);
             if (craftingModule != null && craftingModule.isEnabled()) {
                 event.setCancelled(true);
-                dev.yanianz.essentials.crafting.CraftingListener.ensureRegistered((fr.maxlego08.essentials.ZEssentialsPlugin) this.plugin);
                 craftingModule.openCrafting(player);
                 return;
             }

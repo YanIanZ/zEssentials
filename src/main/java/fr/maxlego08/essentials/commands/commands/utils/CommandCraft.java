@@ -19,7 +19,6 @@ public class CommandCraft extends VCommand {
         fr.maxlego08.essentials.module.modules.CraftingModule module =
                 plugin.getModuleManager().getModule(fr.maxlego08.essentials.module.modules.CraftingModule.class);
         if (module != null && module.isEnabled()) {
-            dev.yanianz.essentials.crafting.CraftingListener.ensureRegistered((fr.maxlego08.essentials.ZEssentialsPlugin) plugin);
             module.openCrafting(this.player);
         } else {
             message(sender, Message.MODULE_DISABLE, "%name%", "crafting");

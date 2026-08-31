@@ -1,0 +1,37 @@
+name: '#3f3f3fᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ'
+size: 54
+items:
+  decorations:
+    item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: '&e'
+    slots:
+      - 45-53
+  content:
+    type: ZESSENTIALS_ENDERCHEST_CONTENT
+    slots:
+      - 0-44
+  previous:
+    type: pagination_previous
+    slot: 45
+    item:
+      material: ARROW
+      name: '&7← Previous Page'
+  next:
+    type: pagination_next
+    slot: 53
+    item:
+      material: ARROW
+      name: '&7Next Page →'
+  indicator:
+    slot: 49
+    update: true
+    item:
+      material: ENDER_EYE
+      name: '&fPage &e%openInventory.getPage%&7/&e%openInventory.getMaxPage%'
+  close:
+    slot: 47
+    closeInventory: true
+    item:
+      material: BARRIER
+      name: '&cClose'
