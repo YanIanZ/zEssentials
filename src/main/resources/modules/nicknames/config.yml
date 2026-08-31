@@ -1,12 +1,13 @@
 ########################################################################################################################
 #
-# zEssentials - Nicknames
+# zEssentials - Nicknames & Disguise
 # Players change their own display name, staff can change it for anyone.
+# Disguise changes name + skin at the packet level via ProtocolLib.
 #
 ########################################################################################################################
 
 # Config schema version — do not edit
-config-version: 1
+config-version: 2
 
 enable: true
 
@@ -25,3 +26,30 @@ block-impersonation: true
 allow-colors: true
 
 cooldown-seconds: 60
+
+# Disguise settings — changes name AND skin at the packet level
+disguise:
+  # Master toggle for the disguise system
+  enable: true
+
+  # Whether the disguised player sees their own disguise in F5/third-person view
+  self-view: false
+
+  # Cooldown between disguise changes (seconds)
+  cooldown-seconds: 120
+
+  # How long to cache fetched skins from the Mojang API (hours)
+  skin-cache-hours: 24
+
+  # Block disguising as staff members (players with essentials.disguise.use)
+  block-staff: false
+
+  # Random disguise pool — /disguise random picks from this list
+  # These are Minecraft usernames; skins are fetched from Mojang
+  random-pool:
+    - Notch
+    - jeb_
+    - Dinnerbone
+    - Grumm
+    - deadmau5
+    - MidasGolden
