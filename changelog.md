@@ -87,6 +87,14 @@ Every change lands in this changelog immediately under its bumped heading.
 - **Max size** — configurable cap (default 8)
 - **Auto-disband** — when last member leaves
 
+## Polish pass
+
+- **Fixed hex color rendering** — 17 files used a broken `colorize()` pattern (`text.replace("&", "§")`) that corrupted hex colors like `&#ff0000` into `§#ff0000` instead of the proper `§x§f§f§0§0§0§0` sequence. All replaced with `ColorUtil.sections()` which handles both legacy and hex codes correctly
+- **Nicknames polish** — proper tab completion (off + online players), cooldown feedback message, validation error messages, confirmation messages; `validate()` now uses `PlainTextComponentSerializer` for proper plain text extraction
+- **Vanish polish** — `COMMAND_VANISH_TOGGLED_OTHER` message for targeting other players (previously reused self message)
+- **4 new NicknamesModule tests** — validate rejects too long / accepts valid / rejects invalid chars / cooldown window
+- **Cleaned unused imports** — `Modifier`, `Locale` removed from NicknamesModule and ReputationModule
+
 ## Network/Social Layer
 
 - **NetworkManager** — BungeeCord plugin messaging transport with sub-channel routing
