@@ -74,10 +74,6 @@ public class CraftingListener implements Listener {
             plugin.getScheduler().runNextTick(wrappedTask -> updateResult(inventory));
             return;
         }
-
-        if (CraftingSlotMap.isPlayerInvSlot(slot)) {
-            return;
-        }
     }
 
     @EventHandler
@@ -86,8 +82,7 @@ public class CraftingListener implements Listener {
         if (!(inventory.getHolder() instanceof CraftingHolder)) return;
 
         for (int slot : event.getRawSlots()) {
-            if (CraftingSlotMap.isFillerSlot(slot) || CraftingSlotMap.isResultSlot(slot)
-                    || CraftingSlotMap.isQuickCraftSlot(slot) || CraftingSlotMap.isCloseSlot(slot)) {
+            if (slot < 54 && !CraftingSlotMap.isGridSlot(slot)) {
                 event.setCancelled(true);
                 return;
             }
@@ -100,14 +95,14 @@ public class CraftingListener implements Listener {
         if (!(inventory.getHolder() instanceof CraftingHolder holder)) return;
         if (!(event.getPlayer() instanceof Player player)) return;
 
-        for (int i = 0; i < 9; i++) {
-            ItemStack item = inventory.getItem(i);
+        for (int gridSlot : CraftingSlotMap.GRID_SLOTS) {
+            ItemStack item = inventory.getItem(gridSlot);
             if (item != null && !item.getType().isAir()) {
                 Map<Integer, ItemStack> overflow = player.getInventory().addItem(item);
                 for (ItemStack drop : overflow.values()) {
                     player.getWorld().dropItemNaturally(player.getLocation(), drop);
                 }
-                inventory.setItem(i, null);
+                inventory.setItem(gridSlot, null);
             }
         }
     }
@@ -115,7 +110,7 @@ public class CraftingListener implements Listener {
     private void updateResult(Inventory inventory) {
         ItemStack[] grid = new ItemStack[9];
         for (int i = 0; i < 9; i++) {
-            ItemStack item = inventory.getItem(i);
+            ItemStack item = inventory.getItem(CraftingSlotMap.GRID_SLOTS[i]);
             grid[i] = (item != null && !item.getType().isAir()) ? item : null;
         }
         ItemStack result = RecipeMatcher.matchRecipe(grid);
@@ -127,11 +122,11 @@ public class CraftingListener implements Listener {
         for (ItemStack drop : overflow.values()) {
             player.getWorld().dropItemNaturally(player.getLocation(), drop);
         }
-        for (int i = 0; i < 9; i++) {
-            ItemStack item = inventory.getItem(i);
+        for (int gridSlot : CraftingSlotMap.GRID_SLOTS) {
+            ItemStack item = inventory.getItem(gridSlot);
             if (item != null && !item.getType().isAir()) {
                 item.setAmount(item.getAmount() - 1);
-                if (item.getAmount() <= 0) inventory.setItem(i, null);
+                if (item.getAmount() <= 0) inventory.setItem(gridSlot, null);
             }
         }
     }
@@ -140,7 +135,7 @@ public class CraftingListener implements Listener {
         while (true) {
             ItemStack[] grid = new ItemStack[9];
             for (int i = 0; i < 9; i++) {
-                ItemStack item = inventory.getItem(i);
+                ItemStack item = inventory.getItem(CraftingSlotMap.GRID_SLOTS[i]);
                 grid[i] = (item != null && !item.getType().isAir()) ? item : null;
             }
             ItemStack result = RecipeMatcher.matchRecipe(grid);
@@ -153,11 +148,11 @@ public class CraftingListener implements Listener {
             for (ItemStack drop : overflow.values()) {
                 player.getWorld().dropItemNaturally(player.getLocation(), drop);
             }
-            for (int i = 0; i < 9; i++) {
-                ItemStack item = inventory.getItem(i);
+            for (int gridSlot : CraftingSlotMap.GRID_SLOTS) {
+                ItemStack item = inventory.getItem(gridSlot);
                 if (item != null && !item.getType().isAir()) {
                     item.setAmount(item.getAmount() - craftable);
-                    if (item.getAmount() <= 0) inventory.setItem(i, null);
+                    if (item.getAmount() <= 0) inventory.setItem(gridSlot, null);
                 }
             }
             if (max <= 1) break;

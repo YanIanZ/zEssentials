@@ -9,45 +9,51 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CraftingSlotMapTest {
 
     @Test
-    @DisplayName("Grid slots are 0-8")
+    @DisplayName("Grid slots are the 3x3 centered grid (10-12, 19-21, 28-30)")
     void testGridSlots() {
-        for (int i = 0; i < 9; i++) assertTrue(CraftingSlotMap.isGridSlot(i));
+        for (int slot : new int[]{10, 11, 12, 19, 20, 21, 28, 29, 30}) {
+            assertTrue(CraftingSlotMap.isGridSlot(slot), "Slot " + slot + " should be a grid slot");
+        }
         assertFalse(CraftingSlotMap.isGridSlot(9));
+        assertFalse(CraftingSlotMap.isGridSlot(13));
+        assertFalse(CraftingSlotMap.isGridSlot(0));
     }
 
     @Test
-    @DisplayName("Result slot is 13")
+    @DisplayName("Result slot is 15")
     void testResultSlot() {
-        assertTrue(CraftingSlotMap.isResultSlot(13));
+        assertTrue(CraftingSlotMap.isResultSlot(15));
         assertFalse(CraftingSlotMap.isResultSlot(0));
+        assertFalse(CraftingSlotMap.isResultSlot(10));
     }
 
     @Test
-    @DisplayName("Quick craft slot is 22")
+    @DisplayName("Quick craft slots are 16, 25, 34")
     void testQuickCraftSlot() {
-        assertTrue(CraftingSlotMap.isQuickCraftSlot(22));
+        assertTrue(CraftingSlotMap.isQuickCraftSlot(16));
+        assertTrue(CraftingSlotMap.isQuickCraftSlot(25));
+        assertTrue(CraftingSlotMap.isQuickCraftSlot(34));
+        assertFalse(CraftingSlotMap.isQuickCraftSlot(15));
     }
 
     @Test
     @DisplayName("Close slot is 49")
     void testCloseSlot() {
         assertTrue(CraftingSlotMap.isCloseSlot(49));
-    }
-
-    @Test
-    @DisplayName("Player inventory slots are 27-53")
-    void testPlayerInvSlots() {
-        for (int i = 27; i < 54; i++) assertTrue(CraftingSlotMap.isPlayerInvSlot(i));
-        assertFalse(CraftingSlotMap.isPlayerInvSlot(26));
+        assertFalse(CraftingSlotMap.isCloseSlot(0));
     }
 
     @Test
     @DisplayName("Filler slots are everything else")
     void testFillerSlots() {
+        assertTrue(CraftingSlotMap.isFillerSlot(0));
         assertTrue(CraftingSlotMap.isFillerSlot(9));
-        assertTrue(CraftingSlotMap.isFillerSlot(14));
-        assertTrue(CraftingSlotMap.isFillerSlot(26));
-        assertFalse(CraftingSlotMap.isFillerSlot(0));
-        assertFalse(CraftingSlotMap.isFillerSlot(27));
+        assertTrue(CraftingSlotMap.isFillerSlot(13));
+        assertTrue(CraftingSlotMap.isFillerSlot(17));
+        assertTrue(CraftingSlotMap.isFillerSlot(53));
+        assertFalse(CraftingSlotMap.isFillerSlot(10));
+        assertFalse(CraftingSlotMap.isFillerSlot(15));
+        assertFalse(CraftingSlotMap.isFillerSlot(16));
+        assertFalse(CraftingSlotMap.isFillerSlot(49));
     }
 }

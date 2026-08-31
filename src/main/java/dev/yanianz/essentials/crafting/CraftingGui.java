@@ -36,22 +36,15 @@ public final class CraftingGui {
         }
 
         if (quickCraft) {
-            inventory.setItem(CraftingSlotMap.SLOT_QUICK_CRAFT,
-                    namedItem(Material.valueOf(module.getQuickCraftMaterial()),
-                            module.getQuickCraftText(), module.getQuickCraftLore()));
-        } else {
-            inventory.setItem(CraftingSlotMap.SLOT_QUICK_CRAFT, filler);
+            for (int slot : CraftingSlotMap.QUICK_CRAFT_SLOTS) {
+                inventory.setItem(slot,
+                        namedItem(Material.valueOf(module.getQuickCraftMaterial()),
+                                module.getQuickCraftText(), module.getQuickCraftLore()));
+            }
         }
 
         inventory.setItem(CraftingSlotMap.SLOT_CLOSE,
                 namedItem(Material.valueOf(module.getCloseMaterial()), module.getCloseText()));
-
-        for (int i = 0; i < 27; i++) {
-            ItemStack playerItem = player.getInventory().getItem(i + 9);
-            if (playerItem != null) {
-                inventory.setItem(CraftingSlotMap.PLAYER_INV_START + i, playerItem);
-            }
-        }
 
         player.openInventory(inventory);
         return holder;
