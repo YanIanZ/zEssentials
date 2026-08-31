@@ -197,7 +197,8 @@ public class NameTagModule extends ZModule {
                 : net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
                         .plainText().serialize(dev.yanianz.essentials.util.ColorUtil.component(disguiseName));
         String effectiveName = (plainName == null || plainName.isBlank()) ? player.getName() : plainName;
-        String fallbackTab = colorize(this.fallbackTabFormat.replace("%player%", effectiveName));
+        String format = this.fallbackTabFormat != null ? this.fallbackTabFormat : "&7%player%";
+        String fallbackTab = colorize(format.replace("%player%", effectiveName));
 
         Component tabName = rule == null
                 ? dev.yanianz.essentials.util.ColorUtil.component(fallbackTab)

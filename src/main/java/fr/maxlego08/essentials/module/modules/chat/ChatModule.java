@@ -469,6 +469,10 @@ public class ChatModule extends ZModule {
             var module = this.plugin.getModuleManager()
                     .getModule(dev.yanianz.essentials.nicknames.NicknamesModule.class);
             if (module != null) {
+                String disguiseName = module.getDisplayName(player);
+                if (disguiseName != null && !disguiseName.isEmpty()) {
+                    return disguiseName;
+                }
                 String nickname = module.getNickname(player.getUniqueId());
                 if (nickname != null && !nickname.isEmpty()) {
                     return nickname;
