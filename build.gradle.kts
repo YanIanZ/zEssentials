@@ -100,6 +100,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("io.papermc.paper:paper-api:26.2.build.119-stable")
     testImplementation("io.papermc.paper:paper-api:26.2.build.119-stable")
+    testImplementation("com.tcoded:FoliaLib:0.5.1")
     compileOnly("org.mongodb:mongodb-driver-sync:5.2.1")
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
 

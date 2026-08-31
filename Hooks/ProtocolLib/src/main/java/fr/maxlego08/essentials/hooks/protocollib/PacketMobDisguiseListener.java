@@ -31,6 +31,8 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
 
     private final EssentialsPlugin plugin;
     private final Class<? extends Module> nicknamesModuleClass;
+    private final java.util.Map<Integer, UUID> entityIdCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private volatile long entityIdCacheAt;
 
     public PacketMobDisguiseListener(EssentialsPlugin plugin) {
         super(PacketAdapter.params()
@@ -236,10 +238,30 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
     }
 
     private Player lookupPlayerByEntityId(int entityId) {
+        UUID cached = this.entityIdCache.get(entityId);
+        if (cached != null) {
+            Player player = Bukkit.getPlayer(cached);
+            if (player != null && player.getEntityId() == entityId) return player;
+            this.entityIdCache.remove(entityId);
+        }
+        if (System.currentTimeMillis() - this.entityIdCacheAt > 5000L) {
+            rebuildEntityIdCache();
+        }
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getEntityId() == entityId) return player;
+            if (player.getEntityId() == entityId) {
+                this.entityIdCache.put(entityId, player.getUniqueId());
+                return player;
+            }
         }
         return null;
+    }
+
+    private void rebuildEntityIdCache() {
+        this.entityIdCache.clear();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            this.entityIdCache.put(player.getEntityId(), player.getUniqueId());
+        }
+        this.entityIdCacheAt = System.currentTimeMillis();
     }
 
     private static String colorize(String text) {

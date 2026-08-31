@@ -65,6 +65,8 @@ public class NicknamesModule extends ZModule {
     private final Map<UUID, Long> lastDisguiseChange = new ConcurrentHashMap<>();
     @NonLoadable
     private SkinCache skinCache;
+    @NonLoadable
+    private com.tcoded.folialib.wrapper.task.WrappedTask skinCacheEvictTask;
 
     public NicknamesModule(ZEssentialsPlugin plugin) {
         super(plugin, "nicknames");
@@ -101,6 +103,10 @@ public class NicknamesModule extends ZModule {
         this.allowedMobs = config.getStringList("disguise.allowed-mobs");
         if (this.allowedMobs == null) this.allowedMobs = new java.util.ArrayList<>();
         this.skinCache = new SkinCache(this.skinCacheHours * 3600_000L);
+        if (this.skinCacheEvictTask != null) {
+            this.skinCacheEvictTask.cancel();
+        }
+        this.skinCacheEvictTask = this.plugin.getScheduler().runTimer(this.skinCache::evictExpired, 600L * 20L, 600L * 20L);
 
         this.disguises.clear();
         loadDisguiseStorage();

@@ -29,6 +29,15 @@ public class SkinCache {
         return System.currentTimeMillis() - profile.cachedAt() > this.cacheTtlMillis;
     }
 
+    /**
+     * Removes expired entries from the cache. Called periodically so the
+     * map does not grow unbounded when players are looked up over time.
+     */
+    public void evictExpired() {
+        long now = System.currentTimeMillis();
+        this.cache.values().removeIf(profile -> now - profile.cachedAt() > this.cacheTtlMillis);
+    }
+
     public void clear() {
         this.cache.clear();
     }
