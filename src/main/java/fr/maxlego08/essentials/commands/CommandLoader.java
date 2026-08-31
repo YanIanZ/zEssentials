@@ -138,7 +138,7 @@ public class CommandLoader {
         register("tpacancel", CommandTeleportCancel.class);
         register("back", CommandTeleportBack.class);
         register("tpr", CommandTeleportRandom.class, "rtp");
-        register("g", CommandGlobalChat.class, "globalchat");
+        register("gchat", CommandGlobalChat.class, "globalchat");
         register("friend", CommandFriend.class, "friends");
         register("guild", CommandGuild.class);
         register("gc", CommandGuildChat.class, "guildchat");
