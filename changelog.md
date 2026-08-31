@@ -34,6 +34,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - **5 new permissions** — `ESSENTIALS_DISGUISE_USE`, `ESSENTIALS_DISGUISE_OTHER`, `ESSENTIALS_DISGUISE_RANDOM`, `ESSENTIALS_DISGUISE_SKIN`, `ESSENTIALS_DISGUISE_BYPASS_COOLDOWN`
 - **12 new tests** — DisguiseData (5), SkinCache (7)
 
+## Disguise system — LibsDisguises-style engine
+
+- **Packet engine rewrite** — `PacketMobDisguiseListener` now covers 4 packet types: `SPAWN_ENTITY` (rewrite entity type in-flight via `EntityTypeModifier`), `ENTITY_METADATA` (replace watcher with mob defaults + colorized custom name above the mob), `ENTITY_EQUIPMENT` (cancelled for mob-disguised players — mobs don't wear player gear), `PLAYER_INFO` (mob-disguised players removed from tab list, `hide-from-tab` config, own entry always preserved)
+- **Refresh system (LibsDisguises respawn pattern)** — `refreshDisguise()` runs a hide/show cycle per viewer so the server resends the full spawn sequence, which ProtocolLib listeners rewrite in-flight to the disguise; called on apply, remove, and 40 ticks after join for persisted disguises
+- **Self-view (F5 third-person)** — destroys the player's own entity client-side and respawns it as the mob using the same entity id, so movement prediction keeps the fake mob in sync; restore on undisguise via PLAYER-type spawn packet
+- **LibsDisguises-style commands** — bare mob names work (`/disguise zombie` → mob disguise, case-insensitive, validated against `allowed-mobs` config); `/disguise player <name>` and `/disguise player <target> <name>` (LD player-disguise syntax); tab completion includes all allowed mob types + off/random/skin/player/mob/list
+- **`isValidMob()`** — rejects non-living entity types and PLAYER; respects the `allowed-mobs` allowlist (25 default mobs)
+- **Root build.gradle.kts** — added `compileOnly("net.dmulloy2:ProtocolLib:5.4.0")` so the main module can send self-view packets directly
+
 ## Crafting & Enderchest — no vanilla fallback
 
 - **Crafting table block** — right-click opens custom crafting GUI only; no vanilla workbench fallback when module disabled (shows "module disabled" message instead)

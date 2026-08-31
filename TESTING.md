@@ -67,22 +67,28 @@
 
 ---
 
-## 4. Disguise — Mob
+## 4. Disguise — Mob (LibsDisguises-style engine)
 
 | # | Aksi | Ekspektasi |
 |---|------|-----------|
 | DM1 | `/disguise mob ZOMBIE` | Player berubah jadi zombie di mata player lain |
-| DM2 | `/disguise mob SKELETON` | Player berubah jadi skeleton |
-| DM3 | `/disguise mob CREEPER` | Player berubah jadi creeper |
-| DM4 | `/disguise mob PIG` | Player berubah jadi pig |
+| DM2 | `/disguise zombie` (bare mob name, LD-style) | Sama seperti `/disguise mob ZOMBIE` |
+| DM3 | `/disguise SKELETON` | Player berubah jadi skeleton |
+| DM4 | `/disguise creeper` (lowercase) | Player berubah jadi creeper |
 | DM5 | `/disguise mob INVALID` | Pesan "Unknown mob type" |
-| DM6 | `/disguise mob ENDER_DRAGON` | Player berubah jadi ender dragon |
-| DM7 | `/disguise off` setelah mob disguise | Kembali ke normal |
-| DM8 | `/disguise mob ZOMBIE <player>` (admin) | Target berubah jadi zombie |
-| DM9 | Mob disguise + rejoin | Disguise tetap (persisted) |
-| DM10 | Cek tab list saat mob disguise | Nama tidak berubah (mob tidak punya name) |
-
----
+| DM6 | `/disguise ENDER_DRAGON` | Player berubah jadi ender dragon |
+| DM7 | Equipment check saat mob disguise | Pemain lain TIDAK melihat senjata/armor di mob |
+| DM8 | Tab list saat mob disguise | Disguised player HILANG dari tab list pemain lain (hide-from-tab) |
+| DM9 | Tab list milik disguised player sendiri | Entry sendiri tetap ada |
+| DM10 | Custom name di atas mob | Menampilkan disguise name (jika diset) |
+| DM11 | `/disguise off` setelah mob disguise | Kembali ke normal, tab list pulih |
+| DM12 | `/disguise mob ZOMBIE <player>` (admin) | Target berubah jadi zombie |
+| DM13 | Mob disguise + rejoin | Disguise tetap (persisted), refresh otomatis 40 tick setelah join |
+| DM14 | `/disguise mob BOAT` (non-living) | Ditolak — hanya living entities |
+| DM15 | `/disguise player Notch` (LD-style) | Name+skin disguise via player subcommand |
+| DM16 | `/disguise player <target> Notch` (admin) | Target di-disguise sebagai Notch |
+| DM17 | Self-view enabled + `/disguise mob ZOMBIE` + F5 | Player melihat dirinya sebagai zombie di third-person |
+| DM18 | Self-view + `/disguise off` + F5 | Player melihat dirinya kembali normal |
 
 ## 5. Disguise — Random & Skin
 
