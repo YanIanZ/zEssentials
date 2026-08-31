@@ -35,6 +35,7 @@ public class GlobalChatModule extends ZModule {
 
         if (this.networkManager == null) {
             this.networkManager = new NetworkManager(this.plugin);
+            this.networkManager.register();
         }
         this.networkManager.setLocalServerName(this.serverName);
 

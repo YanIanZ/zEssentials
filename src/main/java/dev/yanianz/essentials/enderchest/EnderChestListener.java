@@ -64,7 +64,7 @@ public class EnderChestListener implements Listener {
 
         player.closeInventory();
         EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
-        plugin.getScheduler().runNextTick(wrappedTask ->
+        plugin.getScheduler().runAtEntity(player, wrappedTask ->
                 EnderChestGui.open(plugin, player, holder.getData(), holder.getPages(), page, holder.isReadOnly()));
     }
 

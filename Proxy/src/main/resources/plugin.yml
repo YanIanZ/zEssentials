@@ -1,0 +1,5 @@
+name: zEssentialsProxy
+version: ${version}
+main: fr.maxlego08.essentials.proxy.ProxyPlugin
+author: [ YanIanZ ]
+description: Proxy-side relay for zEssentials cross-server messaging (global chat, friends, guilds, parties).

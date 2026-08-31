@@ -280,3 +280,18 @@
 | TL3 | Per-world header/footer (worlds section) | Header/footer sesuai world |
 | TL4 | Per-group header/footer (groups section) | Permission-based, group menang atas world |
 | TL5 | %anim_% di header | Animasi frame berputar per refresh |
+
+---
+
+## 19. Proxy relay (BungeeCord/Velocity)
+
+| # | Aksi | Ekspektasi |
+|---|------|-----------|
+| PX1 | Pasang `target-proxy/zEssentials-proxy-<v>.jar` di `plugins/` BungeeCord | "zEssentials relay enabled" di log proxy |
+| PX2 | Setup BungeeCord forwarding di spigot.yml (modern/bungeecord) | Backend servers connect lewat proxy |
+| PX3 | Enable network-chat module di 2 backend server | Keduanya load GlobalChatModule |
+| PX4 | `/gchat` hello di server A | Muncul di server B dengan format + prefix server asal |
+| PX5 | `/gchat` toggle, chat lagi | Tidak terkirim ke server lain |
+| PX6 | Tanpa proxy jar (direct connect) | Chat lokal tetap jalan, tidak crash |
+| PX7 | Craft/EC right-click lewat proxy | GUI terbuka tanpa "Cannot init menu async" error |
+| PX8 | `/nick` lewat proxy | Random identity apply tanpa thread violation |

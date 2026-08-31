@@ -298,7 +298,7 @@ public class CommandDisguise extends VCommand {
                 return null;
             }
         }).thenAccept(profile -> {
-            this.plugin.getScheduler().runNextTick(w -> {
+            this.plugin.getScheduler().runAtEntity(target, w -> {
                 if (profile == null) {
                     message(sender, Message.DISGUISE_FETCH_FAILED, "%player%", playerName);
                     return;

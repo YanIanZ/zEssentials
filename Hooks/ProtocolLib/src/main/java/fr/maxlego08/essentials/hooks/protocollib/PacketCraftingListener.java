@@ -54,8 +54,14 @@ public class PacketCraftingListener extends PacketAdapter implements PacketRegis
 
             event.setCancelled(true);
 
+            Player player = event.getPlayer();
             var openMethod = this.craftingModuleClass.getMethod("openCrafting", Player.class);
-            openMethod.invoke(module, event.getPlayer());
+            plugin.getScheduler().runAtEntity(player, w -> {
+                try {
+                    openMethod.invoke(module, player);
+                } catch (Exception ignored) {
+                }
+            });
 
             var zEssentialsPluginClass = Class.forName("fr.maxlego08.essentials.ZEssentialsPlugin");
             var listenerClass = Class.forName("dev.yanianz.essentials.crafting.CraftingListener");

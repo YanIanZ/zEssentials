@@ -182,7 +182,7 @@ public class CommandNick extends VCommand {
                 return null;
             }
         }).thenAccept(textures -> {
-            this.plugin.getScheduler().runNextTick(w -> {
+            this.plugin.getScheduler().runAtEntity(target, w -> {
                 if (textures == null) {
                     if (self) {
                         message(sender, Message.NICK_FETCH_FAILED, "%player%", nickName);

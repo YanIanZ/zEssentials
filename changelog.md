@@ -34,6 +34,18 @@ Every change lands in this changelog immediately under its bumped heading.
 - **5 new permissions** — `ESSENTIALS_DISGUISE_USE`, `ESSENTIALS_DISGUISE_OTHER`, `ESSENTIALS_DISGUISE_RANDOM`, `ESSENTIALS_DISGUISE_SKIN`, `ESSENTIALS_DISGUISE_BYPASS_COOLDOWN`
 - **12 new tests** — DisguiseData (5), SkinCache (7)
 
+## Bug fixes
+
+- **Fixed** Folia thread violations opening crafting/enderchest GUIs — `PacketCraftingListener` opened the custom crafting GUI directly from the ProtocolLib Netty packet thread (`Cannot init menu async`); the open is now scheduled on the player's region scheduler via `runAtEntity`. Same for the enderchest overview page click (was on the global scheduler)
+- **Fixed** disguise and /nick never applying on Folia — the async Mojang skin fetch callbacks ran `applyDisguise` on the global scheduler thread; now scheduled on the target player's region thread
+- **Network relay channel changed** from `BungeeCord` to `zessentials:relay` — the BungeeCord proxy drops unknown subchannels on its own channel, so cross-server relay never worked without a proxy plugin
+
+## Proxy module (new)
+
+- **`zEssentialsProxy`** — new standalone BungeeCord plugin jar (`target-proxy/zEssentials-proxy-<version>.jar`) that relays the `zessentials:relay` plugin channel between every server behind the proxy; enables `/gchat`, and later friends/guild/party messaging, across the network; Velocity legacy-compatible (relays plugin messages of registered channels)
+- **Gradle `:Proxy` module** — `Proxy/` subproject with `bungeecord-api` (Maven Central), separate jar output
+- **NetworkManager** — registers outgoing + incoming `zessentials:relay` channel; message format unchanged (`zessentials:<sub>` + UTF payload)
+
 ## Scoreboard & TabList — TAB parity (https://github.com/NEZNAMY/TAB)
 
 - **`hidden-numbers`** — hides the score numbers on the right side of the scoreboard (TAB feature); implemented through FastBoard custom scores on 1.20.3+ servers, applied on board create and every update

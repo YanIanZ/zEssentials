@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class NetworkManager {
 
-    private static final String BUNGEECORD_CHANNEL = "BungeeCord";
+    public static final String RELAY_CHANNEL = "zessentials:relay";
     public static final String ZESSENTIALS_PREFIX = "zessentials:";
 
     private final ZEssentialsPlugin plugin;
@@ -34,10 +34,26 @@ public class NetworkManager {
         return localServerName;
     }
 
+    public void register() {
+        Messenger messenger = Bukkit.getMessenger();
+        messenger.registerOutgoingPluginChannel(plugin, RELAY_CHANNEL);
+        messenger.registerIncomingPluginChannel(plugin, RELAY_CHANNEL, (channel, player, bytes) -> {
+            try {
+                DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
+                String sub = in.readUTF();
+                String data = in.readUTF();
+                Consumer<String> listener = listeners.get(sub);
+                if (listener != null) listener.accept(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     public void sendToServer(String subChannel, String data) {
         String fullChannel = ZESSENTIALS_PREFIX + subChannel;
         Messenger messenger = Bukkit.getMessenger();
-        if (!messenger.isOutgoingChannelRegistered(plugin, BUNGEECORD_CHANNEL)) return;
+        if (!messenger.isOutgoingChannelRegistered(plugin, RELAY_CHANNEL)) return;
         if (Bukkit.getOnlinePlayers().isEmpty()) return;
         Player carrier = Bukkit.getOnlinePlayers().iterator().next();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -45,7 +61,7 @@ public class NetworkManager {
         try {
             out.writeUTF(fullChannel);
             out.writeUTF(data);
-            carrier.sendPluginMessage(plugin, BUNGEECORD_CHANNEL, baos.toByteArray());
+            carrier.sendPluginMessage(plugin, RELAY_CHANNEL, baos.toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,22 +70,9 @@ public class NetworkManager {
     public void registerListener(String subChannel, Consumer<String> handler) {
         String fullChannel = ZESSENTIALS_PREFIX + subChannel;
         listeners.put(fullChannel, handler);
-        Messenger messenger = Bukkit.getMessenger();
-        messenger.registerIncomingPluginChannel(plugin, BUNGEECORD_CHANNEL,
-                (channel, player, bytes) -> {
-                    try {
-                        DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
-                        String sub = in.readUTF();
-                        String data = in.readUTF();
-                        Consumer<String> listener = listeners.get(sub);
-                        if (listener != null) listener.accept(data);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
     }
 
     public boolean isAvailable() {
-        return Bukkit.getMessenger().isOutgoingChannelRegistered(plugin, BUNGEECORD_CHANNEL);
+        return Bukkit.getMessenger().isOutgoingChannelRegistered(plugin, RELAY_CHANNEL);
     }
 }
