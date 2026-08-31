@@ -53,7 +53,7 @@ public class StepModule extends ZModule implements StepManager {
                 return;
             }
 
-            scheduler.runNextTick(w2 -> createStep(this.plugin.getUser(player.getUniqueId()), player, step));
+            scheduler.runAtEntity(player, w2 -> createStep(this.plugin.getUser(player.getUniqueId()), player, step));
         });
     }
 
@@ -84,7 +84,7 @@ public class StepModule extends ZModule implements StepManager {
                 additionalData.put(customStep.getServiceName(), customStep.register(player, date));
             }
 
-            scheduler.runNextTick(w2 -> finishStep(plugin.getUser(player.getUniqueId()), player, step, additionalData, stepDTO.play_time_start()));
+            scheduler.runAtEntity(player, w2 -> finishStep(plugin.getUser(player.getUniqueId()), player, step, additionalData, stepDTO.play_time_start()));
         });
     }
 

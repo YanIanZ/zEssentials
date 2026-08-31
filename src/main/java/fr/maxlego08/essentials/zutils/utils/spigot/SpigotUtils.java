@@ -19,7 +19,7 @@ public class SpigotUtils extends BaseServer {
 
     @Override
     public void kick(Player player, Message message, Object... objects) {
-        Bukkit.getScheduler().runTask(this.plugin, () -> player.kickPlayer(getMessage(message, objects)));
+        this.plugin.getScheduler().runAtEntity(player, task -> player.kickPlayer(getMessage(message, objects)));
     }
 
     @Override

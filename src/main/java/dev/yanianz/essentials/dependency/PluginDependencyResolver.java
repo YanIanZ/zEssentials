@@ -111,7 +111,7 @@ public final class PluginDependencyResolver {
 
             // Some region threaded platforms reject the global task, fall back to a delayed stop
             try {
-                Bukkit.getScheduler().runTaskLater(plugin, Bukkit::shutdown, 20L * 10);
+                Bukkit.getAsyncScheduler().runDelayed(plugin, task -> Bukkit.shutdown(), 10L, java.util.concurrent.TimeUnit.SECONDS);
             } catch (Throwable throwable) {
                 Thread stopper = new Thread(() -> {
                     try { Thread.sleep(10_000L); } catch (InterruptedException ignored) {}

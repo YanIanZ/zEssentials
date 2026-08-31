@@ -54,7 +54,7 @@ public class CommandPublicHomes extends VCommand {
 
             if (homeModule.getPublicHomesDisplay() == PublicHomesDisplay.INVENTORY) {
                 homeModule.setCachedPublicHomes(this.player.getUniqueId(), filtered);
-                plugin.getScheduler().runNextTick(wrappedTask -> homeModule.openPublicHomesInventory(this.player));
+                plugin.getScheduler().runAtEntity(this.player, wrappedTask -> homeModule.openPublicHomesInventory(this.player));
                 return;
             }
 

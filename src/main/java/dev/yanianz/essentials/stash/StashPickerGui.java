@@ -45,7 +45,7 @@ public final class StashPickerGui {
 
         player.openInventory(inventory);
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        plugin.getScheduler().runNextTick(task -> {
             StashPickerListener.register(plugin, player, module);
         });
     }

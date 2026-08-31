@@ -212,7 +212,7 @@ public class SanctionModule extends ZModule implements SanctionManager {
                 if (warningCount >= entry.getKey() && !entry.getValue().isEmpty()) {
                     String command = entry.getValue().replace("%player%", playerName);
                     this.plugin.getLogger().info("Warning escalation (" + warningCount + " warnings): " + command);
-                    Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+                    this.plugin.getScheduler().runNextTick(task -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
                     break;
                 }
             }
