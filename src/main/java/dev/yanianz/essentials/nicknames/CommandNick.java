@@ -27,6 +27,7 @@ public class CommandNick extends VCommand {
         this.addOptionalArg("nickname", (sender, args) -> nickCompletion(args));
         this.addOptionalArg("nickname", (sender, args) -> nickCompletionAdmin(args));
         this.setExtendedArgs(true);
+        this.onlyPlayers();
     }
 
     private List<String> nickCompletion(String[] args) {

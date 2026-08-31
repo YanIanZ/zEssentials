@@ -20,6 +20,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -259,6 +260,33 @@ public class PlayerListener extends ZUtils implements Listener {
 
         String command = optional.get();
         event.setCancelled(event.getPlayer().performCommand(command));
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getClickedBlock() == null) return;
+        Player player = event.getPlayer();
+        if (player.isSneaking()) return;
+
+        org.bukkit.Material material = event.getClickedBlock().getType();
+
+        if (material == org.bukkit.Material.CRAFTING_TABLE) {
+            fr.maxlego08.essentials.module.modules.CraftingModule craftingModule =
+                    this.plugin.getModuleManager().getModule(fr.maxlego08.essentials.module.modules.CraftingModule.class);
+            if (craftingModule != null && craftingModule.isEnabled()) {
+                event.setCancelled(true);
+                dev.yanianz.essentials.crafting.CraftingListener.ensureRegistered((fr.maxlego08.essentials.ZEssentialsPlugin) this.plugin);
+                craftingModule.openCrafting(player);
+            }
+        } else if (material == org.bukkit.Material.ENDER_CHEST) {
+            dev.yanianz.essentials.enderchest.EnderChestModule ecModule =
+                    this.plugin.getModuleManager().getModule(dev.yanianz.essentials.enderchest.EnderChestModule.class);
+            if (ecModule != null && ecModule.isEnable()) {
+                event.setCancelled(true);
+                ecModule.openEnderChest(player);
+            }
+        }
     }
 
     @EventHandler

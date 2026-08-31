@@ -17,6 +17,7 @@ public class CommandUnDisguise extends VCommand {
         this.setPermission(Permission.ESSENTIALS_DISGUISE_USE);
         this.setDescription(Message.DESCRIPTION_UNDISGUISE);
         this.addOptionalArg("player", getVisiblePlayerNames());
+        this.onlyPlayers();
     }
 
     @Override

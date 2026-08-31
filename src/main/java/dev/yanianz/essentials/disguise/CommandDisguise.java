@@ -28,6 +28,7 @@ public class CommandDisguise extends VCommand {
         this.setDescription(Message.DESCRIPTION_DISGUISE);
         this.addOptionalArg("action", (sender, args) -> List.of("off", "random", "skin", "list"));
         this.setExtendedArgs(true);
+        this.onlyPlayers();
     }
 
     @Override

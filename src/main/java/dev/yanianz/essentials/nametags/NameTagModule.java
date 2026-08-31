@@ -192,11 +192,22 @@ public class NameTagModule extends ZModule {
 
         GroupRule rule = firstMatch(player);
         NicknamesModule nickModule = this.plugin.getModuleManager().getModule(NicknamesModule.class);
-        String disguiseName = nickModule == null ? null : nickModule.getDisplayName(player);
-        String plainName = disguiseName == null ? null
-                : net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+        String effectiveName = player.getName();
+        if (nickModule != null) {
+            String disguiseName = nickModule.getDisplayName(player);
+            if (disguiseName != null && !disguiseName.isEmpty()) {
+                String plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
                         .plainText().serialize(dev.yanianz.essentials.util.ColorUtil.component(disguiseName));
-        String effectiveName = (plainName == null || plainName.isBlank()) ? player.getName() : plainName;
+                if (!plain.isBlank()) effectiveName = plain;
+            } else {
+                String nickname = nickModule.getNickname(player.getUniqueId());
+                if (nickname != null && !nickname.isEmpty()) {
+                    String plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+                            .plainText().serialize(dev.yanianz.essentials.util.ColorUtil.component(nickname));
+                    if (!plain.isBlank()) effectiveName = plain;
+                }
+            }
+        }
         String format = this.fallbackTabFormat != null ? this.fallbackTabFormat : "&7%player%";
         String fallbackTab = colorize(format.replace("%player%", effectiveName));
 
@@ -204,9 +215,9 @@ public class NameTagModule extends ZModule {
                 ? dev.yanianz.essentials.util.ColorUtil.component(fallbackTab)
                 : rule.tabFormat();
 
-        // PlaceholderAPI support inside the tab name
         try {
             String legacy = toLegacy(tabName);
+            legacy = legacy.replace("%player%", effectiveName);
             String resolved = papi(legacy, player);
             tabName = dev.yanianz.essentials.util.ColorUtil.component(resolved);
         } catch (Exception ignored) {
@@ -216,11 +227,12 @@ public class NameTagModule extends ZModule {
 
         if (rule == null) return;
 
+        final String effName = effectiveName;
         this.plugin.getScheduler().runNextTick(wrappedTask -> {
             try {
                 Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
                 String teamName = this.ladderSort
-                        ? teamName(rule, effectiveName)
+                        ? teamName(rule, effName)
                         : teamName(rule);
 
                 Team team = scoreboard.getTeam(teamName);
@@ -230,22 +242,20 @@ public class NameTagModule extends ZModule {
                     team.suffix(rule.suffix());
                 }
 
-                if (!team.hasEntry(effectiveName)) {
-                    team.addEntry(effectiveName);
+                if (!team.hasEntry(effName)) {
+                    team.addEntry(effName);
                 }
             } catch (Throwable ignored) {
-                // Scoreboard manager unavailable during early joins
             }
         });
 
-        // Below name objective — scoreboard ops need the main thread on Folia
         if (this.belowNameEnabled) {
             this.plugin.getScheduler().runNextTick(wrappedTask -> {
                 org.bukkit.scoreboard.Objective objective = belowNameObjective();
                 if (objective != null && "PLACEHOLDER".equals(this.belowNameMode)) {
                     String value = papi(this.belowNamePlaceholder, player).replaceAll("[^0-9.-]", "");
                     try {
-                        objective.getScore(player.getName()).setScore((int) Double.parseDouble(value));
+                    objective.getScore(effName).setScore((int) Double.parseDouble(value));
                     } catch (NumberFormatException ignored) {
                     }
                 }
