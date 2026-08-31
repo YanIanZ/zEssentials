@@ -46,8 +46,8 @@ public final class CraftingGui {
         inventory.setItem(CraftingSlotMap.SLOT_CLOSE,
                 namedItem(Material.valueOf(module.getCloseMaterial()), module.getCloseText()));
 
-        for (int i = 0; i < 36; i++) {
-            ItemStack playerItem = player.getInventory().getItem(i);
+        for (int i = 0; i < 27; i++) {
+            ItemStack playerItem = player.getInventory().getItem(i + 9);
             if (playerItem != null) {
                 inventory.setItem(CraftingSlotMap.PLAYER_INV_START + i, playerItem);
             }

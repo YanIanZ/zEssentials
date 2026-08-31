@@ -8,6 +8,8 @@ public final class CraftingSlotMap {
     public static final int SLOT_QUICK_CRAFT = 22;
     public static final int SLOT_CLOSE = 49;
     public static final int PLAYER_INV_START = 27;
+    public static final int PLAYER_INV_END = 53;
+    public static final int PLAYER_INV_SLOTS = 27;
     private CraftingSlotMap() {
     }
 
@@ -28,7 +30,7 @@ public final class CraftingSlotMap {
     }
 
     public static boolean isPlayerInvSlot(int slot) {
-        return slot >= PLAYER_INV_START && slot < INVENTORY_SIZE;
+        return slot >= PLAYER_INV_START && slot <= PLAYER_INV_END;
     }
 
     public static boolean isFillerSlot(int slot) {
