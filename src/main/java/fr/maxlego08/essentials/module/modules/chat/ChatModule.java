@@ -85,6 +85,8 @@ public class ChatModule extends ZModule {
     private final Pattern urlPattern = Pattern.compile("(https?://[\\w-\\.]+(\\:[0-9]+)?(/[\\w-./?%&=~+#]*)?)", Pattern.CASE_INSENSITIVE);
     private final List<ChatCooldown> chatCooldowns = new ArrayList<>();
     private final List<ChatFormat> chatFormats = new ArrayList<>();
+    private final Map<String, String> worldChatFormats = new java.util.HashMap<>();
+    private final List<NameColor> nameColors = new ArrayList<>();
     private final List<ChatPlaceholder> chatPlaceholders = new ArrayList<>();
     private final List<CustomRules> customRules = new ArrayList<>();
     private ChatDisplay pingDisplay;
@@ -94,6 +96,9 @@ public class ChatModule extends ZModule {
     private String pubRegex;
     private String defaultChatFormat;
     private String moderatorAction;
+    private String prefixPlaceholder = "%luckperms_prefix%";
+    private String suffixPlaceholder = "%luckperms_suffix%";
+    private String defaultNameColor = "&f";
     private String linkTransform;
     private String dateFormat;
     private String antiFloodRegex;
@@ -143,6 +148,27 @@ public class ChatModule extends ZModule {
     @Override
     public void loadConfiguration() {
         super.loadConfiguration();
+
+        var lpcConfig = getConfiguration();
+        this.prefixPlaceholder = lpcConfig.getString("lpc.prefix-placeholder", "%luckperms_prefix%");
+        this.suffixPlaceholder = lpcConfig.getString("lpc.suffix-placeholder", "%luckperms_suffix%");
+        this.defaultNameColor = lpcConfig.getString("lpc.default-name-color", "&f");
+        this.worldChatFormats.clear();
+        var worldFormatsSection = lpcConfig.getConfigurationSection("world-chat-formats");
+        if (worldFormatsSection != null) {
+            for (String key : worldFormatsSection.getKeys(false)) {
+                String format = worldFormatsSection.getString(key);
+                if (format != null) this.worldChatFormats.put(key.toLowerCase(java.util.Locale.ROOT), format);
+            }
+        }
+        this.nameColors.clear();
+        for (Object obj : lpcConfig.getMapList("lpc.name-colors")) {
+            if (!(obj instanceof java.util.Map<?, ?> raw)) continue;
+            Object colorObj = raw.get("color");
+            Object permObj = raw.get("permission");
+            if (colorObj == null) continue;
+            this.nameColors.add(new NameColor(String.valueOf(colorObj), permObj == null ? "" : String.valueOf(permObj)));
+        }
 
         this.alphanumericPattern = Pattern.compile(or(this.alphanumericRegex, "^[a-zA-Z0-9_.?!^¨%ù*&é\"#'{(\\[-|èêë`\\\\çà)\\]=}ûî+<>:²€$/\\-,-â@;ô ]+$"));
         this.linkPattern = Pattern.compile(or(this.linkRegex, "[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)"));
@@ -368,7 +394,7 @@ public class ChatModule extends ZModule {
         }
 
         PaperComponent paperComponent = (PaperComponent) this.componentMessage;
-        String chatFormat = papi(getChatFormat(player), player);
+        String chatFormat = papi(applyLpcPlaceholders(player, getChatFormat(player)), player);
 
         TagResolver.Builder builder = TagResolver.builder();
         try {
@@ -543,7 +569,53 @@ public class ChatModule extends ZModule {
     }
 
     private String getChatFormat(Player player) {
+        String worldKey = player.getWorld().getName().toLowerCase(java.util.Locale.ROOT);
+        String worldFormat = this.worldChatFormats.get(worldKey);
+        if (worldFormat != null) return worldFormat;
         return this.chatFormats.stream().filter(chatFormat -> player.hasPermission(chatFormat.permission())).sorted(Comparator.comparingInt(ChatFormat::priority).reversed()).map(ChatFormat::format).findFirst().orElse(this.defaultChatFormat);
+    }
+
+    /**
+     * LPC-style placeholders: %prefix% / %suffix% resolved through the
+     * configured PAPI keys (LuckPerms by default) and %name-color% resolved
+     * through the permission-based name color list.
+     */
+    private String applyLpcPlaceholders(Player player, String format) {
+        String result = format;
+        if (result.contains("%prefix%")) {
+            String prefix = resolvePapiOrEmpty(player, this.prefixPlaceholder);
+            result = result.replace("%prefix%", prefix);
+        }
+        if (result.contains("%suffix%")) {
+            String suffix = resolvePapiOrEmpty(player, this.suffixPlaceholder);
+            result = result.replace("%suffix%", suffix);
+        }
+        if (result.contains("%name-color%")) {
+            result = result.replace("%name-color%", resolveNameColor(player));
+        }
+        return result;
+    }
+
+    private String resolvePapiOrEmpty(Player player, String placeholder) {
+        try {
+            String resolved = papi(placeholder, player);
+            if (resolved == null || resolved.equals(placeholder) || resolved.contains(placeholder)) return "";
+            return resolved;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String resolveNameColor(Player player) {
+        for (NameColor nameColor : this.nameColors) {
+            if (nameColor.permission().isEmpty() || player.hasPermission(nameColor.permission())) {
+                return nameColor.color();
+            }
+        }
+        return this.defaultNameColor;
+    }
+
+    public record NameColor(String color, String permission) {
     }
 
     private double handleCooldown(User user) {

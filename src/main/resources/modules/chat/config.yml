@@ -117,6 +117,28 @@ chat-cooldown-max: 50
 # %displayName% - Player's display name
 # <message> - Player's message, Attention for message it's not %message% !
 # %moderator_action% - Moderation action, see moderator-action
+# LPC-style chat (https://github.com/ThePM2/LPC-Pro-Wiki)
+# %prefix% / %suffix% resolve through the configured PlaceholderAPI keys
+# (LuckPerms by default). %name-color% resolves from the permission list.
+lpc:
+  prefix-placeholder: "%luckperms_prefix%"
+  suffix-placeholder: "%luckperms_suffix%"
+  default-name-color: "&f"
+  name-colors:
+    - color: "&#ff4d4d"
+      permission: "essentials.chat.color.red"
+    - color: "&#ffd93d"
+      permission: "essentials.chat.color.gold"
+    - color: "&#4cd5ff"
+      permission: "essentials.chat.color.aqua"
+    - color: "&#24d65d"
+      permission: "essentials.chat.color.green"
+
+# Per-world chat formats — override the group formats in these worlds.
+# Remove or comment out if not needed.
+world-chat-formats: []
+#  event_world: "<gray>%prefix%<white>%player% » <gray><message>"
+
 chat-formats:
   - priority: 1
     permission: "essentials.chat.format.vip"
