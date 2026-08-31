@@ -1,5 +1,6 @@
 package dev.yanianz.essentials.nametags;
 
+import dev.yanianz.essentials.nicknames.NicknamesModule;
 import fr.maxlego08.essentials.ZEssentialsPlugin;
 import fr.maxlego08.essentials.api.configuration.NonLoadable;
 import fr.maxlego08.essentials.module.ZModule;
@@ -190,7 +191,13 @@ public class NameTagModule extends ZModule {
         if (!this.isEnable || !player.isOnline()) return;
 
         GroupRule rule = firstMatch(player);
-        String fallbackTab = colorize(this.fallbackTabFormat.replace("%player%", player.getName()));
+        NicknamesModule nickModule = this.plugin.getModuleManager().getModule(NicknamesModule.class);
+        String disguiseName = nickModule == null ? null : nickModule.getDisplayName(player);
+        String plainName = disguiseName == null ? null
+                : net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+                        .plainText().serialize(dev.yanianz.essentials.util.ColorUtil.component(disguiseName));
+        String effectiveName = (plainName == null || plainName.isBlank()) ? player.getName() : plainName;
+        String fallbackTab = colorize(this.fallbackTabFormat.replace("%player%", effectiveName));
 
         Component tabName = rule == null
                 ? dev.yanianz.essentials.util.ColorUtil.component(fallbackTab)
@@ -212,7 +219,7 @@ public class NameTagModule extends ZModule {
             try {
                 Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
                 String teamName = this.ladderSort
-                        ? teamName(rule, player.getName())
+                        ? teamName(rule, effectiveName)
                         : teamName(rule);
 
                 Team team = scoreboard.getTeam(teamName);
@@ -222,8 +229,8 @@ public class NameTagModule extends ZModule {
                     team.suffix(rule.suffix());
                 }
 
-                if (!team.hasEntry(player.getName())) {
-                    team.addEntry(player.getName());
+                if (!team.hasEntry(effectiveName)) {
+                    team.addEntry(effectiveName);
                 }
             } catch (Throwable ignored) {
                 // Scoreboard manager unavailable during early joins
