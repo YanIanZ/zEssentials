@@ -29,10 +29,10 @@ public class CommandPartyChat extends VCommand {
             return CommandResultType.SUCCESS;
         }
         String msg = getArgs(0);
-        String formatted = module.getChatFormat()
-                .replace("%player%", this.player.getName())
-                .replace("%message%", msg)
-                .replace("&", "§");
+        String formatted = dev.yanianz.essentials.util.ColorUtil.sections(
+                module.getChatFormat()
+                        .replace("%player%", this.player.getName())
+                        .replace("%message%", msg));
         for (UUID memberUuid : module.getParty(partyId).members().keySet()) {
             Player p = Bukkit.getPlayer(memberUuid);
             if (p != null) p.sendMessage(LegacyComponentSerializer.legacySection().deserialize(formatted));

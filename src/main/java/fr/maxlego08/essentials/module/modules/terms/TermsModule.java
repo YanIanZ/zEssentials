@@ -305,7 +305,7 @@ public class TermsModule extends ZModule {
     }
 
     private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
+        return dev.yanianz.essentials.util.ColorUtil.sections(text);
     }
 
     private File getStorageFile() {

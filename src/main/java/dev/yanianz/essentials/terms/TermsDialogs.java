@@ -84,6 +84,6 @@ public final class TermsDialogs {
     }
 
     private static String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
+        return dev.yanianz.essentials.util.ColorUtil.sections(text);
     }
 }

@@ -209,7 +209,7 @@ public class TabListModule extends ZModule {
     }
 
     private String colorize(String text) {
-        return text == null ? "" : text.replace("&", "§");
+        return dev.yanianz.essentials.util.ColorUtil.sections(text);
     }
 
     public boolean isLayoutEnabled() {
