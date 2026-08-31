@@ -903,4 +903,47 @@ public class JsonStorage extends StorageHelper implements IStorage {
 
     private record DiscordLogEntry(DiscordAction action, UUID uniqueId, String minecraftName, String discordName, long userId, String data, Date createdAt) {
     }
+
+    // ── JSON-backed feature stubs (use MYSQL/MONGO) ──
+    private void unsupported() {
+        throw new UnsupportedOperationException("Use MYSQL or MONGO storage for this feature");
+    }
+
+    @Override public void upsertNickname(UUID uuid, String nickname) { unsupported(); }
+    @Override public void deleteNickname(UUID uuid) { unsupported(); }
+    @Override public String getNickname(UUID uuid) { return null; }
+    @Override public Map<UUID, String> getAllNicknames() { return new HashMap<>(); }
+
+    @Override public void upsertDisguise(UUID uuid, String json) { unsupported(); }
+    @Override public void deleteDisguise(UUID uuid) { unsupported(); }
+    @Override public String getDisguise(UUID uuid) { return null; }
+    @Override public Map<UUID, String> getAllDisguises() { return new HashMap<>(); }
+
+    @Override public void upsertChatPreference(UUID uuid, String json) { unsupported(); }
+    @Override public void deleteChatPreference(UUID uuid) { unsupported(); }
+    @Override public String getChatPreference(UUID uuid) { return null; }
+    @Override public Map<UUID, String> getAllChatPreferences() { return new HashMap<>(); }
+
+    @Override public void upsertReport(ReportDTO report) { unsupported(); }
+    @Override public void deleteReport(int id) { unsupported(); }
+    @Override public List<ReportDTO> getReports() { return new ArrayList<>(); }
+    @Override public List<ReportDTO> getReports(UUID targetUuid) { return new ArrayList<>(); }
+
+    @Override public void upsertNote(NoteDTO note) { unsupported(); }
+    @Override public void deleteNote(UUID playerUuid, int noteIndex) { unsupported(); }
+    @Override public List<NoteDTO> getNotes(UUID playerUuid) { return new ArrayList<>(); }
+    @Override public void clearNotes(UUID playerUuid) { unsupported(); }
+
+    @Override public void upsertReputation(UUID uuid, String json) { unsupported(); }
+    @Override public String getReputation(UUID uuid) { return null; }
+    @Override public Map<UUID, String> getAllReputations() { return new HashMap<>(); }
+
+    @Override public void upsertEnderChest(UUID uuid, String json) { unsupported(); }
+    @Override public String getEnderChest(UUID uuid) { return null; }
+
+    @Override public void upsertItemStash(UUID uuid, String json) { unsupported(); }
+    @Override public String getItemStash(UUID uuid) { return null; }
+
+    @Override public void upsertMaterialStash(UUID uuid, String json) { unsupported(); }
+    @Override public String getMaterialStash(UUID uuid) { return null; }
 }

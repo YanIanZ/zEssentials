@@ -27,6 +27,15 @@ import fr.maxlego08.essentials.storage.mongodb.repos.MongoLinkAccountRepository;
 import fr.maxlego08.essentials.storage.mongodb.repos.MongoLinkCodeRepository;
 import fr.maxlego08.essentials.storage.mongodb.repos.MongoLinkHistoryRepository;
 import fr.maxlego08.essentials.storage.mongodb.repos.MongoUserStepRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoNicknameRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoDisguiseRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoChatPreferenceRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoReportRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoNoteRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoReputationRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoEnderChestRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoItemStashRepository;
+import fr.maxlego08.essentials.storage.mongodb.repos.MongoMaterialStashRepository;
 
 public class MongoRepositories {
 
@@ -55,6 +64,15 @@ public class MongoRepositories {
     public final MongoLinkCodeRepository linkCodes;
     public final MongoLinkHistoryRepository linkHistory;
     public final MongoUserStepRepository steps;
+    public final MongoNicknameRepository nicknames;
+    public final MongoDisguiseRepository disguises;
+    public final MongoChatPreferenceRepository chatPreferences;
+    public final MongoReportRepository reports;
+    public final MongoNoteRepository notes;
+    public final MongoReputationRepository reputations;
+    public final MongoEnderChestRepository enderChests;
+    public final MongoItemStashRepository itemStashes;
+    public final MongoMaterialStashRepository materialStashes;
 
     public MongoRepositories(EssentialsPlugin plugin, MongoDatabase database) {
         this.users = new MongoUserRepository(plugin, database);
@@ -82,5 +100,14 @@ public class MongoRepositories {
         this.linkCodes = new MongoLinkCodeRepository(plugin, database);
         this.linkHistory = new MongoLinkHistoryRepository(plugin, database);
         this.steps = new MongoUserStepRepository(plugin, database);
+        this.nicknames = new MongoNicknameRepository(plugin, database);
+        this.disguises = new MongoDisguiseRepository(plugin, database);
+        this.chatPreferences = new MongoChatPreferenceRepository(plugin, database);
+        this.reports = new MongoReportRepository(plugin, database);
+        this.notes = new MongoNoteRepository(plugin, database);
+        this.reputations = new MongoReputationRepository(plugin, database);
+        this.enderChests = new MongoEnderChestRepository(plugin, database);
+        this.itemStashes = new MongoItemStashRepository(plugin, database);
+        this.materialStashes = new MongoMaterialStashRepository(plugin, database);
     }
 }

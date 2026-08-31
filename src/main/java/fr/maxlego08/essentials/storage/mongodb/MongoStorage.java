@@ -684,4 +684,51 @@ public class MongoStorage extends StorageHelper implements IStorage {
         }
         return null;
     }
+
+    // ── Nicknames ──
+    @Override public void upsertNickname(UUID uuid, String nickname) { repositories.nicknames.upsert(uuid, nickname); }
+    @Override public void deleteNickname(UUID uuid) { repositories.nicknames.delete(uuid); }
+    @Override public String getNickname(UUID uuid) { return repositories.nicknames.get(uuid); }
+    @Override public Map<UUID, String> getAllNicknames() { return repositories.nicknames.getAll(); }
+
+    // ── Disguises ──
+    @Override public void upsertDisguise(UUID uuid, String json) { repositories.disguises.upsert(uuid, json); }
+    @Override public void deleteDisguise(UUID uuid) { repositories.disguises.delete(uuid); }
+    @Override public String getDisguise(UUID uuid) { return repositories.disguises.get(uuid); }
+    @Override public Map<UUID, String> getAllDisguises() { return repositories.disguises.getAll(); }
+
+    // ── Chat preferences ──
+    @Override public void upsertChatPreference(UUID uuid, String json) { repositories.chatPreferences.upsert(uuid, json); }
+    @Override public void deleteChatPreference(UUID uuid) { repositories.chatPreferences.delete(uuid); }
+    @Override public String getChatPreference(UUID uuid) { return repositories.chatPreferences.get(uuid); }
+    @Override public Map<UUID, String> getAllChatPreferences() { return repositories.chatPreferences.getAll(); }
+
+    // ── Reports ──
+    @Override public void upsertReport(ReportDTO report) { repositories.reports.upsert(report); }
+    @Override public void deleteReport(int id) { repositories.reports.delete(id); }
+    @Override public List<ReportDTO> getReports() { return repositories.reports.selectAll(); }
+    @Override public List<ReportDTO> getReports(UUID targetUuid) { return repositories.reports.selectByTarget(targetUuid); }
+
+    // ── Notes ──
+    @Override public void upsertNote(NoteDTO note) { repositories.notes.upsert(note); }
+    @Override public void deleteNote(UUID playerUuid, int noteIndex) { repositories.notes.delete(playerUuid, noteIndex); }
+    @Override public List<NoteDTO> getNotes(UUID playerUuid) { return repositories.notes.selectByPlayer(playerUuid); }
+    @Override public void clearNotes(UUID playerUuid) { repositories.notes.clearByPlayer(playerUuid); }
+
+    // ── Reputation ──
+    @Override public void upsertReputation(UUID uuid, String json) { repositories.reputations.upsert(uuid, json); }
+    @Override public String getReputation(UUID uuid) { return repositories.reputations.get(uuid); }
+    @Override public Map<UUID, String> getAllReputations() { return repositories.reputations.getAll(); }
+
+    // ── EnderChest ──
+    @Override public void upsertEnderChest(UUID uuid, String json) { repositories.enderChests.upsert(uuid, json); }
+    @Override public String getEnderChest(UUID uuid) { return repositories.enderChests.get(uuid); }
+
+    // ── Stash items ──
+    @Override public void upsertItemStash(UUID uuid, String json) { repositories.itemStashes.upsert(uuid, json); }
+    @Override public String getItemStash(UUID uuid) { return repositories.itemStashes.get(uuid); }
+
+    // ── Stash materials ──
+    @Override public void upsertMaterialStash(UUID uuid, String json) { repositories.materialStashes.upsert(uuid, json); }
+    @Override public String getMaterialStash(UUID uuid) { return repositories.materialStashes.get(uuid); }
 }

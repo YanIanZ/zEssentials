@@ -776,4 +776,51 @@ public interface IStorage {
      * @return a list of player names
      */
     List<String> getPlayerNames();
+
+    // ── Nicknames ──
+    void upsertNickname(UUID uuid, String nickname);
+    void deleteNickname(UUID uuid);
+    String getNickname(UUID uuid);
+    java.util.Map<UUID, String> getAllNicknames();
+
+    // ── Disguises (stored as JSON string) ──
+    void upsertDisguise(UUID uuid, String json);
+    void deleteDisguise(UUID uuid);
+    String getDisguise(UUID uuid);
+    java.util.Map<UUID, String> getAllDisguises();
+
+    // ── Chat preferences (stored as JSON string) ──
+    void upsertChatPreference(UUID uuid, String json);
+    void deleteChatPreference(UUID uuid);
+    String getChatPreference(UUID uuid);
+    java.util.Map<UUID, String> getAllChatPreferences();
+
+    // ── Reports ──
+    void upsertReport(fr.maxlego08.essentials.api.dto.ReportDTO report);
+    void deleteReport(int id);
+    java.util.List<fr.maxlego08.essentials.api.dto.ReportDTO> getReports();
+    java.util.List<fr.maxlego08.essentials.api.dto.ReportDTO> getReports(UUID targetUuid);
+
+    // ── Notes ──
+    void upsertNote(fr.maxlego08.essentials.api.dto.NoteDTO note);
+    void deleteNote(UUID playerUuid, int noteIndex);
+    java.util.List<fr.maxlego08.essentials.api.dto.NoteDTO> getNotes(UUID playerUuid);
+    void clearNotes(UUID playerUuid);
+
+    // ── Reputation (stored as JSON string) ──
+    void upsertReputation(UUID uuid, String json);
+    String getReputation(UUID uuid);
+    java.util.Map<UUID, String> getAllReputations();
+
+    // ── EnderChest (stored as JSON string) ──
+    void upsertEnderChest(UUID uuid, String json);
+    String getEnderChest(UUID uuid);
+
+    // ── Stash items (stored as JSON string) ──
+    void upsertItemStash(UUID uuid, String json);
+    String getItemStash(UUID uuid);
+
+    // ── Stash materials (stored as JSON string) ──
+    void upsertMaterialStash(UUID uuid, String json);
+    String getMaterialStash(UUID uuid);
 }

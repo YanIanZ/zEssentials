@@ -123,6 +123,16 @@ public class SqlStorage extends StorageHelper implements IStorage {
         MigrationManager.registerMigration(new CreateUserStepV2Migration());
         MigrationManager.registerMigration(new CreateUserMailMessageMigration());
 
+        MigrationManager.registerMigration(new CreateNicknamesMigration());
+        MigrationManager.registerMigration(new CreateDisguisesMigration());
+        MigrationManager.registerMigration(new CreateChatPreferencesMigration());
+        MigrationManager.registerMigration(new CreateReportsMigration());
+        MigrationManager.registerMigration(new CreateNotesMigration());
+        MigrationManager.registerMigration(new CreateReputationsMigration());
+        MigrationManager.registerMigration(new CreateEnderChestMigration());
+        MigrationManager.registerMigration(new CreateItemStashMigration());
+        MigrationManager.registerMigration(new CreateMaterialStashMigration());
+
         // Repositories
         this.repositories = new Repositories(plugin, this.connection);
         this.repositories.register(UserRepository.class);
@@ -150,6 +160,16 @@ public class SqlStorage extends StorageHelper implements IStorage {
         this.repositories.register(LinkHistoryRepository.class);
         this.repositories.register(PrivateMessagesRepository.class);
         this.repositories.register(UserStepRepository.class);
+
+        this.repositories.register(NicknameRepository.class);
+        this.repositories.register(DisguiseRepository.class);
+        this.repositories.register(ChatPreferenceRepository.class);
+        this.repositories.register(ReportRepository.class);
+        this.repositories.register(NoteRepository.class);
+        this.repositories.register(ReputationRepository.class);
+        this.repositories.register(EnderChestRepository.class);
+        this.repositories.register(ItemStashRepository.class);
+        this.repositories.register(MaterialStashRepository.class);
 
         MigrationManager.execute(this.connection, JULogger.from(this.plugin.getLogger()));
 
@@ -916,6 +936,53 @@ public class SqlStorage extends StorageHelper implements IStorage {
     public DatabaseConnection getConnection() {
         return connection;
     }
+
+    // ── Nicknames ──
+    @Override public void upsertNickname(UUID uuid, String nickname) { with(NicknameRepository.class).upsert(uuid, nickname); }
+    @Override public void deleteNickname(UUID uuid) { with(NicknameRepository.class).delete(uuid); }
+    @Override public String getNickname(UUID uuid) { return with(NicknameRepository.class).get(uuid); }
+    @Override public Map<UUID, String> getAllNicknames() { return with(NicknameRepository.class).getAll(); }
+
+    // ── Disguises ──
+    @Override public void upsertDisguise(UUID uuid, String json) { with(DisguiseRepository.class).upsert(uuid, json); }
+    @Override public void deleteDisguise(UUID uuid) { with(DisguiseRepository.class).delete(uuid); }
+    @Override public String getDisguise(UUID uuid) { return with(DisguiseRepository.class).get(uuid); }
+    @Override public Map<UUID, String> getAllDisguises() { return with(DisguiseRepository.class).getAll(); }
+
+    // ── Chat preferences ──
+    @Override public void upsertChatPreference(UUID uuid, String json) { with(ChatPreferenceRepository.class).upsert(uuid, json); }
+    @Override public void deleteChatPreference(UUID uuid) { with(ChatPreferenceRepository.class).delete(uuid); }
+    @Override public String getChatPreference(UUID uuid) { return with(ChatPreferenceRepository.class).get(uuid); }
+    @Override public Map<UUID, String> getAllChatPreferences() { return with(ChatPreferenceRepository.class).getAll(); }
+
+    // ── Reports ──
+    @Override public void upsertReport(ReportDTO report) { with(ReportRepository.class).upsert(report); }
+    @Override public void deleteReport(int id) { with(ReportRepository.class).delete(id); }
+    @Override public List<ReportDTO> getReports() { return with(ReportRepository.class).selectAll(); }
+    @Override public List<ReportDTO> getReports(UUID targetUuid) { return with(ReportRepository.class).selectByTarget(targetUuid); }
+
+    // ── Notes ──
+    @Override public void upsertNote(NoteDTO note) { with(NoteRepository.class).upsert(note); }
+    @Override public void deleteNote(UUID playerUuid, int noteIndex) { with(NoteRepository.class).delete(playerUuid, noteIndex); }
+    @Override public List<NoteDTO> getNotes(UUID playerUuid) { return with(NoteRepository.class).selectByPlayer(playerUuid); }
+    @Override public void clearNotes(UUID playerUuid) { with(NoteRepository.class).clearByPlayer(playerUuid); }
+
+    // ── Reputation ──
+    @Override public void upsertReputation(UUID uuid, String json) { with(ReputationRepository.class).upsert(uuid, json); }
+    @Override public String getReputation(UUID uuid) { return with(ReputationRepository.class).get(uuid); }
+    @Override public Map<UUID, String> getAllReputations() { return with(ReputationRepository.class).getAll(); }
+
+    // ── EnderChest ──
+    @Override public void upsertEnderChest(UUID uuid, String json) { with(EnderChestRepository.class).upsert(uuid, json); }
+    @Override public String getEnderChest(UUID uuid) { return with(EnderChestRepository.class).get(uuid); }
+
+    // ── Stash items ──
+    @Override public void upsertItemStash(UUID uuid, String json) { with(ItemStashRepository.class).upsert(uuid, json); }
+    @Override public String getItemStash(UUID uuid) { return with(ItemStashRepository.class).get(uuid); }
+
+    // ── Stash materials ──
+    @Override public void upsertMaterialStash(UUID uuid, String json) { with(MaterialStashRepository.class).upsert(uuid, json); }
+    @Override public String getMaterialStash(UUID uuid) { return with(MaterialStashRepository.class).get(uuid); }
 
     protected void async(UUID uniqueId, Runnable runnable) {
         this.plugin.getScheduler().runAsync(wrappedTask -> {
