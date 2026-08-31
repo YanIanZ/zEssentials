@@ -11,15 +11,32 @@ public class EnderChestHolder implements InventoryHolder {
     private final EnderChestData data;
     private final int pages;
     private final boolean readOnly;
+    private final boolean overview;
+    private final int allowedPages;
     private int currentPage;
     private Inventory inventory;
 
     public EnderChestHolder(UUID playerId, EnderChestData data, int currentPage, int pages, boolean readOnly) {
+        this(playerId, data, currentPage, pages, readOnly, false, pages);
+    }
+
+    public EnderChestHolder(UUID playerId, EnderChestData data, int currentPage, int pages,
+                            boolean readOnly, boolean overview, int allowedPages) {
         this.playerId = playerId;
         this.data = data;
         this.currentPage = currentPage;
         this.pages = pages;
         this.readOnly = readOnly;
+        this.overview = overview;
+        this.allowedPages = allowedPages;
+    }
+
+    public boolean isOverview() {
+        return overview;
+    }
+
+    public int getAllowedPages() {
+        return allowedPages;
     }
 
     public UUID getPlayerId() {

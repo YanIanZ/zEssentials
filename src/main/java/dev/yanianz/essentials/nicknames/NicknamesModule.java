@@ -47,6 +47,7 @@ public class NicknamesModule extends ZModule {
     private int skinCacheHours;
     private boolean blockStaff;
     private List<String> randomPool = new java.util.ArrayList<>();
+    private List<String> randomNickPool = new java.util.ArrayList<>();
     private List<String> allowedMobs = new java.util.ArrayList<>();
 
     @NonLoadable
@@ -92,6 +93,8 @@ public class NicknamesModule extends ZModule {
         this.skinCacheHours = Math.max(1, config.getInt("disguise.skin-cache-hours", 24));
         this.blockStaff = config.getBoolean("disguise.block-staff", false);
         this.randomPool = config.getStringList("disguise.random-pool");
+        this.randomNickPool = config.getStringList("random-nick-pool");
+        if (this.randomNickPool == null || this.randomNickPool.isEmpty()) this.randomNickPool = this.randomPool;
         if (this.randomPool == null) this.randomPool = new java.util.ArrayList<>();
         this.allowedMobs = config.getStringList("disguise.allowed-mobs");
         if (this.allowedMobs == null) this.allowedMobs = new java.util.ArrayList<>();
@@ -342,6 +345,10 @@ public class NicknamesModule extends ZModule {
 
     public List<String> getRandomPool() {
         return this.randomPool;
+    }
+
+    public List<String> getRandomNickPool() {
+        return this.randomNickPool;
     }
 
     public List<String> getAllowedMobs() {

@@ -83,10 +83,12 @@ class EnderChestSlotMapTest {
     }
 
     @Test
-    @DisplayName("Nav button slots: prev=45, close=49, next=53")
+    @DisplayName("Nav button slots: first=45, prev=46, close=49, next=52, last=53")
     void testNavButtonSlots() {
-        assertEquals(45, EnderChestSlotMap.SLOT_PREV);
+        assertEquals(45, EnderChestSlotMap.SLOT_FIRST);
+        assertEquals(46, EnderChestSlotMap.SLOT_PREV);
         assertEquals(49, EnderChestSlotMap.SLOT_CLOSE);
-        assertEquals(53, EnderChestSlotMap.SLOT_NEXT);
+        assertEquals(52, EnderChestSlotMap.SLOT_NEXT);
+        assertEquals(53, EnderChestSlotMap.SLOT_LAST);
     }
 }

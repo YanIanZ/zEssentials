@@ -57,6 +57,8 @@ public final class EnderChestGui {
         }
 
         if (currentPage > 0) {
+            inventory.setItem(EnderChestSlotMap.SLOT_FIRST,
+                    namedItem(parseMaterial(module.getNavFirstButton(), Material.SPECTRAL_ARROW), module.getNavFirstText()));
             inventory.setItem(EnderChestSlotMap.SLOT_PREV,
                     namedItem(parseMaterial(module.getNavPrevButton(), Material.ARROW), module.getNavPrevText()));
         }
@@ -67,13 +69,59 @@ public final class EnderChestGui {
             String indicator = module.getPageIndicatorText()
                     .replace("%current%", String.valueOf(currentPage + 1))
                     .replace("%total%", String.valueOf(pages));
-            inventory.setItem(47, namedItem(filler, indicator));
+            inventory.setItem(EnderChestSlotMap.SLOT_INDICATOR, namedItem(filler, indicator));
         }
 
         if (currentPage < pages - 1) {
             inventory.setItem(EnderChestSlotMap.SLOT_NEXT,
                     namedItem(parseMaterial(module.getNavNextButton(), Material.ARROW), module.getNavNextText()));
+            inventory.setItem(EnderChestSlotMap.SLOT_LAST,
+                    namedItem(parseMaterial(module.getNavLastButton(), Material.SPECTRAL_ARROW), module.getNavLastText()));
         }
+    }
+
+    /**
+     * Hypixel SkyBlock style overview: ender chest info icon at the top,
+     * one clickable button per page with locked pages grayed out.
+     */
+    public static void openOverview(ZEssentialsPlugin plugin, Player player,
+                                    EnderChestData data, int visiblePages, int allowedPages) {
+        EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
+        EnderChestHolder holder = new EnderChestHolder(data.getPlayerId(), data, 0, visiblePages, false, true, allowedPages);
+
+        Inventory inventory = Bukkit.createInventory(holder, 54,
+                LEGACY.deserialize(ColorUtil.sections(module.getOverviewTitle())));
+        holder.setInventory(inventory);
+
+        Material filler = parseMaterial(module.getNavFillerMaterial(), Material.GRAY_STAINED_GLASS_PANE);
+        ItemStack fillerItem = namedItem(filler, module.getNavFillerColor() + " ");
+        for (int i = 0; i < 54; i++) inventory.setItem(i, fillerItem);
+
+        inventory.setItem(EnderChestSlotMap.OVERVIEW_INFO_SLOT,
+                namedItem(parseMaterial(module.getOverviewInfoMaterial(), Material.ENDER_CHEST),
+                        module.getOverviewInfoText(), module.getOverviewInfoLore()));
+
+        for (int i = 0; i < Math.max(visiblePages, allowedPages); i++) {
+            int slot = EnderChestSlotMap.OVERVIEW_PAGE_START + i;
+            if (slot > EnderChestSlotMap.OVERVIEW_CLOSE_SLOT) break;
+            String pageStr = String.valueOf(i + 1);
+            if (i < visiblePages) {
+                inventory.setItem(slot, namedItem(
+                        parseMaterial(module.getOverviewPageMaterial(), Material.ENDER_EYE),
+                        module.getOverviewPageText().replace("%page%", pageStr),
+                        module.getOverviewPageLore()));
+            } else {
+                inventory.setItem(slot, namedItem(
+                        parseMaterial(module.getOverviewLockedMaterial(), Material.GRAY_DYE),
+                        module.getOverviewLockedText().replace("%page%", pageStr),
+                        module.getOverviewLockedLore()));
+            }
+        }
+
+        inventory.setItem(EnderChestSlotMap.OVERVIEW_CLOSE_SLOT,
+                namedItem(parseMaterial(module.getNavCloseButton(), Material.BARRIER), module.getNavCloseText()));
+
+        player.openInventory(inventory);
     }
 
     static void switchPage(ZEssentialsPlugin plugin, Player player, EnderChestHolder holder, int newPage) {
@@ -87,10 +135,17 @@ public final class EnderChestGui {
     }
 
     static ItemStack namedItem(Material material, String nameLegacy) {
+        return namedItem(material, nameLegacy, null);
+    }
+
+    static ItemStack namedItem(Material material, String nameLegacy, List<String> loreLegacy) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(LEGACY.deserialize(ColorUtil.sections(nameLegacy)));
+            if (loreLegacy != null && !loreLegacy.isEmpty()) {
+                meta.lore(loreLegacy.stream().map(l -> LEGACY.deserialize(ColorUtil.sections(l))).toList());
+            }
             item.setItemMeta(meta);
         }
         return item;

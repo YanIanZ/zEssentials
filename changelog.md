@@ -34,6 +34,13 @@ Every change lands in this changelog immediately under its bumped heading.
 - **5 new permissions** — `ESSENTIALS_DISGUISE_USE`, `ESSENTIALS_DISGUISE_OTHER`, `ESSENTIALS_DISGUISE_RANDOM`, `ESSENTIALS_DISGUISE_SKIN`, `ESSENTIALS_DISGUISE_BYPASS_COOLDOWN`
 - **12 new tests** — DisguiseData (5), SkinCache (7)
 
+## Nick & Enderchest — Hypixel SkyBlock reference
+
+- **Hypixel-style `/nick`** — `/nick` with no arguments now gives a random anonymous identity: random plausible username from `random-nick-pool` (20 defaults) + matching skin fetched from Mojang; identity applies everywhere (chat, tab, name tag, packet skin) via the disguise system; `/nick clear` removes it; `/nick <name>` now applies the matching skin too; `/nick random` re-rolls
+- **`SkinFetcher`** — shared Mojang API helper (uuid lookup + textures fetch) extracted from CommandDisguise, reused by `/nick` with 24h SkinCache
+- **Hypixel-style Ender Chest** — `/enderchest` now opens a page-selector overview (info icon, clickable page buttons with locked pages grayed out, close button) before the page view; page view nav row upgraded to Hypixel layout: `« First (45)`, `← Previous (46)`, indicator (48), Close (49), `Next → (52)`, `Last » (53)`; overview fully config-driven in `modules/enderchest/config.yml` `overview` section
+- **EnderChestHolder** — carries overview state + allowed pages for the page selector
+
 ## Disguise system — LibsDisguises-style engine
 
 - **Packet engine rewrite** — `PacketMobDisguiseListener` now covers 4 packet types: `SPAWN_ENTITY` (rewrite entity type in-flight via `EntityTypeModifier`), `ENTITY_METADATA` (replace watcher with mob defaults + colorized custom name above the mob), `ENTITY_EQUIPMENT` (cancelled for mob-disguised players — mobs don't wear player gear), `PLAYER_INFO` (mob-disguised players removed from tab list, `hide-from-tab` config, own entry always preserved)

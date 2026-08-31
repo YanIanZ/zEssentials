@@ -26,6 +26,12 @@ public class EnderChestListener implements Listener {
 
         int slot = event.getRawSlot();
 
+        if (holder.isOverview()) {
+            event.setCancelled(true);
+            handleOverviewClick(player, holder, slot);
+            return;
+        }
+
         if (EnderChestSlotMap.isNavSlot(slot)) {
             event.setCancelled(true);
             handleNavClick(player, holder, slot);
@@ -46,15 +52,37 @@ public class EnderChestListener implements Listener {
         }
     }
 
+    private void handleOverviewClick(Player player, EnderChestHolder holder, int slot) {
+        if (slot == EnderChestSlotMap.OVERVIEW_CLOSE_SLOT) {
+            player.closeInventory();
+            return;
+        }
+        if (!EnderChestSlotMap.isOverviewPageSlot(slot, holder.getAllowedPages())) return;
+
+        int page = EnderChestSlotMap.overviewPage(slot);
+        if (page < 0 || page >= holder.getPages()) return;
+
+        player.closeInventory();
+        EnderChestModule module = plugin.getModuleManager().getModule(EnderChestModule.class);
+        plugin.getScheduler().runNextTick(wrappedTask ->
+                EnderChestGui.open(plugin, player, holder.getData(), holder.getPages(), page, holder.isReadOnly()));
+    }
+
     private void handleNavClick(Player player, EnderChestHolder holder, int slot) {
         if (slot == EnderChestSlotMap.SLOT_CLOSE) {
             player.closeInventory();
+        } else if (slot == EnderChestSlotMap.SLOT_FIRST) {
+            syncAllSlots(holder);
+            EnderChestGui.switchPage(plugin, player, holder, 0);
         } else if (slot == EnderChestSlotMap.SLOT_PREV) {
             syncAllSlots(holder);
             EnderChestGui.switchPage(plugin, player, holder, holder.getCurrentPage() - 1);
         } else if (slot == EnderChestSlotMap.SLOT_NEXT) {
             syncAllSlots(holder);
             EnderChestGui.switchPage(plugin, player, holder, holder.getCurrentPage() + 1);
+        } else if (slot == EnderChestSlotMap.SLOT_LAST) {
+            syncAllSlots(holder);
+            EnderChestGui.switchPage(plugin, player, holder, holder.getPages() - 1);
         }
     }
 

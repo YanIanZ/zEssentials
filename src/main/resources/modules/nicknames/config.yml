@@ -27,6 +27,30 @@ allow-colors: true
 
 cooldown-seconds: 60
 
+# Hypixel-style /nick — /nick with no arguments gives a random anonymous
+# identity (random username from this pool + matching skin from Mojang).
+random-nick-pool:
+  - xX_ShadowKing_Xx
+  - DiamondHunter07
+  - EnderSlayer99
+  - BlazeMaster_YT
+  - CoolDude_2007
+  - Steve_Miner
+  - NightWolf_13
+  - PixelPanda
+  - LavaRunner
+  - SkyWarrior_YT
+  - CraftKing_99
+  - ToxicGamer_Xx
+  - SnowBallz
+  - IronGolemFan
+  - NotAProGamer
+  - HyperBeast_YT
+  - SolarFlareX
+  - MoonLightNinja
+  - ZombieSlayer42
+  - RedstoneWizard
+
 # Disguise settings — changes name AND skin at the packet level
 disguise:
   # Master toggle for the disguise system

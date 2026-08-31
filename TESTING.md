@@ -46,6 +46,12 @@
 | N13 | Cek tab list setelah /nick | Tab list menampilkan nickname |
 | N14 | Cek name above head | NameTag menampilkan nickname |
 | N15 | Cek below-name objective | Menampilkan nickname |
+| N16 | `/nick` tanpa arg (Hypixel style) | Random identity: nama acak + skin matching, "Randomizing..." message |
+| N17 | `/nick` lagi | Identity baru berbeda (re-roll) |
+| N18 | `/nick clear` | Nick + skin hilang, kembali normal |
+| N19 | `/nick Notch` | Nama + skin Notch (matching skin) |
+| N20 | Kosongkan random-nick-pool, `/nick` | Pesan "random nick pool is empty" |
+| N21 | Matikan internet, `/nick OfflineName` | Pesan fetch failed |
 
 ---
 
@@ -124,11 +130,16 @@
 | C4 | `/craft` | Custom crafting GUI terbuka |
 | C5 | Craft item dengan recipe valid | Item hasil muncul |
 | C6 | Tutup GUI dengan item di slot | Item kembali ke inventory |
-| C7 | Right-click enderchest | Custom enderchest GUI terbuka (54 slot, paginated) |
+| C7 | Right-click enderchest | Ender chest overview terbuka (page selector ala Hypixel) |
 | C8 | Sneak + right-click enderchest | Vanilla enderchest (bypass) |
 | C9 | Disable enderchest module, right-click enderchest | Pesan "module disabled", no vanilla GUI |
-| C10 | `/enderchest` | Custom enderchest GUI terbuka |
-| C11 | `/endersee <player>` (admin) | Lihat enderchest player lain (read-only) |
+| C10 | `/enderchest` | Overview page selector terbuka |
+| C11 | Click page button (unlocked) | Page view terbuka dengan konten page itu |
+| C12 | Click locked page button | Tidak terjadi apa-apa (locked) |
+| C13 | Nav: click « First | Kembali ke page 1 |
+| C14 | Nav: click Last » | Lompat ke page terakhir |
+| C15 | Nav: ← Prev / Next → | Pindah page satu-satu |
+| C16 | `/endersee <player>` (admin) | Lihat enderchest player lain (read-only) |
 
 ---
 

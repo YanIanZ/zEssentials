@@ -24,11 +24,34 @@ title: "&5&lEnder Chest &8(&f%page%&8/&f%total%&8)"
 nav-row:
   filler-material: GRAY_STAINED_GLASS_PANE
   filler-color: "&8"
+  first-button: SPECTRAL_ARROW
+  first-text: "&7« First Page"
   prev-button: ARROW
-  prev-text: "&7« Previous Page"
+  prev-text: "&7← Previous Page"
   next-button: ARROW
-  next-text: "&7Next Page »"
+  next-text: "&7Next Page →"
+  last-button: SPECTRAL_ARROW
+  last-text: "&7Last Page »"
   close-button: BARRIER
   close-text: "&cClose"
   page-indicator: true
   page-indicator-text: "&fPage &e%current% &7/ &e%total%"
+
+# Hypixel SkyBlock style overview — /enderchest opens this page selector
+overview:
+  enable: true
+  title: "&5&lEnder Chest"
+  info-material: ENDER_CHEST
+  info-text: "&5&lEnder Chest"
+  info-lore:
+    - "&7Select a page below to view"
+    - "&7your ender chest storage."
+  page-material: ENDER_EYE
+  page-text: "&5Ender Chest Page &e%page%"
+  page-lore:
+    - "&7Click to open this page."
+  locked-material: GRAY_DYE
+  locked-text: "&cPage &e%page% &8(Locked)"
+  locked-lore:
+    - "&7Unlock more pages with"
+    - "&7essentials.enderchest.pages.<n>"
