@@ -15,6 +15,32 @@ Every change lands in this changelog immediately under its bumped heading.
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
+# 1.3.0.0
+
+## Cross-server storage migration
+
+Migrated 9 features from per-module JSON files to IStorage (SQL + Mongo) so player data syncs across a proxy network.
+
+- **IStorage interface** — 30+ new domain-specific method signatures (nicknames, disguises, chat preferences, reports, notes, reputation, enderchest, stash items, stash materials)
+- **ReportDTO + NoteDTO** — new API record types for structured queries
+- **SQL** — 9 new migrations + 9 repositories following the existing `sarah` pattern, registered in `SqlStorage`
+- **Mongo** — 9 new `MongoRepository` subclasses, wired into `MongoRepositories`
+- **JsonStorage** — `UnsupportedOperationException` stubs (use MYSQL/MONGO)
+- **Complex objects** (disguises, chat preferences, reputation, enderchest, stash) stored as JSON strings via existing serializers (Gson + Base64 ItemStack encoding)
+- **Auto-migration** — on startup, each module checks for legacy JSON files, bulk-inserts into the database, and renames to `.migrated`
+- **Module updates** — all 9 modules switched from `Files.readString`/`Files.writeString` to `IStorage` calls; in-memory caches and data structures unchanged
+
+Features migrated:
+1. Nicknames — `getAllNicknames()` / `upsertNickname()` / `deleteNickname()`
+2. Disguises — `getAllDisguises()` / `upsertDisguise()` / `deleteDisguise()` (JSON string)
+3. Chat preferences — `getAllChatPreferences()` / `upsertChatPreference()` (JSON string)
+4. Reports — `getReports()` / `upsertReport(ReportDTO)` / `deleteReport(int)`
+5. Notes — `getNotes(UUID)` / `upsertNote(NoteDTO)` / `clearNotes(UUID)` (lazy per-player load)
+6. Reputation — `getAllReputations()` / `upsertReputation()` (JSON string)
+7. EnderChest — `getEnderChest()` / `upsertEnderChest()` (JSON string, per-player)
+8. Stash items — `getItemStash()` / `upsertItemStash()` (JSON string, per-player)
+9. Stash materials — `getMaterialStash()` / `upsertMaterialStash()` (JSON string, per-player)
+
 # 1.2.2.0
 
 ## zMenu GUI — Hypixel bottom row polish

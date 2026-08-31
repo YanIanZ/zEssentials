@@ -14,7 +14,7 @@
 Sorted by priority:
 
 ## Next steps (open)
-- [ ] Cross-server storage: migrate disguises, enderchest, reports, notes, reputations and chat preferences from JSON files to IStorage (MYSQL/MONGO) so player data syncs across the proxy network
+- [x] Cross-server storage: migrate disguises, enderchest, reports, notes, reputations, nicknames, chat preferences, stash items and stash materials from JSON files to IStorage (MYSQL/MONGO) — auto-migration on startup, player data syncs across the proxy network
 - [x] Velocity-native proxy plugin (:ProxyVelocity module, zessentials:relay channel)
 - [ ] Disguise: per-mob metadata polish (baby variants, villager professions) and bundled spawn packets to remove viewer flicker on refresh
 - [x] Craft/enderchest zMenu GUIs: Hypixel-style bottom row (craft button, filler, close/back), stash withdraw-all button
