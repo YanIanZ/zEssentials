@@ -49,6 +49,8 @@ public enum Permission {
     ESSENTIALS_TP_WORLD,
     ESSENTIALS_TP_WORLD_OTHER("Allows to teleport another player into a world"),
     ESSENTIALS_TRASH,
+    ESSENTIALS_TOAST("Show a custom advancement toast popup"),
+    ESSENTIALS_TOAST_OTHER("Show a toast to another player"),
     ESSENTIALS_CONDENSE,
     ESSENTIALS_FEED,
     ESSENTIALS_FEED_OTHER("Allows to feed another player"),

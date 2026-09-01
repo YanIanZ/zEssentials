@@ -58,6 +58,17 @@ public class TextPlaceholders implements PlaceholderRegister {
                 "Returns the text in monospace Unicode letters", "text");
         placeholder.register("double_", (player, text) -> transform(text, DOUBLE_STRUCK),
                 "Returns the text in double-struck Unicode letters", "text");
+        placeholder.register("roman_", (player, number) -> toRoman(safeInt(number)),
+                "Converts a number to Roman numerals (I, II, III... max 3999)", "number");
+        placeholder.register("gametime_", (player, ticks) -> ticksToTime(ticks),
+                "Converts game ticks to 24h time format (HH:MM, 0 ticks = 06:00)", "ticks");
+        placeholder.register("compactnum_", (player, value) -> compactNumber(value),
+                "Formats large numbers compactly (1.5K, 2.3M, 3B)", "value");
+    }
+
+    private int safeInt(String s) {
+        try { return Integer.parseInt(s.trim()); }
+        catch (NumberFormatException e) { return 0; }
     }
 
     private String transform(String text, String[] mapping) {
@@ -76,5 +87,53 @@ public class TextPlaceholders implements PlaceholderRegister {
             }
         }
         return out.toString();
+    }
+
+    // ── Roman numeral placeholder ──
+    private static final java.util.TreeMap<Integer, String> ROMAN_MAP = new java.util.TreeMap<>();
+    static {
+        ROMAN_MAP.put(1000, "M"); ROMAN_MAP.put(900, "CM"); ROMAN_MAP.put(500, "D"); ROMAN_MAP.put(400, "CD");
+        ROMAN_MAP.put(100, "C");  ROMAN_MAP.put(90, "XC");  ROMAN_MAP.put(50, "L");  ROMAN_MAP.put(40, "XL");
+        ROMAN_MAP.put(10, "X");   ROMAN_MAP.put(9, "IX");    ROMAN_MAP.put(5, "V");   ROMAN_MAP.put(4, "IV");
+        ROMAN_MAP.put(1, "I");
+    }
+
+    private static String toRoman(int number) {
+        if (number <= 0 || number > 3999) return String.valueOf(number);
+        Integer key = ROMAN_MAP.floorKey(number);
+        if (key == null) return String.valueOf(number);
+        if (number == key) return ROMAN_MAP.get(key);
+        return ROMAN_MAP.get(key) + toRoman(number - key);
+    }
+
+    // ── Game time placeholder (ticks → HH:MM 24h format) ──
+    private static String ticksToTime(String ticksStr) {
+        try {
+            long ticks = Long.parseLong(ticksStr);
+            ticks = ((ticks % 24000) + 24000) % 24000;
+            long totalMinutes = (ticks * 24 * 60) / 24000;
+            long hours = (6 + totalMinutes / 60) % 24;
+            long minutes = totalMinutes % 60;
+            return String.format("%02d:%02d", hours, minutes);
+        } catch (NumberFormatException e) {
+            return "00:00";
+        }
+    }
+
+    // ── Compact number placeholder ──
+    private static final String[] COMPACT_SUFFIXES = {"", "K", "M", "B", "T", "Q"};
+    private static String compactNumber(String valueStr) {
+        try {
+            double value = Double.parseDouble(valueStr);
+            if (value < 1000) return String.valueOf((long) value);
+            int tier = 0;
+            while (value >= 1000 && tier < COMPACT_SUFFIXES.length - 1) {
+                value /= 1000;
+                tier++;
+            }
+            return String.format("%.1f%s", value, COMPACT_SUFFIXES[tier]);
+        } catch (NumberFormatException e) {
+            return valueStr;
+        }
     }
 }

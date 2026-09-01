@@ -15,6 +15,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - ~~Ajouter une option pour désactiver la tabulation des joueurs hors ligne~~ ✅ Already existed (config: `enable-offline-player-names`), default changed to `false` in 1.3.4.0
 - ~~Ajouter un placeholder pour transformed les caractères en lettre spécial~~ ✅ Done in 1.3.4.0
 
+# 1.3.5.0
+
+## CMILib-inspired small features (4 new)
+
+- **`/toast [player] <message>`** — show a custom advancement toast popup to yourself or another player; optional icon via `&&` separator (e.g. `/toast Hello && diamond`); permissions `essentials.toast` / `essentials.toast.other`; `ToastSender` uses NMS reflection to load a temporary advancement
+- **`%zessentials_roman_<number>%`** — convert integers to Roman numerals (I, II, III... XLII... max 3999, fallback to plain number above)
+- **`%zessentials_gametime_<ticks>%`** — convert game ticks to 24h time format (HH:MM, 0 ticks = 06:00, 6000 = 12:00)
+- **`%zessentials_compactnum_<value>%`** — format large numbers compactly (1500 → 1.5K, 2300000 → 2.3M, 3B, 4T)
+
 # 1.3.4.0
 
 ## Changelog Idée features (all 3 completed)

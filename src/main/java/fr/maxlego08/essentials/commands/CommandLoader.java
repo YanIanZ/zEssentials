@@ -105,6 +105,7 @@ public class CommandLoader {
         register("more", CommandMore.class);
         register("worldtp", CommandTeleportWorld.class, "wtp");
         register("trash", CommandTrash.class, "poubelle");
+        register("toast", dev.yanianz.essentials.toast.CommandToast.class);
         register("condense", CommandCondense.class);
         register("feed", CommandFeed.class, "eat");
         register("craft", CommandCraft.class, "wb", "workbench");
