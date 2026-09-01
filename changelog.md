@@ -15,6 +15,29 @@ Every change lands in this changelog immediately under its bumped heading.
 - ~~Ajouter une option pour désactiver la tabulation des joueurs hors ligne~~ ✅ Already existed (config: `enable-offline-player-names`), default changed to `false` in 1.3.4.0
 - ~~Ajouter un placeholder pour transformed les caractères en lettre spécial~~ ✅ Done in 1.3.4.0
 
+# 1.3.6.0
+
+## UI/UX polish — messages + GUI
+
+### Messages
+- **Separator modernization** — replaced `&8&m--------` strikethrough dash separators in `warnings-header`, `notes-header`, `report-list-header` with clean Unicode vertical bars `#656665│` in all 7 message files (en + fr/de/es/it/nl/zh)
+- **`notes-line` bug fix** — replaced legacy `§` section signs with `&` ampersand color codes (consistency with all other messages)
+- **`messages_it.yml` prefix fix** — replaced hardcoded hex `#03fcb6zEssentials #656665•` with theme tokens `<primary>zEssentials <secondary>•` (matches all other language files)
+
+### GUI titles modernized (10 files)
+- `enderchest/config.yml` — `&5&lEnder Chest` → `#3f3f3fᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ` (title, info-text, page-text)
+- `stash/config.yml` — `&d&lItem Stash` → `#3f3f3fɪᴛᴇᴍ sᴛᴀsʜ`
+- `crafting/config.yml` — `&8&lCrafting Table` → `#3f3f3fᴄʀᴀꜰᴛɪɴɢ ᴛᴀʙʟᴇ`
+- `kits/kits_categories.yml` — `&8&l« &e&lKit Categories &8&l»` → `#3f3f3fᴋɪᴛ ᴄᴀᴛᴇɢᴏʀɪᴇs`
+- `kits/kits_category_default.yml` — `&6&l⛏ &e&lTOOLS CATEGORY &6&l⛏` → `#3f3f3fᴛᴏᴏʟs ᴄᴀᴛᴇɢᴏʀʏ`
+- `kits/kits_category_combat.yml` — `&4&l⚔ &c&lCOMBAT KITS &4&l⚔` → `#3f3f3fᴄᴏᴍʙᴀᴛ ᴋɪᴛs`
+- `worldedit/pw-help.yml` — `&8Help Player Warp` → `#3f3f3fᴘʟᴀʏᴇʀ ᴡᴀʀᴘs`
+- `vault/vault.yml` — `&f%vault-name%` → `#3f3f3f%vault-name%`
+- `vault/vault-admin.yml` — `&f%player% - %vault-name%` → `#3f3f3f%player% - %vault-name%`
+- `vault/vault-configuration.yml` — `&8ᴄᴏɴғɪɢᴜʀᴀᴛɪᴏɴ` → `#3f3f3fᴄᴏɴғɪɢᴜʀᴀᴛɪᴏɴ`
+
+All GUI titles now use consistent `#3f3f3f` hex + Unicode small-caps style matching the enderchest/crafting/stash inventories.
+
 # 1.3.5.0
 
 ## CMILib-inspired small features (4 new)

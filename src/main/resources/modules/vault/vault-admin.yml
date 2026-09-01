@@ -1,4 +1,4 @@
-name: "&f%player% - %vault-name%"
+name: "#3f3f3f%player% - %vault-name%"
 size: 54
 items:
   disableSlots:

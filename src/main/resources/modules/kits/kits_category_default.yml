@@ -15,7 +15,7 @@ size: 54 # Inventory size
 open-permission: null
 
 # Menu title with professional styling
-title: "&6&l⛏ &e&lTOOLS CATEGORY &6&l⛏"
+title: "#3f3f3fᴛᴏᴏʟs ᴄᴀᴛᴇɢᴏʀʏ"
 
 # Fill empty slots
 fillItem:

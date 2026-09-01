@@ -15,7 +15,7 @@ size: 54 # Inventory size
 open-permission: null
 
 # Menu title with professional styling
-title: "&4&l⚔ &c&lCOMBAT KITS &4&l⚔"
+title: "#3f3f3fᴄᴏᴍʙᴀᴛ ᴋɪᴛs"
 
 # Fill empty slots
 fillItem:

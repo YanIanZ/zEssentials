@@ -814,10 +814,10 @@ raid-alert:
   message: '&#ff4d4d&l⚠ 突袭警报&#ffffff: 检测到 %amount% 条相似消息 &8«&7&o%message%&8»'
 description-warn: 向玩家发出警告
 description-warnings: 列出玩家的警告
-warnings-header: '&8&m--------&#ff4d4d &f%player% 的警告 &8(&f%count%&8) &8&m--------'
+warnings-header: '#656665│ &#ff4d4d&f%player% 的警告 &8(&f%count%&8) #656665│'
 warnings-line: ' &#ff9d4d• &7[%date%] &f%reason%'
 description-notes: 查看或管理私人员工备注
-notes-header: '&8&m--------&#00d4ff &f%player% 的备注 &8(&f%count%&8) &8&m--------'
+notes-header: '#656665│ &#00d4ff&f%player% 的备注 &8(&f%count%&8) #656665│'
 notes-line: ' §7[%date% §8| §f%staff%§7] §f%note%'
 note-added: '<success>已为 &f%player%<success> 添加备注。'
 notes-cleared: '<success>已删除 &f%player% <success>的 &f%count% <success>条备注。'
@@ -880,7 +880,7 @@ report-target-offline: '<error>被举报的玩家已离线,传送已取消。'
 report-teleported: '<success>已传送到 &f%player%<success>。'
 report-resolved: '<success>举报 &f#%id% <success>已标记为已解决。'
 report-reopened: '<success>举报 &f#%id% <success>已重新打开。'
-report-list-header: '&8&m--------&#ff4d4d 举报 &8(&f%count%&8) &8&m--------'
+report-list-header: '#656665│ &#ff4d4d举报 &8(&f%count%&8) #656665│'
 description-chatcolor: 打开聊天颜色选择
 description-tags: 打开聊天标签选择
 reply-no-target: '<error>你还没有可以回复的对象。'

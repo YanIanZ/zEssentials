@@ -18,7 +18,7 @@
 ########################################################################################################################
 # Plugin's prefix
 # Translation made by Melon-Oof
-prefix: "#03fcb6zEssentials #656665• "
+prefix: "<primary>zEssentials <secondary>• "
 you: "Tu"
 #Trash can GUI username
 trash: "&8Cestino della Spazzatura"
@@ -724,10 +724,10 @@ raid-alert:
   message: "&#ff4d4d&l⚠ ALLARME RAID&#ffffff: %amount% messaggi simili rilevati &8«&7&o%message%&8»"
 description-warn: "Emetti un avvertimento a un giocatore"
 description-warnings: "Elenca gli avvertimenti di un giocatore"
-warnings-header: "&8&m--------&#ff4d4d Avvertimenti di &f%player% &8(&f%count%&8) &8&m--------"
+warnings-header: "#656665│ &#ff4d4dAvvertimenti di &f%player% &8(&f%count%&8) #656665│"
 warnings-line: " &#ff9d4d• &7[%date%] &f%reason%"
 description-notes: "Visualizza o gestisci le note private dello staff"
-notes-header: "&8&m--------&#00d4ff Note di &f%player% &8(&f%count%&8) &8&m--------"
+notes-header: "#656665│ &#00d4ffNote di &f%player% &8(&f%count%&8) #656665│"
 notes-line: " §7[%date% §8| §f%staff%§7] §f%note%"
 note-added: "<success>Nota aggiunta per &f%player%<success>."
 notes-cleared: "<success>Rimosse &f%count% <success>nota/e di &f%player%<success>."
@@ -790,7 +790,7 @@ report-target-offline: "<error>Il giocatore segnalato è offline, teleport annul
 report-teleported: "<success>Teletrasportato da &f%player%<success>."
 report-resolved: "<success>Segnalazione &f#%id% <success>segnata come risolta."
 report-reopened: "<success>Segnalazione &f#%id% <success>riaperta."
-report-list-header: "&8&m--------&#ff4d4d Segnalazioni &8(&f%count%&8) &8&m--------"
+report-list-header: "#656665│ &#ff4d4dSegnalazioni &8(&f%count%&8) #656665│"
 description-chatcolor: "Apri la selezione del colore della chat"
 description-tags: "Apri la selezione dei tag di chat"
 reply-no-target: "<error>Non hai ancora nessuno a cui rispondere."
