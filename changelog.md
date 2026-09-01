@@ -11,9 +11,23 @@ Every change lands in this changelog immediately under its bumped heading.
 
 # Idée:
 
-- Ajouter un broadcast de message centré avec le support des \n pour ajouter plusieurs lignes
-- Ajouter une option pour désactiver la tabulation des joueurs hors ligne
-- Ajouter un placeholder pour transformed les caractères en lettre spécial
+- ~~Ajouter un broadcast de message centré avec le support des \n pour ajouter plusieurs lignes~~ ✅ Done in 1.3.4.0
+- ~~Ajouter une option pour désactiver la tabulation des joueurs hors ligne~~ ✅ Already existed (config: `enable-offline-player-names`), default changed to `false` in 1.3.4.0
+- ~~Ajouter un placeholder pour transformed les caractères en lettre spécial~~ ✅ Done in 1.3.4.0
+
+# 1.3.4.0
+
+## Changelog Idée features (all 3 completed)
+
+- **Centered multi-line broadcast** — `/broadcast` now always centers each line using the pixel-width centering algorithm, and splits on `\n` for multi-line broadcasts (e.g. `/broadcast Line1\nLine2` sends two centered lines)
+- **Offline tab-completion default** — `config.yml` `enable-offline-player-names` default changed from `true` to `false` with a performance warning comment; on large servers, loading all player names from the database on every tab completion causes latency
+- **Fancy text placeholders** — new `TextPlaceholders` class with 6 Unicode text styles:
+  - `%zessentials_fancy_<text>%` — mathematical script (𝓯𝓪𝓷𝓬𝔂)
+  - `%zessentials_bold_<text>%` — mathematical bold (𝐛𝐨𝐥𝐝)
+  - `%zessentials_italic_<text>%` — mathematical italic (𝑖𝑡𝑎𝑙𝑖𝑐)
+  - `%zessentials_smallcaps_<text>%` — small caps (sᴍᴀʟʟ ᴄᴀᴘs)
+  - `%zessentials_mono_<text>%` — monospace (𝚖𝚘𝚗𝚘)
+  - `%zessentials_double_<text>%` — double-struck (𝕕𝕠𝕦𝕓𝕝𝕖)
 
 # 1.3.3.0
 

@@ -6,6 +6,10 @@ import fr.maxlego08.essentials.api.commands.Permission;
 import fr.maxlego08.essentials.api.messages.Message;
 import fr.maxlego08.essentials.module.modules.chat.ChatModule;
 import fr.maxlego08.essentials.zutils.utils.commands.VCommand;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
+
+import dev.yanianz.essentials.util.ColorUtil;
 
 public class CommandChatBroadcast extends VCommand {
 
@@ -21,7 +25,14 @@ public class CommandChatBroadcast extends VCommand {
     @Override
     protected CommandResultType perform(EssentialsPlugin plugin) {
         String message = getArgs(0);
-        plugin.getEssentialsServer().broadcast(message);
+        String[] lines = message.split("\\\\n");
+        for (String line : lines) {
+            String colored = ColorUtil.sections(line);
+            String centered = getCenteredMessage(colored);
+            var component = LegacyComponentSerializer.legacySection().deserialize(centered);
+            Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(component));
+            Bukkit.getConsoleSender().sendMessage(component);
+        }
         return CommandResultType.SUCCESS;
     }
 }

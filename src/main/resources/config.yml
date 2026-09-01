@@ -301,7 +301,9 @@ random-words:
   - "enderchest"
 
 # Displays the nicknames of online and offline players in the command completion tab
-enable-offline-player-names: true
+# Warning: on large servers with many registered players, this can cause latency on tab completion
+# Set to false to only suggest online players
+enable-offline-player-names: false
 
 # List of players that will be blacklist of your server, they will not be able to connect
 blacklist-uuids:
