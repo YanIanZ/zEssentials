@@ -12,7 +12,7 @@ config-version: 1
 enable: true
 
 # Title of the custom crafting GUI
-title: "#3f3f3fᴄʀᴀꜰᴛɪɴɢ ᴛᴀʙʟᴇ"
+title: "#3f3f3f🔨 ᴄʀᴀꜰᴛɪɴɢ ᴛᴀʙʟᴇ"
 
 # Quick Craft button (shown only for players with the permission)
 quick-craft:

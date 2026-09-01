@@ -18,7 +18,7 @@ max-pages: 3
 
 # Title shown at the top of the enderchest GUI.
 # %page% and %total% placeholders are available.
-title: "#3f3f3fᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ &8(&f%page%&8/&f%total%&8)"
+title: "#3f3f3f📦 ᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ &8(&f%page%&8/&f%total%&8)"
 
 # Navigation row configuration (bottom row, slots 45-53).
 nav-row:
@@ -40,14 +40,14 @@ nav-row:
 # Hypixel SkyBlock style overview — /enderchest opens this page selector
 overview:
   enable: true
-  title: "#3f3f3fᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ"
+  title: "#3f3f3f📦 ᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ"
   info-material: ENDER_CHEST
-  info-text: "#3f3f3fᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ"
+  info-text: "#3f3f3f📦 ᴇɴᴅᴇʀ ᴄʜᴇꜱᴛ"
   info-lore:
     - "&7Select a page below to view"
     - "&7your ender chest storage."
   page-material: ENDER_EYE
-  page-text: "#3f3f3fᴘᴀɢᴇ &e%page%"
+  page-text: "#3f3f3f📄 ᴘᴀɢᴇ &e%page%"
   page-lore:
     - "&7Click to open this page."
   locked-material: GRAY_DYE

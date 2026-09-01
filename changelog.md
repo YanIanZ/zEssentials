@@ -15,6 +15,40 @@ Every change lands in this changelog immediately under its bumped heading.
 - ~~Ajouter une option pour désactiver la tabulation des joueurs hors ligne~~ ✅ Already existed (config: `enable-offline-player-names`), default changed to `false` in 1.3.4.0
 - ~~Ajouter un placeholder pour transformed les caractères en lettre spécial~~ ✅ Done in 1.3.4.0
 
+# 1.3.7.0
+
+## GUI title icons — Unicode emoji for all inventories
+
+Added fitting Unicode icons to all 31 GUI inventory titles for better visual identification:
+
+| Icon | GUI |
+|------|-----|
+| 📦 | EnderChest (+ overview, config title/info/page) |
+| 💎 | Item Stash |
+| 🔨 | Crafting Table |
+| 🎁 | Kits |
+| 📂 | Kit Categories |
+| ⛏ | Tools Category |
+| ⚔ | Combat Kits |
+| 👁 | Kit Preview |
+| 🗄 | Vault (+ admin) |
+| ⚙ | Vault Configuration |
+| 🌐 | Player Warps |
+| 🗳 | Vote |
+| 💰 | Baltop |
+| ✅ | Confirm Pay |
+| 🏠 | Homes (+ donut layout) |
+| 🌍 | Public Homes |
+| 🗑 | Home Delete |
+| 🔮 | Warps |
+| ✉ | Mailbox (+ admin) |
+| 📜 | Rules |
+| ⚖ | Sanction (+ sanctions list) |
+| 📋 | Sanction History |
+| 🤝 | Confirm Teleport Request (+ here variant) |
+
+All titles now follow the pattern: `#3f3f3f<icon> <small-caps text>`
+
 # 1.3.6.0
 
 ## UI/UX polish — messages + GUI
