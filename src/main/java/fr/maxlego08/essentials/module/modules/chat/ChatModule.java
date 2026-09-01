@@ -82,6 +82,12 @@ public class ChatModule extends ZModule {
     private record RaidEntry(java.util.UUID playerId, String normalized, long at) {
     }
     private final ExpiringCache<UUID, List<ChatMessageDTO>> chatMessagesCache = new ExpiringCache<>(1000 * 60);
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private dev.yanianz.essentials.network.NetworkManager networkManager;
+
+    @fr.maxlego08.essentials.api.configuration.NonLoadable
+    private static boolean deleteChatListenerRegistered = false;
     private final Pattern urlPattern = Pattern.compile("(https?://[\\w-\\.]+(\\:[0-9]+)?(/[\\w-./?%&=~+#]*)?)", Pattern.CASE_INSENSITIVE);
     private final List<ChatCooldown> chatCooldowns = new ArrayList<>();
     private final List<ChatFormat> chatFormats = new ArrayList<>();
@@ -148,6 +154,14 @@ public class ChatModule extends ZModule {
     @Override
     public void loadConfiguration() {
         super.loadConfiguration();
+
+        if (this.networkManager == null) {
+            try {
+                this.networkManager = new dev.yanianz.essentials.network.NetworkManager((fr.maxlego08.essentials.ZEssentialsPlugin) this.plugin);
+                this.networkManager.register();
+                ensureDeleteChatListener();
+            } catch (Exception ignored) {}
+        }
 
         var lpcConfig = getConfiguration();
         this.prefixPlaceholder = lpcConfig.getString("lpc.prefix-placeholder", "%luckperms_prefix%");
@@ -705,7 +719,53 @@ public class ChatModule extends ZModule {
             this.chatMessagesCache.clear(targetUuid);
             message(sender, Message.CHAT_MESSAGE_DELETED, "%count%", String.valueOf(removed), "%player%", targetName);
             sendChatHistory(sender, targetUuid, targetName, page);
+
+            broadcastChatDeletion(dto, targetName);
         });
+    }
+
+    /**
+     * Broadcasts the deleted ChatMessageDTO to all other servers via the
+     * zessentials:relay channel so they can clear their cache, delete the
+     * message locally, and notify staff.
+     */
+    private void broadcastChatDeletion(ChatMessageDTO dto, String targetName) {
+        if (this.networkManager == null || !this.networkManager.isAvailable()) return;
+        try {
+            String payload = dto.unique_id() + "|" + targetName + "|" + dto.content() + "|" + dto.created_at().getTime();
+            this.networkManager.sendToServer("deletechat", payload);
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * Registers the incoming relay listener for cross-server chat deletion.
+     * Clears the local cache, deletes from storage (idempotent), and notifies
+     * online staff that a message was deleted on another server.
+     */
+    private void ensureDeleteChatListener() {
+        if (deleteChatListenerRegistered || this.networkManager == null) return;
+        this.networkManager.registerListener("deletechat", data -> {
+            String[] parts = data.split("\\|", 4);
+            if (parts.length < 4) return;
+            try {
+                UUID targetUuid = UUID.fromString(parts[0]);
+                String targetName = parts[1];
+                String content = parts[2];
+                long createdAt = Long.parseLong(parts[3]);
+
+                this.chatMessagesCache.clear(targetUuid);
+                this.plugin.getScheduler().runAsync(w -> {
+                    this.plugin.getStorageManager().getStorage().deleteChatMessage(targetUuid, content);
+                    ChatMessageDTO dto = new ChatMessageDTO(targetUuid, content, new java.util.Date(createdAt));
+                    for (Player staff : Bukkit.getOnlinePlayers()) {
+                        if (staff.hasPermission("essentials.chat.moderator")) {
+                            message(staff, Message.CHAT_MESSAGE_DELETED, "%count%", "1", "%player%", targetName);
+                        }
+                    }
+                });
+            } catch (Exception ignored) {}
+        });
+        deleteChatListenerRegistered = true;
     }
 
     private String plain(String legacy) {

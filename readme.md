@@ -18,7 +18,7 @@ Sorted by priority:
 - [x] Velocity-native proxy plugin (:ProxyVelocity module, zessentials:relay channel)
 - [x] Disguise: per-mob metadata polish (baby variants, villager professions) and bundled spawn packets to remove viewer flicker on refresh — LibsDisguises-inspired FlagWatcher hierarchy with MetaIndex constants
 - [x] Craft/enderchest zMenu GUIs: Hypixel-style bottom row (craft button, filler, close/back), stash withdraw-all button
-- [ ] Global chat: message deletion sync across servers via the proxy relay
+- [x] Global chat: message deletion sync across servers via the proxy relay — full ChatMessageDTO broadcast on deletion, cache clear + storage delete + staff notify on receive
 
 ## Fixes
 - [x] Compile against paper-api 26.2 with adventure 5 compatibility (ClickEvent payload/action)

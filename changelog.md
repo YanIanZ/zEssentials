@@ -15,6 +15,15 @@ Every change lands in this changelog immediately under its bumped heading.
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
+# 1.3.2.0
+
+## Global chat deletion sync
+
+- **Cross-server message deletion** — when a staff member deletes a chat message via `/chathistory <player> delete <index>`, the full `ChatMessageDTO` (UUID, content, timestamp) is broadcast to all other servers via the `zessentials:relay` channel (`deletechat` sub-channel)
+- **Receive handler** — on receipt, the receiving server clears its `chatMessagesCache` for the target UUID, deletes the message from local storage (idempotent for shared databases), and notifies all online moderators with `CHAT_MESSAGE_DELETED`
+- **Wire format** — `zessentials:deletechat` payload: `uuid|targetName|content|createdAtMillis`
+- **NetworkManager** wired into `ChatModule` (init + listener registration in `loadConfiguration`)
+
 # 1.3.1.0
 
 ## Disguise metadata polish — LibsDisguises-inspired
