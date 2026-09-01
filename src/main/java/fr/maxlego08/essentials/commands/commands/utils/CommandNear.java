@@ -22,11 +22,23 @@ public class CommandNear extends VCommand {
         this.setPermission(Permission.ESSENTIALS_NEAR);
         this.setDescription(Message.DESCRIPTION_NEAR);
         this.onlyPlayers();
-        this.addOptionalArg("radius", (s,a) -> java.util.List.of("10", "50", "100", "200"));
+        this.addOptionalArg("player|radius", (s,a) -> {
+            java.util.List<String> out = new java.util.ArrayList<>(java.util.List.of("10", "50", "100", "200"));
+            out.addAll(plugin.getEssentialsServer().getVisiblePlayerNames(s));
+            return out;
+        });
     }
 
     @Override
     protected CommandResultType perform(EssentialsPlugin plugin) {
+
+        // Check if first arg is a player name (specific target mode)
+        if (this.args.length > 0) {
+            Player target = plugin.getServer().getPlayerExact(this.argAsString(0));
+            if (target != null && target != this.player) {
+                return showSpecificTarget(target);
+            }
+        }
 
         // Optional radius argument overrides the configured distance
         double distance = plugin.getConfiguration().getNearDistance(this.player);
@@ -64,6 +76,16 @@ public class CommandNear extends VCommand {
             message(sender, Message.COMMAND_NEAR_PLAYER, "%players%", playersInfo.toString());
         }
 
+        return CommandResultType.SUCCESS;
+    }
+
+    private CommandResultType showSpecificTarget(Player target) {
+        double dist = target.getLocation().distance(this.player.getLocation());
+        String direction = getDirection(this.player, target);
+        message(sender, Message.COMMAND_NEAR_INFO,
+                "%player%", target.getName(),
+                "%distance%", DISTANCE_FORMAT.format(dist),
+                "%direction%", direction);
         return CommandResultType.SUCCESS;
     }
 

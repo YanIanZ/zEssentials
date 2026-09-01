@@ -15,6 +15,22 @@ Every change lands in this changelog immediately under its bumped heading.
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
+# 1.3.3.0
+
+## Messages & translations upgrade
+
+- **6 new message keys** — disguise baby/adult/profession/size feedback, villager type, stash withdraw-all success + empty
+- **160 missing translation keys** filled in all 6 language files (fr/de/es/it/nl/zh) — 960 total new translations across all languages, preserving format tokens (`<success>`, `<error>`, `%player%`, etc.)
+- All 7 message files now have 1029 keys (100% parity)
+
+## Small features
+
+- **Disguise feedback** — `/disguise mob ZOMBIE baby`, `/disguise mob VILLAGER LIBRARIAN`, `/disguise mob SLIME 3` now send user-facing success/error messages instead of silently swallowing invalid args
+- **Stash withdraw-all feedback** — clicking the withdraw-all button now sends a success message with item count, or "stash empty" if nothing to withdraw; added `withdraw-all-button`/`text`/`lore` config keys to `modules/stash/config.yml`
+- **Command aliases** — `craft`→`wb`/`workbench`, `enchanting`→`etable`/`enchanttable`, `heal`→`healme`, `anvil`→`av`
+- **`/eat <player>`** — target argument (staff permission `essentials.eat.other`), `/eat *` for all players (permission `essentials.eat.all`), mirrors the `/feed` pattern
+- **`/near <player>`** — specific target mode: shows distance + compass direction to one player (uses existing `getDirection` helper)
+
 # 1.3.2.0
 
 ## Global chat deletion sync

@@ -100,15 +100,15 @@ public class CommandLoader {
         register("flyspeed", CommandFlySpeed.class, "fspeed");
         register("god", CommandGod.class);
         register("vanish", CommandVanish.class, "v");
-        register("heal", CommandHeal.class);
+        register("heal", CommandHeal.class, "healme");
         register("lightning", CommandLightning.class, "strike");
         register("more", CommandMore.class);
         register("worldtp", CommandTeleportWorld.class, "wtp");
         register("trash", CommandTrash.class, "poubelle");
         register("condense", CommandCondense.class);
         register("feed", CommandFeed.class, "eat");
-        register("craft", CommandCraft.class);
-        register("enchanting", CommandEnchanting.class);
+        register("craft", CommandCraft.class, "wb", "workbench");
+        register("enchanting", CommandEnchanting.class, "etable", "enchanttable");
         register("invsee", CommandInvsee.class);
         register("clearinventory", ClearInventoryCommand.class, "clear", "ci");
         register("afk", CommandAfk.class);
@@ -116,7 +116,7 @@ public class CommandLoader {
         register("compactall", CommandCompactAll.class, "blocksall", "condenseall");
         register("hat", CommandHat.class);
         register("fly", CommandFly.class);
-        register("anvil", CommandAnvil.class);
+        register("anvil", CommandAnvil.class, "av");
         register("cartographytable", CommandCartographyTable.class);
         register("grindstone", CommandGrindStone.class);
         register("loom", CommandLoom.class);

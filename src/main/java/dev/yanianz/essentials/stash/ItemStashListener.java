@@ -77,17 +77,30 @@ public class ItemStashListener implements Listener {
 
     private void withdrawAll(Player player, ItemStashHolder holder) {
         ItemStashData data = holder.getData();
+        int totalWithdrawn = 0;
         for (int page = 0; page < data.getPages(); page++) {
             List<ItemStack> contents = data.getPageContents(page);
             for (int slot = 0; slot < contents.size(); slot++) {
                 ItemStack item = contents.get(slot);
                 if (item == null) continue;
+                int amount = item.getAmount();
                 Map<Integer, ItemStack> overflow = player.getInventory().addItem(item);
                 for (ItemStack drop : overflow.values()) {
                     player.getWorld().dropItemNaturally(player.getLocation(), drop);
                 }
                 data.setContent(page, slot, null);
+                totalWithdrawn += amount;
             }
+        }
+        if (totalWithdrawn == 0) {
+            String msg = fr.maxlego08.essentials.api.messages.Message.STASH_EMPTY.getMessageAsString();
+            player.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                    .deserialize(dev.yanianz.essentials.util.ColorUtil.sections(msg)));
+        } else {
+            String msg = fr.maxlego08.essentials.api.messages.Message.STASH_WITHDRAW_ALL_SUCCESS.getMessageAsString()
+                    .replace("%count%", String.valueOf(totalWithdrawn));
+            player.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection()
+                    .deserialize(dev.yanianz.essentials.util.ColorUtil.sections(msg)));
         }
         plugin.getScheduler().runNextTick(wrappedTask -> ItemStashGui.switchPage(
                 plugin, player, holder, Math.min(holder.getCurrentPage(), holder.getPages() - 1)));

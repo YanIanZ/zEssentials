@@ -269,7 +269,10 @@ public class CommandDisguise extends VCommand {
         if (extraArgs != null && data.getWatcher() != null) {
             for (String arg : extraArgs) {
                 if (arg == null) continue;
-                applyWatcherArg(data.getWatcher(), mobType, arg.toLowerCase());
+                String feedback = applyWatcherArg(data.getWatcher(), mobType, arg.toLowerCase());
+                if (feedback != null) {
+                    message(sender, fr.maxlego08.essentials.api.messages.Message.valueOf(feedback));
+                }
             }
         }
 
@@ -283,20 +286,24 @@ public class CommandDisguise extends VCommand {
         }
     }
 
-    private void applyWatcherArg(dev.yanianz.essentials.disguise.watcher.FlagWatcher watcher, String mobType, String arg) {
+    private String applyWatcherArg(dev.yanianz.essentials.disguise.watcher.FlagWatcher watcher, String mobType, String arg) {
         try {
             // Baby variant: "baby" or "adult"
             if (arg.equals("baby")) {
                 if (watcher instanceof dev.yanianz.essentials.disguise.watcher.ZombieWatcher zw) {
                     zw.setBaby(true);
+                    return "DISGUISE_BABY_SET";
                 } else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.AgeableWatcher aw) {
                     aw.setBaby(true);
+                    return "DISGUISE_BABY_SET";
                 }
             } else if (arg.equals("adult")) {
                 if (watcher instanceof dev.yanianz.essentials.disguise.watcher.ZombieWatcher zw) {
                     zw.setBaby(false);
+                    return "DISGUISE_ADULT_SET";
                 } else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.AgeableWatcher aw) {
                     aw.setBaby(false);
+                    return "DISGUISE_ADULT_SET";
                 }
             }
             // Villager profession: FARMER, LIBRARIAN, CLERIC, WEAPONSMITH, FLETCHER, LEATHERWORKER, MASON, NITWIT, ARMORER, BUTCHER, CARTOGRAPHER, SHEPHERD
@@ -304,21 +311,29 @@ public class CommandDisguise extends VCommand {
                 try {
                     org.bukkit.entity.Villager.Profession prof = org.bukkit.entity.Villager.Profession.valueOf(arg.toUpperCase());
                     vw.setProfession(prof.ordinal());
+                    return "DISGUISE_PROFESSION_SET";
                 } catch (IllegalArgumentException ignored) {
                     // Try villager type: DESERT, JUNGLE, PLAINS, SAVANNA, SNOW, SWAMP, TAIGA
                     try {
                         org.bukkit.entity.Villager.Type type = org.bukkit.entity.Villager.Type.valueOf(arg.toUpperCase());
                         vw.setType(type.ordinal());
-                    } catch (IllegalArgumentException ignored2) {}
+                        return "DISGUISE_VILLAGER_TYPE_SET";
+                    } catch (IllegalArgumentException ignored2) {
+                        return "DISGUISE_PROFESSION_INVALID";
+                    }
                 }
             }
             // Slime size: numeric arg for SLIME/MAGMA_CUBE
             else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.SlimeWatcher sw) {
                 try {
                     sw.setSize(Integer.parseInt(arg));
-                } catch (NumberFormatException ignored) {}
+                    return "DISGUISE_SIZE_SET";
+                } catch (NumberFormatException ignored) {
+                    return "DISGUISE_SIZE_INVALID";
+                }
             }
         } catch (Exception ignored) {}
+        return null;
     }
 
     private void fetchAndApplyDisguise(NicknamesModule module, Player target, String playerName, String disguiseName, boolean self) {

@@ -230,6 +230,8 @@ public enum Permission {
     ESSENTIALS_REPORT_VIEW("View and resolve player reports"),
     ESSENTIALS_CHATCOLOR_USE("Customize your chat color and tag"),
     ESSENTIALS_EAT("Fill hunger and saturation instantly"),
+    ESSENTIALS_EAT_OTHER("Allows to eat another player"),
+    ESSENTIALS_EAT_ALL("Allows to eat all players on the server"),
     ESSENTIALS_XYZ("Copy your coordinates to the clipboard"),
     ESSENTIALS_TP_TOGGLE_OTHER("Toggle receiving teleport requests for other players"),
     ESSENTIALS_TPA_HERE_TOGGLE("Toggle receiving tpahere requests"),

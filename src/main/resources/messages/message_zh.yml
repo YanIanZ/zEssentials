@@ -70,6 +70,7 @@ command-god-enable: '&7上帝模式 <success>启用 &7给 &f%player%<success>。
 command-god-disable: '&7上帝模式 <error>禁用 &7给 &f%player%<success>。'
 command-vanish-enable: '&7隐身模式 <success>启用 &7给 &f%player%<success>。'
 command-vanish-disable: '&7隐身模式 <error>禁用 &7给 &f%player%<success>。'
+command-vanish-toggled-other: '&7你已为 &f%player%<success> &7切换了隐身 (他现在是 &f%state%&7)。'
 command-night-vision-enable: '&7夜视 <success>启用 &7给 &f%player%<success>。'
 command-night-vision-disable: '&7夜视 <error>禁用 &7给 &f%player%<success>。'
 command-ext-sender: "&7你已为玩家 &f%player%&7 扑灭了火焰。"
@@ -213,6 +214,8 @@ command-tpa-all-empty: '<error>没有玩家可以接收您的传送请求。'
 
 command-screen-not-found: '<error>界面 &f%screen% <error>不存在。'
 message-screen-condition: '<error>你无法在这里打开此界面。'
+description-terms: 接受或管理服务器服务条款
+command-terms-reset: '<success>已重置 &f%player% <success>的服务条款接受状态。'
 
 
 command-tpa-error-offline: <error>无法找到玩家，可能已离线。
@@ -325,6 +328,7 @@ description-trash: 打开垃圾桶
 description-feed: 喂饱一名玩家
 description-afk: 切换挂机状态
 description-craft: 打开工作台
+description-quickcraft: 从合成网格快速合成物品
 description-enchanting: 打开附魔台
 description-invsee: 打开玩家的背包
 description-compact: "将材料压缩成方块，别名：/blocks, /condense"
@@ -386,6 +390,13 @@ description-chat-broadcast: 广播一条消息
 description-message: 发送私信给一名玩家
 description-reply: 回复私信
 description-message-toggle: 切换私信
+description-chat-dnd: 切换聊天提及的免打扰模式
+command-chat-dnd-enable: '<success>免打扰已开启&7,你将不会收到提及通知。'
+command-chat-dnd-disable: '<success>免打扰已关闭&7,提及通知已恢复。'
+description-chat-slowmode: 在每条聊天消息之间设置慢速模式
+command-chat-slowmode-set: '<success>聊天慢速模式已设置为 &f%seconds%s<success>。'
+command-chat-slowmode-off: '<success>聊天慢速模式已关闭。'
+command-chat-slowmode-wait: '<error>慢速模式生效中&7,请等待 &f%cooldown%<error> 后再发言。'
 description-socialspy: 显示玩家的私信
 description-furnace: 熔炼手中的所有物品
 description-skull: 获取一名玩家的头颅
@@ -415,6 +426,14 @@ description-cooldown: 显示玩家的冷却时间
 description-cooldown-delete: 删除冷却时间
 description-cooldown-create: 创建冷却时间
 description-item-name: 更改物品名称
+description-item-glow: 切换物品的附魔光效
+description-item-unbreakable: 切换物品的不可破坏标志
+description-item-model-data: 设置物品的自定义模型数据
+description-condense: 将散落物品压缩成方块
+description-homes-gui: 打开家界面
+description-kits-gui: 打开礼包界面
+description-warps-gui: 打开传送点选择界面
+description-baltop-gui: 打开余额排行榜界面
 description-item-lore: 显示其子命令
 description-item-lore-set: 定义一个行的传说
 description-item-lore-add: 添加一行到传说
@@ -477,6 +496,10 @@ description-vote-remove: 从一名玩家移除票数
 description-enchant: 为物品添加附魔
 description-night-vision: 启用或禁用夜视
 description-sudo: 强制一名玩家执行命令
+description-worldedit: 管理玩家的 worldedit 功能
+description-essentials: zEssentials 主命令
+description-essentials-convert: 从其他 essentials 插件转换玩家数据
+description-vault: 打开你的私人金库
 description-worldedit-give: 给予一名玩家WorldEdit物品
 description-worldedit-set: 将您选择的所有方块设置为特定方块
 description-worldedit-walls: 将您选择的所有方块设置为墙壁
@@ -756,6 +779,7 @@ message-warn:
 - '&e您刚刚被 &f%player% &e<u>警告</u>。'
 - '&f原因&8: #82d1ff%reason%'
 - ''
+description-un-freeze: 解冻被冻结的玩家
 
 
 command-freeze-success: '&7你刚刚冻结了玩家 &f%player%&7。'
@@ -773,6 +797,97 @@ chat-caps: <error>你不需要大喊大叫来交谈！
 chat-flood: <error>你不能这样说话。
 
 chat-default-format: <白色>%displayName% <#656665>• <灰色>%message%
+chat-message-deleted: '<success>已删除 &f%player% <success>的 &f%count% <success>条消息。'
+description-chat-games: 管理聊天游戏
+chat-game-already-running: '<error>聊天游戏已在进行中或该类型已禁用。'
+description-poll: 对进行中的投票投票
+poll-invalid-usage: '<error>用法&7: /poll create <seconds> <question> | <option 1> | <option 2> ...'
+poll-create-failed: '<error>无法创建投票。'
+description-reputation: 显示你的声望分数
+description-reputation-give: 给玩家一个声望点
+reputation-score: '&f%player% &7有 &#a7ff33%score% &7点声望。'
+reputation-given: '&#a7ff33+1 &7声望给予 &f%player% &8(&7总计: &f%score%&8)'
+reputation-self: '<error>你不能给自己声望。'
+reputation-already: '<error>你最近已经给过该玩家声望了&7,请等待 &f%hours%h<error>。'
+raid-alert:
+  type: WITHOUT_PREFIX
+  message: '&#ff4d4d&l⚠ 突袭警报&#ffffff: 检测到 %amount% 条相似消息 &8«&7&o%message%&8»'
+description-warn: 向玩家发出警告
+description-warnings: 列出玩家的警告
+warnings-header: '&8&m--------&#ff4d4d &f%player% 的警告 &8(&f%count%&8) &8&m--------'
+warnings-line: ' &#ff9d4d• &7[%date%] &f%reason%'
+description-notes: 查看或管理私人员工备注
+notes-header: '&8&m--------&#00d4ff &f%player% 的备注 &8(&f%count%&8) &8&m--------'
+notes-line: ' §7[%date% §8| §f%staff%§7] §f%note%'
+note-added: '<success>已为 &f%player%<success> 添加备注。'
+notes-cleared: '<success>已删除 &f%player% <success>的 &f%count% <success>条备注。'
+description-nick: 更改你的昵称
+nick-set: '<success>&f%player% <success>的昵称现在是&f: %nickname%'
+nick-removed: '<success>&f%player% <success>的昵称已被移除。'
+nick-too-long: '<error>此昵称太长&7,最多 &f%max% <error>个字符。'
+nick-invalid-characters: '<error>此昵称包含禁止字符。'
+nick-colors-not-allowed: '<error>你不能在昵称中使用颜色。'
+nick-impersonation: '<error>你不能冒用其他玩家的名字。'
+nick-cooldown: '<error>请等待 &f%seconds%s <error>后再更改昵称。'
+nick-changed: '<success>你的昵称现在是 &f%nickname%<success>。'
+nick-invalid: '<error>无效的昵称&7: &f%error%'
+nick-usage: '<error>用法&7: &f/nick <nickname|clear> &7或 &f/nick <player> <nickname|clear>'
+nick-hypixel-set: '<success>你的昵称现在是 &f%nickname% <success>,并带有匹配的皮肤。'
+nick-set-no-skin: '<success>你的昵称现在是 &f%nickname%<success>。 &7(无法获取皮肤)'
+nick-hypixel-set-other: '<success>&f%player% <success>的昵称现在是 &f%nickname% <success>,并带有匹配的皮肤。'
+nick-randomizing: '#656665正在随机化你的身份&8...'
+nick-random-empty: '<error>随机昵称池为空。'
+nick-fetch-failed: '<error>获取 &f%player% <error>的身份失败。请稍后再试。'
+disguise-set: '<success>你现在伪装为 &f%disguise%<success>。'
+disguise-set-other: '<success>你将 &f%player% <success>伪装为 &f%disguise%<success>。'
+disguise-removed: '<success>你的伪装已被移除。'
+disguise-removed-other: '<success>&f%player% <success>的伪装已被移除。'
+disguise-not-disguised: '<error>你当前没有伪装。'
+disguise-cooldown: '<error>请等待 &f%seconds%s <error>后再进行伪装。'
+disguise-player-not-found: '<error>未找到玩家 &f%player%<error>。'
+disguise-skin-set: '<success>你的皮肤已更改。'
+disguise-skin-set-other: '<success>&f%player% <success>的皮肤已更改。'
+disguise-random: '<success>你已伪装为随机玩家&7: &f%disguise%<success>。'
+disguise-random-empty: '<error>随机伪装池为空。'
+disguise-list-header: '#656665可用的随机伪装&8:'
+disguise-list-entry: '#656665» &f%name%'
+disguise-fetching: '#656665正在从 Mojang 获取皮肤&8...'
+disguise-fetch-failed: '<error>获取 &f%player% <error>的皮肤失败。请稍后再试。'
+disguise-usage: '<error>用法&7: &f/disguise <player> &7| &f/disguise random &7| &f/disguise skin <texture> [signature] &7| &f/disguise mob <type> &7| &f/disguise off &7| &f/disguise list'
+disguise-disabled: '<error>伪装系统已禁用。'
+disguise-mob: '<success>你现在伪装为 &f%type%<success>。'
+disguise-mob-other: '<success>你将 &f%player% <success>伪装为 &f%type%<success>。'
+disguise-invalid-mob: '<error>未知的生物类型&7: &f%type%<error>。请尝试 ZOMBIE、SKELETON、CREEPER 等。'
+disguise-baby-set: '<success>伪装现在为幼年形态。'
+disguise-adult-set: '<success>伪装现在为成年形态。'
+disguise-profession-set: '<success>村民职业已设置为 &f%profession%<success>。'
+disguise-profession-invalid: '<error>未知的职业&7: &f%profession%<error>。请尝试 FARMER、LIBRARIAN、CLERIC 等。'
+disguise-size-set: '<success>史莱姆大小已设置为 &f%size%<success>。'
+disguise-size-invalid: '<error>大小无效&7: &f%size%<error>。必须是 1 到 50 之间的数字。'
+disguise-villager-type-set: '<success>村民类型已设置为 &f%type%<success>。'
+stash-withdraw-all-success: '<success>已从你的仓库取出 &f%count% <success>件物品。'
+stash-empty: '<error>你的仓库是空的。'
+realname-revealed: '#656665&f%disguise% #656665的真实姓名是 &f%realname%&7。'
+realname-not-disguised: '#656665该玩家没有伪装。'
+description-realname: 揭示伪装玩家的真实姓名
+description-disguise: 伪装成另一名玩家
+description-undisguise: 移除你的伪装
+description-report: 向员工举报玩家
+report-cooldown: '<error>请等待 &f%seconds%s <error>后再发送另一份举报。'
+report-self: '<error>你不能举报自己。'
+report-unknown-id: '<error>没有 id 为 &f%id%<error> 的举报。'
+report-target-offline: '<error>被举报的玩家已离线,传送已取消。'
+report-teleported: '<success>已传送到 &f%player%<success>。'
+report-resolved: '<success>举报 &f#%id% <success>已标记为已解决。'
+report-reopened: '<success>举报 &f#%id% <success>已重新打开。'
+report-list-header: '&8&m--------&#ff4d4d 举报 &8(&f%count%&8) &8&m--------'
+description-chatcolor: 打开聊天颜色选择
+description-tags: 打开聊天标签选择
+reply-no-target: '<error>你还没有可以回复的对象。'
+description-eat: 立即恢复饥饿值和饱和度
+command-eat-success: '<success>饥饿值已恢复&7,请慢用!'
+description-xyz: 将你的坐标复制到剪贴板
+command-xyz-copied: '<success>坐标已复制到剪贴板&7: &f%coords%'
 chat-messages-empty: '&f%player% <error>没有写任何消息。'
 chat-messages-line:
   type: WITHOUT_PREFIX
@@ -864,6 +979,10 @@ command-cooldown-create: <success>你刚刚为 &n%player%&r<success> 创建了�
 command-item-empty: <error>你手中没有物品。
 command-item-clear: <success>你清除了这个物品的名称
 command-item-set: <success>你将持有的物品重命名为 &f%name%<success>。
+command-condense-success: '<success>已压缩 &f%amount%<success> 个方块。'
+command-condense-empty: '<error>没有可压缩的物品。'
+command-trash-opened: '<success>垃圾箱已打开。点击物品以销毁它们。'
+command-near-invalid-radius: '<error>半径无效,使用默认值 (&f%default%<error>)。'
 command-item-lore-add: <success>你刚刚添加了行 &f%text%<success>。
 command-item-lore-set: <success>你刚刚将第 %line% 行设置为 &f%text%<success>。
 command-item-lore-clear: <success>你刚刚清除了物品描述。
@@ -1091,6 +1210,7 @@ description-set-first-spawn: 设置服务器的首次出生点
 description-spawn-first: 传送到首次出生点
 description-step: 显示步骤相关命令
 description-step-finish: 完成一个步骤
+description-stash: 打开你的私人仓库
 description-step-start: 开始一个步骤
 description-vault-delete-slot: 强制删除一个保管箱槽位
 description-vault-get-slot: 获取保管箱槽位内容
@@ -1187,6 +1307,41 @@ command-home-import-start: "<success>正在从 &f%source%<success> 导入家…�
 command-home-import-done: "<success>导入完成：&f%imported% <success>个已导入，&f%skipped% <success>个已跳过，&f%errors% <success>个错误。"
 command-home-import-unknown: "<error>未知的导入来源 &f%source%<error>。可用：essentialsx。"
 command-home-import-error: "<error>导入过程中发生错误，请检查控制台。"
+description-globalchat: 切换跨服全局聊天
+command-globalchat-enabled: '<success>全局聊天已开启。'
+command-globalchat-disabled: '<error>全局聊天已关闭。'
+description-friend: 管理好友
+command-friend-request-sent: '<success>已向 %player% 发送好友请求。'
+command-friend-request-received: '<success>%player% 向你发送了好友请求。'
+command-friend-already-friend: '<error>你已经与 %player% 是好友了。'
+command-friend-removed: '<success>已将 %player% 从你的好友中移除。'
+command-friend-accepted: '<success>你现在与 %player% 是好友了。'
+command-friend-accepted-notify: '<success>%player% 接受了你的好友请求。'
+command-friend-declined: '<error>已拒绝来自 %player% 的好友请求。'
+command-friend-not-online: '<error>%player% 不在线。'
+command-friend-list: '<success>你的好友: %friends%'
+description-guild: 管理你的公会
+description-guild-chat: 向你的公会发送消息
+command-guild-created: '<success>公会 &a%name%<success> 已创建。'
+command-guild-already-in: '<error>你已经在一个公会中了。'
+command-guild-usage: '<error>用法: /guild <create|disband|join|leave|info>'
+command-guild-disbanded: '<success>公会已解散。'
+command-guild-not-leader: '<error>只有会长才能解散公会。'
+command-guild-joined: '<success>已加入公会。'
+command-guild-leader-cannot-leave: '<error>会长不能离开。请改为解散公会。'
+command-guild-left: '<success>已离开公会。'
+command-guild-not-in: '<error>你不在一个公会中。'
+command-guild-info: '<success>公会: &a%name% &7(%members% 名成员)'
+description-party: 管理你的队伍
+description-party-chat: 向你的队伍发送消息
+command-party-created: '<success>队伍已创建。'
+command-party-disbanded: '<success>队伍已解散。'
+command-party-invited: '<success>%player% 加入了队伍。'
+command-party-invited-notify: '<success>%player% 邀请你加入他的队伍。'
+command-party-left: '<success>已离开队伍。'
+command-party-not-in: '<error>你不在一个队伍中。'
+command-party-already-in: '<error>你已经在一个队伍中了。'
+command-party-info: '<success>队伍队长: &a%leader% &7(%size% 名成员)'
 
 
 command-itemdb-empty: '<error>您的手中必须持有物品。'
@@ -1194,6 +1349,9 @@ command-itemdb:
 - '&7物品&8: &f%material% &8(&f%key%&8)'
 - '&7数量&8: &f%amount% &8- &7最大堆叠数&8: &f%stack%'
 command-endersee-error: '<error>无法加载 &f%player% <error>的末影箱。'
+command-enderchest-opened: '<success>你打开了你的末影箱。'
+command-endersee-opened: '<success>你打开了 &f%player%<success> 的末影箱。'
+command-endersee-readonly: '#656665你正在以只读模式查看此末影箱。'
 command-tpa-error-no-request-from-player: '<error>您没有来自 &f%player% <error>的传送请求。'
 command-tpa-accept-all-success: '<success>您已接受 &f%count% <success>个传送请求。'
 command-tpa-deny-all-success: '<success>您已拒绝 &f%count% <success>个传送请求。'
@@ -1229,6 +1387,9 @@ description-death-message: 自定义死亡消息
 description-death-message-toggle: 切换死亡消息可见性
 command-death-message-toggle-disable: '#C084FC☠ #B794F4死亡消息现已对 %player% #E9D5FF隐藏'
 command-death-message-toggle-enable: '#C084FC☠ #B794F4死亡消息现已对 %player% #E9D5FF可见'
+command-pricing-enabled: '<success>物品价格提示现已开启。'
+command-pricing-disabled: '<error>物品价格提示现已关闭。'
+description-pricing: 切换物品价格提示
 death-generic: '#C084FC☠ #E9D5FF%player% #B794F4死亡了。'
 death-by-player: '#C084FC⚔ #E9D5FF%player% #B794F4被 #E9D5FF%killer% #B794F4击杀了。'
 death-by-mob: '#C084FC☠ #E9D5FF%player% #B794F4被 #E9D5FF%killer% #B794F4杀死了。'
