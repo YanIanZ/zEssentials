@@ -15,7 +15,7 @@ public class ItemStashRepository extends Repository {
     }
     public void upsert(UUID uuid, String json) {
         upsert(table -> {
-            table.uuid("uuid", uuid);
+            table.uuid("uuid", uuid).primary();
             table.string("data_json", json);
         });
     }

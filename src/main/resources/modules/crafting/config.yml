@@ -9,7 +9,7 @@
 # Config schema version — do not edit
 config-version: 1
 
-enable: true
+enable: false
 
 # Title of the custom crafting GUI
 title: "#3f3f3f🔨 ᴄʀᴀꜰᴛɪɴɢ ᴛᴀʙʟᴇ"

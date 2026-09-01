@@ -17,7 +17,7 @@ public class NicknameRepository extends Repository {
     }
     public void upsert(UUID uuid, String nickname) {
         upsert(table -> {
-            table.uuid("uuid", uuid);
+            table.uuid("uuid", uuid).primary();
             table.string("nickname", nickname);
         });
     }

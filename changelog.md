@@ -15,6 +15,13 @@ Every change lands in this changelog immediately under its bumped heading.
 - ~~Ajouter une option pour désactiver la tabulation des joueurs hors ligne~~ ✅ Already existed (config: `enable-offline-player-names`), default changed to `false` in 1.3.4.0
 - ~~Ajouter un placeholder pour transformed les caractères en lettre spécial~~ ✅ Done in 1.3.4.0
 
+# 1.3.8.0
+
+## Bug fixes
+
+- **Fix UPSERT crash on SQLite** — all 7 new repositories (Nickname, Disguise, ChatPreference, Reputation, EnderChest, ItemStash, MaterialStash) were missing `.primary()` on the UUID column in their upsert methods, causing `IllegalStateException: UPSERT requires at least one non-auto-increment primary key or unique constraint for SQLite` when opening enderchest, using disguise/nick, saving chat preferences, or accessing stash
+- **Crafting table reverted to vanilla** — removed the CRAFTING_TABLE right-click interception from `PlayerListener`; crafting tables now open the vanilla crafting GUI; crafting module config default changed to `enable: false`
+
 # 1.3.7.0
 
 ## GUI title icons — Unicode emoji for all inventories
