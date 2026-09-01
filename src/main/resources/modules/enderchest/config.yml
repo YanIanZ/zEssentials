@@ -33,7 +33,7 @@ nav-row:
   last-button: SPECTRAL_ARROW
   last-text: "&7Last Page »"
   close-button: BARRIER
-  close-text: "&cClose"
+  close-text: "#ff4d4dClose"
   page-indicator: true
   page-indicator-text: "&fPage &e%current% &7/ &e%total%"
 
