@@ -301,16 +301,72 @@ public class NicknamesModule extends ZModule {
             if (viewer.getUniqueId().equals(player.getUniqueId())) continue;
             this.plugin.getScheduler().runAtEntity(viewer, wrappedTask -> {
                 if (!viewer.isOnline() || !player.isOnline()) return;
-                try {
-                    viewer.hidePlayer(this.plugin, player);
-                    viewer.showPlayer(this.plugin, player);
-                } catch (Exception ignored) {
-                }
+                sendDisguiseRefreshPackets(viewer, player, isDisguised(player.getUniqueId()));
             });
         }
 
         if (this.selfView) {
             this.plugin.getScheduler().runAtEntity(player, wrappedTask -> sendSelfViewPackets(player, isDisguised(player.getUniqueId())));
+        }
+    }
+
+    /**
+     * Flicker-free refresh: sends raw destroy + spawn + metadata packets via ProtocolLib
+     * instead of hidePlayer/showPlayer. Inspired by LibsDisguises' packet batching approach.
+     */
+    private void sendDisguiseRefreshPackets(Player viewer, Player target, boolean disguised) {
+        try {
+            if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) return;
+            var manager = com.comphenix.protocol.ProtocolLibrary.getProtocolManager();
+            int entityId = target.getEntityId();
+
+            // Destroy
+            var destroy = manager.createPacket(com.comphenix.protocol.PacketType.Play.Server.ENTITY_DESTROY);
+            destroy.getIntegerArrays().write(0, new int[]{entityId});
+            manager.sendServerPacket(viewer, destroy);
+
+            // Spawn (rewritten type goes through the packet listener)
+            var spawn = manager.createPacket(com.comphenix.protocol.PacketType.Play.Server.SPAWN_ENTITY);
+            spawn.getIntegers().write(0, entityId);
+            spawn.getUUIDs().write(0, target.getUniqueId());
+            spawn.getDoubles().write(0, target.getLocation().getX());
+            spawn.getDoubles().write(1, target.getLocation().getY());
+            spawn.getDoubles().write(2, target.getLocation().getZ());
+            if (disguised) {
+                DisguiseData data = getDisguise(target.getUniqueId());
+                if (data != null && data.getEntityType() != null) {
+                    org.bukkit.entity.EntityType type = org.bukkit.entity.EntityType.valueOf(data.getEntityType().toUpperCase());
+                    try {
+                        spawn.getEntityTypeModifier().write(0, type);
+                    } catch (Exception e) {
+                        spawn.getIntegers().write(1, (int) type.getTypeId());
+                    }
+                } else {
+                    try {
+                        spawn.getEntityTypeModifier().write(0, org.bukkit.entity.EntityType.PLAYER);
+                    } catch (Exception ignored) {}
+                }
+            } else {
+                try {
+                    spawn.getEntityTypeModifier().write(0, org.bukkit.entity.EntityType.PLAYER);
+                } catch (Exception ignored) {}
+            }
+            manager.sendServerPacket(viewer, spawn);
+
+            // Metadata (built from the FlagWatcher hierarchy if available)
+            if (disguised) {
+                DisguiseData data = getDisguise(target.getUniqueId());
+                if (data != null && data.getWatcher() != null) {
+                    var meta = manager.createPacket(com.comphenix.protocol.PacketType.Play.Server.ENTITY_METADATA);
+                    meta.getIntegers().write(0, entityId);
+                    try {
+                        com.comphenix.protocol.wrappers.WrappedDataWatcher watcher = data.getWatcher().buildWatcher();
+                        meta.getDataWatcherModifier().write(0, watcher);
+                        manager.sendServerPacket(viewer, meta);
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception ignored) {
         }
     }
 

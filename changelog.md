@@ -15,6 +15,18 @@ Every change lands in this changelog immediately under its bumped heading.
 - Ajouter une option pour désactiver la tabulation des joueurs hors ligne
 - Ajouter un placeholder pour transformed les caractères en lettre spécial
 
+# 1.3.1.0
+
+## Disguise metadata polish — LibsDisguises-inspired
+
+- **FlagWatcher hierarchy** — new `dev.yanianz.essentials.disguise.watcher` package with `MetaIndex`, `FlagWatcher` base class, and per-mob subclasses: `LivingWatcher`, `AgeableWatcher`, `InsentientWatcher`, `ZombieWatcher`, `VillagerWatcher`, `SlimeWatcher`, plus `MobWatcherFactory` that returns the right watcher for each `EntityType`
+- **Baby variants** — `/disguise mob ZOMBIE baby` (also HUSK, DROWNED, ZOMBIE_VILLAGER, ZOMBIFIED_PIGLIN); `AgeableWatcher` for cow/pig/sheep/etc.
+- **Villager professions** — `/disguise mob VILLAGER LIBRARIAN` sets profession; biome types (DESERT, JUNGLE, PLAINS, etc.) also supported; level configurable
+- **Slime size** — `/disguise mob SLIME 3` sets size (1-50, clamped)
+- **Mob-specific metadata** — `handleMetadata()` in `PacketMobDisguiseListener` now calls `watcher.buildWatcher()` to produce the full `WrappedDataWatcher` with both generic Entity indices (flags, name, health) AND mob-specific indices (zombie baby at 15, slime size at 16, villager data at 18, ageable age at 15)
+- **Flicker-free refresh** — `refreshDisguise()` replaced `hidePlayer`/`showPlayer` (which caused visible flicker) with raw ProtocolLib packet batching: `ENTITY_DESTROY` + `SPAWN_ENTITY` + `ENTITY_METADATA` sent per viewer in one scheduled task — eliminates the gap between destroy and respawn
+- **Fallback** — if no watcher is available, the old minimal metadata (flags + name + health) is used as fallback
+
 # 1.3.0.0
 
 ## Cross-server storage migration

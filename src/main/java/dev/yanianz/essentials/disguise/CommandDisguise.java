@@ -146,18 +146,22 @@ public class CommandDisguise extends VCommand {
                 return CommandResultType.SUCCESS;
             }
             String mobType = this.argAsString(1);
+            int extraStart = 2;
             if (this.args.length >= 3 && hasPermission(sender, Permission.ESSENTIALS_DISGUISE_OTHER)) {
                 Player other = Bukkit.getPlayerExact(this.argAsString(1));
                 if (other != null) {
                     target = other;
                     mobType = this.argAsString(2);
+                    extraStart = 3;
                 }
             }
             if (!isValidMob(module, mobType)) {
                 message(sender, Message.DISGUISE_INVALID_MOB, "%type%", mobType);
                 return CommandResultType.SUCCESS;
             }
-            applyMobDisguise(module, target, mobType);
+            String[] extraArgs = extraStart < this.args.length
+                    ? java.util.Arrays.copyOfRange(this.args, extraStart, this.args.length) : null;
+            applyMobDisguise(module, target, mobType, extraArgs);
             return CommandResultType.SUCCESS;
         }
 
@@ -196,7 +200,9 @@ public class CommandDisguise extends VCommand {
                 message(sender, Message.DISGUISE_COOLDOWN, "%seconds%", String.valueOf(module.getDisguiseRemainingCooldown(target.getUniqueId())));
                 return CommandResultType.SUCCESS;
             }
-            applyMobDisguise(module, target, firstArg);
+            String[] extraArgs = this.args.length > 1
+                    ? java.util.Arrays.copyOfRange(this.args, 1, this.args.length) : null;
+            applyMobDisguise(module, target, firstArg, extraArgs);
             return CommandResultType.SUCCESS;
         }
 
@@ -253,11 +259,20 @@ public class CommandDisguise extends VCommand {
         return module.getAllowedMobs().isEmpty() || module.getAllowedMobs().contains(mobType.toUpperCase());
     }
 
-    private void applyMobDisguise(NicknamesModule module, Player target, String mobType) {
+    private void applyMobDisguise(NicknamesModule module, Player target, String mobType, String[] extraArgs) {
         DisguiseData data = new DisguiseData();
         data.setEntityType(mobType);
         data.setDisguiseName(null);
         data.setTextureValue(null);
+
+        // Parse extra args for baby/profession/size (LibsDisguises-inspired)
+        if (extraArgs != null && data.getWatcher() != null) {
+            for (String arg : extraArgs) {
+                if (arg == null) continue;
+                applyWatcherArg(data.getWatcher(), mobType, arg.toLowerCase());
+            }
+        }
+
         module.applyDisguise(target, data);
         if (target.equals(this.player)) {
             module.markDisguiseChanged(target.getUniqueId());
@@ -266,6 +281,44 @@ public class CommandDisguise extends VCommand {
             message(sender, Message.DISGUISE_MOB_OTHER, "%player%", target.getName(), "%type%", mobType);
             message(target, Message.DISGUISE_MOB, "%type%", mobType);
         }
+    }
+
+    private void applyWatcherArg(dev.yanianz.essentials.disguise.watcher.FlagWatcher watcher, String mobType, String arg) {
+        try {
+            // Baby variant: "baby" or "adult"
+            if (arg.equals("baby")) {
+                if (watcher instanceof dev.yanianz.essentials.disguise.watcher.ZombieWatcher zw) {
+                    zw.setBaby(true);
+                } else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.AgeableWatcher aw) {
+                    aw.setBaby(true);
+                }
+            } else if (arg.equals("adult")) {
+                if (watcher instanceof dev.yanianz.essentials.disguise.watcher.ZombieWatcher zw) {
+                    zw.setBaby(false);
+                } else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.AgeableWatcher aw) {
+                    aw.setBaby(false);
+                }
+            }
+            // Villager profession: FARMER, LIBRARIAN, CLERIC, WEAPONSMITH, FLETCHER, LEATHERWORKER, MASON, NITWIT, ARMORER, BUTCHER, CARTOGRAPHER, SHEPHERD
+            else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.VillagerWatcher vw) {
+                try {
+                    org.bukkit.entity.Villager.Profession prof = org.bukkit.entity.Villager.Profession.valueOf(arg.toUpperCase());
+                    vw.setProfession(prof.ordinal());
+                } catch (IllegalArgumentException ignored) {
+                    // Try villager type: DESERT, JUNGLE, PLAINS, SAVANNA, SNOW, SWAMP, TAIGA
+                    try {
+                        org.bukkit.entity.Villager.Type type = org.bukkit.entity.Villager.Type.valueOf(arg.toUpperCase());
+                        vw.setType(type.ordinal());
+                    } catch (IllegalArgumentException ignored2) {}
+                }
+            }
+            // Slime size: numeric arg for SLIME/MAGMA_CUBE
+            else if (watcher instanceof dev.yanianz.essentials.disguise.watcher.SlimeWatcher sw) {
+                try {
+                    sw.setSize(Integer.parseInt(arg));
+                } catch (NumberFormatException ignored) {}
+            }
+        } catch (Exception ignored) {}
     }
 
     private void fetchAndApplyDisguise(NicknamesModule module, Player target, String playerName, String disguiseName, boolean self) {

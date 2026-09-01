@@ -159,6 +159,31 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
         EntityType type = mobType(disguiseData);
         if (type == null || !type.isAlive()) return;
 
+        // Try to use the FlagWatcher hierarchy (LibsDisguises-inspired)
+        WrappedDataWatcher watcher = buildWatcherFromDisguise(disguiseData);
+        if (watcher == null) {
+            watcher = buildFallbackWatcher(disguiseData);
+        }
+
+        try {
+            event.getPacket().getDataWatcherModifier().write(0, watcher);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private WrappedDataWatcher buildWatcherFromDisguise(Object disguiseData) {
+        try {
+            Object watcher = disguiseData.getClass().getMethod("getWatcher").invoke(disguiseData);
+            if (watcher == null) return null;
+            Object built = watcher.getClass().getMethod("buildWatcher").invoke(watcher);
+            if (built instanceof WrappedDataWatcher w) return w;
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private WrappedDataWatcher buildFallbackWatcher(Object disguiseData) {
         WrappedDataWatcher watcher = new WrappedDataWatcher();
         try {
             watcher.setObject(0, (byte) 0);
@@ -182,10 +207,7 @@ public class PacketMobDisguiseListener extends PacketAdapter implements PacketRe
         } catch (Exception ignored) {
         }
 
-        try {
-            event.getPacket().getDataWatcherModifier().write(0, watcher);
-        } catch (Exception ignored) {
-        }
+        return watcher;
     }
 
     private void handleEquipment(PacketEvent event, Module module, ModuleState state) {
